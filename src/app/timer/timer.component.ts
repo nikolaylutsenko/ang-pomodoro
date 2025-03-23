@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { TimerSettingsService } from '../services/timer-settings.service';
 import { TimerHistoryService } from '../services/timer-history.service';
 import { TimerHistoryComponent } from './timer-history.component';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-timer',
@@ -24,10 +25,13 @@ export class TimerComponent implements OnInit, OnDestroy {
   settings: any;
   private timerStartTime: Date | null = null;
   taskDescription: string = '';
+  private workIntervalCount: number = 0;
+  private readonly workIntervalsBeforeLongBreak: number = 4; // Adjust as needed
 
   constructor(
     private timerSettingsService: TimerSettingsService,
-    private timerHistoryService: TimerHistoryService
+    private timerHistoryService: TimerHistoryService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -41,6 +45,13 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (savedTask) {
       this.taskDescription = savedTask;
     }
+
+    // Listen for notification action events
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.action === 'startNextInterval') {
+        this.toggleTimer();
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -76,9 +87,8 @@ export class TimerComponent implements OnInit, OnDestroy {
           this.currentTimeInSeconds--;
           this.updateDisplay();
         } else {
-          this.addHistoryEntry(true);
-          this.stopTimer();
-          this.playNotification();
+          clearInterval(this.timer);
+          this.onTimerEnd();
         }
       }, 1000);
     }
@@ -146,9 +156,33 @@ export class TimerComponent implements OnInit, OnDestroy {
         startTime: this.timerStartTime,
         type: this.currentMode,
         isSuccessful,
-        taskDescription: this.taskDescription
+        taskDescription: this.currentMode === 'work' ? this.taskDescription : '' // Only add task description for work intervals
       });
       this.timerStartTime = null;
     }
   }
-} 
+
+  onTimerEnd() {
+    this.addHistoryEntry(true); // Mark the entry as successful
+    this.notificationService.showNotification('Pomodoro Timer', {
+      body: 'Time is up!',
+      icon: 'assets/icons/timer-icon.png', // Optional: Add an icon for the notification
+    }).then(notification => {
+      notification.addEventListener('click', () => {
+        this.toggleTimer();
+      });
+    });
+
+    if (this.currentMode === 'work') {
+      this.workIntervalCount++;
+      if (this.workIntervalCount >= this.workIntervalsBeforeLongBreak) {
+        this.setMode('longBreak');
+        this.workIntervalCount = 0; // Reset the counter after a long break
+      } else {
+        this.setMode('shortBreak');
+      }
+    } else {
+      this.setMode('work');
+    }
+  }
+}
