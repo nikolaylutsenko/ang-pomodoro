@@ -1,0 +1,44 @@
+<div class="timer-container card">
+  <div class="mode-selector">
+    <button 
+      class="mode-btn" 
+      [class.active]="currentMode === TimerMode.WORK"
+      (click)="setTimeForMode(TimerMode.WORK)" 
+      [disabled]="isRunning"
+    >
+      Work
+    </button>
+    <button 
+      class="mode-btn" 
+      [class.active]="currentMode === TimerMode.SHORT_BREAK"
+      (click)="setTimeForMode(TimerMode.SHORT_BREAK)" 
+      [disabled]="isRunning"
+    >
+      Short Break
+    </button>
+    <button 
+      class="mode-btn" 
+      [class.active]="currentMode === TimerMode.LONG_BREAK"
+      (click)="setTimeForMode(TimerMode.LONG_BREAK)" 
+      [disabled]="isRunning"
+    >
+      Long Break
+    </button>
+  </div>
+
+  <div class="timer-display">
+    <span class="time">{{ formatTime(minutes) }}:{{ formatTime(seconds) }}</span>
+  </div>
+
+  <div class="timer-controls">
+    <button class="btn" (click)="startTimer()" [disabled]="isRunning">
+      Start
+    </button>
+    <button class="btn" (click)="stopTimer()" [disabled]="!isRunning">
+      Stop
+    </button>
+    <button class="btn" (click)="resetTimer()" [disabled]="isRunning">
+      Reset
+    </button>
+  </div>
+</div>

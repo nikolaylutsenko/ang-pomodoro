@@ -1,0 +1,92 @@
+.timer-container {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  .mode-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: rgba(255, 107, 107, 0.3);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.timer-display {
+  margin: 2rem 0;
+  
+  .time {
+    font-size: 4rem;
+    font-weight: 300;
+    font-family: 'Roboto Mono', monospace;
+    color: #ffffff;
+  }
+}
+
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+
+  .btn {
+    min-width: 100px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .mode-selector {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 1rem;
+
+    .mode-btn {
+      width: 100%;
+    }
+  }
+
+  .timer-display .time {
+    font-size: 3rem;
+  }
+
+  .timer-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
