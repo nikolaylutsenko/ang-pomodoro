@@ -86,9 +86,16 @@ export class TimerComponent implements OnInit, OnDestroy {
         if (this.currentTimeInSeconds > 0) {
           this.currentTimeInSeconds--;
           this.updateDisplay();
-        } else {
+        }
+        else if (this.currentTimeInSeconds <= 0)
+        {
           clearInterval(this.timer);
           this.onTimerEnd();
+        }
+        else {
+          this.addHistoryEntry(true);
+          this.stopTimer();
+          this.playNotification();
         }
       }, 1000);
     }
@@ -156,14 +163,13 @@ export class TimerComponent implements OnInit, OnDestroy {
         startTime: this.timerStartTime,
         type: this.currentMode,
         isSuccessful,
-        taskDescription: this.currentMode === 'work' ? this.taskDescription : '' // Only add task description for work intervals
+        taskDescription: this.taskDescription
       });
       this.timerStartTime = null;
     }
   }
 
   onTimerEnd() {
-    this.addHistoryEntry(true); // Mark the entry as successful
     this.notificationService.showNotification('Pomodoro Timer', {
       body: 'Time is up!',
       icon: 'assets/icons/timer-icon.png', // Optional: Add an icon for the notification
