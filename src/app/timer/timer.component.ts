@@ -86,16 +86,9 @@ export class TimerComponent implements OnInit, OnDestroy {
         if (this.currentTimeInSeconds > 0) {
           this.currentTimeInSeconds--;
           this.updateDisplay();
-        }
-        else if (this.currentTimeInSeconds <= 0)
-        {
+        } else {
           clearInterval(this.timer);
           this.onTimerEnd();
-        }
-        else {
-          this.addHistoryEntry(true);
-          this.stopTimer();
-          this.playNotification();
         }
       }, 1000);
     }
@@ -170,17 +163,13 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   onTimerEnd() {
-    this.notificationService.showNotification('Pomodoro Timer', {
-      body: 'Time is up!',
-      icon: 'assets/icons/timer-icon.png', // Optional: Add an icon for the notification
-    }).then(notification => {
-      notification.addEventListener('click', () => {
-        this.toggleTimer();
-      });
-    });
+    let remainingWorkIntervals = parseInt(localStorage.getItem('remainingWorkIntervals') || this.workIntervalsBeforeLongBreak.toString(), 10);
 
     if (this.currentMode === 'work') {
       this.workIntervalCount++;
+      remainingWorkIntervals--; // Decrement remaining work intervals only after a successful work interval
+      localStorage.setItem('remainingWorkIntervals', remainingWorkIntervals.toString());
+      
       if (this.workIntervalCount >= this.workIntervalsBeforeLongBreak) {
         this.setMode('longBreak');
         this.workIntervalCount = 0; // Reset the counter after a long break
@@ -190,5 +179,16 @@ export class TimerComponent implements OnInit, OnDestroy {
     } else {
       this.setMode('work');
     }
+
+    this.notificationService.showNotification('Pomodoro Timer', {
+      body: `Time is up! Take a break. ${remainingWorkIntervals} work intervals until the next long break.`,
+      icon: 'assets/icons/timer-icon.png', // Optional: Add an icon for the notification
+    }).then(notification => {
+      notification.addEventListener('click', () => {
+        this.toggleTimer();
+      });
+    }).catch(error => {
+      console.log('Notification error:', error);
+    });
   }
 }
