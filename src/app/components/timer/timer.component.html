@@ -1,4 +1,11 @@
 <div class="timer-container card">
+  <div class="timer-display">
+    <span class="time">{{ formatTime(minutes) }}:{{ formatTime(seconds) }}</span>
+  </div>
+
+  <!-- Task input area -->
+  <input type="text" class="task-input" placeholder="What are you working on?" />
+
   <div class="mode-selector">
     <button 
       class="mode-btn" 
@@ -26,19 +33,21 @@
     </button>
   </div>
 
-  <div class="timer-display">
-    <span class="time">{{ formatTime(minutes) }}:{{ formatTime(seconds) }}</span>
-  </div>
-
   <div class="timer-controls">
-    <button class="btn" (click)="startTimer()" [disabled]="isRunning">
-      Start
+    <button class="btn start-btn" (click)="startTimer()" [disabled]="isRunning">
+      <i class="fas fa-play"></i>
     </button>
-    <button class="btn" (click)="stopTimer()" [disabled]="!isRunning">
-      Stop
+    <button class="btn stop-btn" (click)="stopTimer()" [disabled]="!isRunning">
+      <i class="fas fa-square"></i>
     </button>
-    <button class="btn" (click)="resetTimer()" [disabled]="isRunning">
-      Reset
+    <button class="btn reset-btn" (click)="resetTimer()" [disabled]="isRunning">
+      <i class="fas fa-redo-alt"></i>
     </button>
+  </div>
+  
+  <!-- Bottom navigation bar -->
+  <div class="bottom-nav">
+    <span>TASK</span>
+    <span class="type-label">TYPE <span class="type-value">Work</span></span>
   </div>
 </div>

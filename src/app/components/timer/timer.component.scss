@@ -2,91 +2,273 @@
   width: 100%;
   max-width: 400px;
   text-align: center;
+  margin: 0 auto; /* Remove explicit top margin */
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto; /* Allow container to expand as needed */
+  overflow: visible; /* Prevent content from being cut off */
+  position: relative;
+  padding-bottom: 60px; /* Space for bottom nav */
 }
 
 .mode-selector {
   display: flex;
-  gap: 0.5rem;
+  width: 100%;
+  justify-content: space-between;
+  margin: 1rem 0 1.5rem 0; /* Added top margin */
+  min-height: 44px; /* Ensure minimum height for touch targets */
+  position: relative; /* For proper positioning */
+  z-index: 1; /* Ensure buttons appear above other elements */
+}
+
+.mode-btn {
+  flex: 1;
+  margin: 0 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  height: auto;
+  min-height: 42px;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
+  box-sizing: border-box;
+  overflow: visible;
+  white-space: nowrap;
 
-  .mode-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+  &:first-child {
+    margin-left: 0;
+  }
 
-    &:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.1);
-    }
+  &:last-child {
+    margin-right: 0;
+  }
 
-    &.active {
-      background: rgba(255, 107, 107, 0.2);
-      border-color: rgba(255, 107, 107, 0.3);
-      color: #fff;
-    }
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+  &.active {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.3);
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
 .timer-display {
-  margin: 2rem 0;
+  margin: 1.5rem 0;
+  width: 100%;
   
   .time {
     font-size: 4rem;
     font-weight: 300;
     font-family: 'Roboto Mono', monospace;
     color: #ffffff;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    line-height: 1.2;
   }
 }
 
 .timer-controls {
   display: flex;
-  gap: 1rem;
+  width: 100%;
   justify-content: center;
-  margin-top: 2rem;
+  margin: 1.5rem 0;
+  gap: 20px;
+}
 
-  .btn {
-    min-width: 100px;
+.btn {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%; /* Circular buttons as shown in screenshot */
+  font-size: 1.5rem;
+  touch-action: manipulation;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  &.start-btn {
+    background-color: #f1f1f1;
+  }
+  
+  &.stop-btn {
+    background-color: #ffebee;
+  }
+  
+  &.reset-btn {
+    background-color: #f1f1f1;
+    font-size: 1.2rem;
+  }
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Add styles for the task input area shown in your screenshot */
+.task-input {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  box-sizing: border-box;
+  background: transparent;
+  color: #555;
+  
+  &::placeholder {
+    color: #aaa;
+  }
+}
+
+/* Task history section styles */
+.task-history {
+  width: 100%;
+  margin-top: 1rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: visible;
+}
+
+.task-item {
+  padding: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Bottom navigation/status bar shown in screenshot */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  color: #777;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.type-label {
+  display: flex;
+  align-items: center;
+}
+
+.type-value {
+  color: green;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .timer-container {
+    padding: 0.75rem 0.5rem;
+    margin-bottom: 80px; /* Add space for the bottom navigation */
+  }
+  
+  .timer-display .time {
+    font-size: 3.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .mode-selector {
     flex-direction: column;
-    align-items: stretch;
-    margin: 1rem;
-
-    .mode-btn {
-      width: 100%;
-    }
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
   }
-
-  .timer-display .time {
-    font-size: 3rem;
+  
+  .mode-btn {
+    margin: 0;
+    width: 100%;
+    padding: 12px 15px;
+    min-height: 48px; /* Larger touch target on mobile */
+    font-size: 1rem;
+    border-radius: 12px; /* Slightly less rounded on mobile for more space */
   }
-
+  
   .timer-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-
-    .btn {
-      width: 100%;
+    justify-content: center;
+  }
+  
+  .btn {
+    width: 65px;
+    height: 65px;
+    font-size: 1.2rem;
+  }
+  
+  .timer-display {
+    margin: 1.25rem 0;
+    
+    .time {
+      font-size: 3rem;
     }
+  }
+  
+  /* Ensure task input and history are fully visible */
+  .task-input,
+  .task-history {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 360px) {
+  .timer-display .time {
+    font-size: 2.5rem;
+  }
+  
+  .mode-btn, .btn {
+    font-size: 0.9rem;
+    padding: 10px;
+    height: auto;
+  }
+  
+  .btn {
+    width: 55px;
+    height: 55px;
+    font-size: 1rem;
+  }
+  
+  .mode-btn {
+    padding: 10px 12px;
+    min-height: 44px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

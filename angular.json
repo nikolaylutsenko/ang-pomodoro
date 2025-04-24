@@ -29,7 +29,19 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              "src/service-worker.js",
+              {
+                "glob": "manifest.webmanifest",
+                "input": "src",
+                "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets"
               }
+              
             ],
             "styles": [
               "src/styles.scss"
@@ -88,7 +100,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/service-worker.js"
             ],
             "styles": [
               "src/styles.scss"

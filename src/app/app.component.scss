@@ -1,8 +1,12 @@
 .app-container {
   min-height: 100vh;
+  width: 100%;
   background: #1e1e1e;
   color: white;
   transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 
   &.light-theme {
     background: #f5f5f5;
@@ -11,7 +15,10 @@
 }
 
 header {
-  padding: 1.75rem 2rem 0;
+  padding: 1.5rem 1rem 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .header-content {
@@ -21,6 +28,8 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 
   h1 {
     font-size: 2.5rem;
@@ -117,12 +126,17 @@ header {
 }
 
 .main-content {
-  max-width: 1200px;
-  margin: -0.75rem auto 0;
+  flex: 1;
+  width: 100%;
+  padding: 1rem; /* Keep horizontal padding */
+  padding-top: 4rem; /* Added padding to push content down */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  justify-content: center; /* Changed from flex-start */
+  box-sizing: border-box;
+  overflow-x: hidden;
+  /* margin-top: 2rem; Removed */
 }
 
 .controls-container {
@@ -213,18 +227,31 @@ header {
 
 @media (max-width: 768px) {
   .app-container {
-    padding: 1rem;
+    padding: 0;
   }
 
   .header-content {
+    padding: 0 0.5rem;
+    
     h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
+    }
+  }
+
+  .theme-toggle,
+  .settings-btn {
+    width: 40px;
+    height: 40px;
+    
+    i {
+      font-size: 1.2rem;
     }
   }
 
   .settings-dropdown {
     width: calc(100vw - 2rem);
     right: -1rem;
+    max-width: 300px;
   }
 
   .modal-content {
@@ -234,5 +261,53 @@ header {
   .controls-container {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem 0.5rem 0.5rem;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    
+    h1 {
+      font-size: 1.5rem;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+  }
+  
+  .header-controls {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .main-content {
+    /* Remove margin-top: 1.5rem; Let header push content down */
+    margin-top: 0; /* Reset margin-top for mobile */
+    padding: 0.5rem;
+    padding-top: 2rem; /* Adjusted top padding for smaller screens */
+    justify-content: flex-start; /* Align content to the top after padding */
+  }
+
+  .controls-container {
+    flex-direction: column; // Ensure vertical stacking
+    align-items: center; // Center buttons horizontally
+    gap: 1rem; // Reduce gap for smaller screens
+  }
+}
+
+@media (max-width: 360px) {
+  .header-content h1 {
+    font-size: 1.3rem;
+  }
+  
+  .theme-toggle,
+  .settings-btn {
+    width: 36px;
+    height: 36px;
   }
 }
