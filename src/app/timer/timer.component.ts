@@ -24,6 +24,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   currentTimeInSeconds: number = 1500; // 25 minutes in seconds
   settings: any;
   private timerStartTime: Date | null = null;
+  private timerEndTimestamp: number | null = null;
   taskDescription: string = '';
   private workIntervalCount: number = 0;
   private readonly workIntervalsBeforeLongBreak: number = 4; // Adjust as needed
@@ -82,13 +83,18 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (!this.isRunning) {
       this.isRunning = true;
       this.timerStartTime = new Date();
+      // Calculate the end timestamp based on current time and remaining seconds
+      this.timerEndTimestamp = Date.now() + this.currentTimeInSeconds * 1000;
       this.timer = setInterval(() => {
-        if (this.currentTimeInSeconds > 0) {
-          this.currentTimeInSeconds--;
+        if (this.timerEndTimestamp) {
+          const now = Date.now();
+          const remaining = Math.max(0, Math.round((this.timerEndTimestamp - now) / 1000));
+          this.currentTimeInSeconds = remaining;
           this.updateDisplay();
-        } else {
-          clearInterval(this.timer);
-          this.onTimerEnd();
+          if (remaining <= 0) {
+            clearInterval(this.timer);
+            this.onTimerEnd();
+          }
         }
       }, 1000);
     }
@@ -100,6 +106,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (this.timer) {
       clearInterval(this.timer);
     }
+    // Adjust currentTimeInSeconds in case of pause
+    if (this.timerEndTimestamp) {
+      const now = Date.now();
+      this.currentTimeInSeconds = Math.max(0, Math.round((this.timerEndTimestamp - now) / 1000));
+      this.timerEndTimestamp = null;
+    }
   }
 
   stopTimer() {
@@ -110,6 +122,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (this.timer) {
       clearInterval(this.timer);
     }
+    this.timerEndTimestamp = null;
     this.resetTimer();
   }
 
@@ -135,11 +148,6 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.seconds = seconds < 10 ? `0${seconds}` : seconds.toString();
   }
 
-  playNotification() {
-    const audio = new Audio('assets/notification.mp3');
-    audio.play().catch(error => console.log('Error playing notification:', error));
-  }
-
   updateTaskDescription(description: string) {
     this.taskDescription = description;
     localStorage.setItem('currentTask', description);
@@ -163,32 +171,53 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   onTimerEnd() {
-    let remainingWorkIntervals = parseInt(localStorage.getItem('remainingWorkIntervals') || this.workIntervalsBeforeLongBreak.toString(), 10);
+    this.addHistoryEntry(true); // Add entry for the completed interval
 
-    if (this.currentMode === 'work') {
+    let nextMode: 'work' | 'shortBreak' | 'longBreak';
+    let nextDuration: number;
+    let notificationBody: string;
+
+    const endedMode = this.currentMode; // Store the mode that just ended
+
+    if (endedMode === 'work') {
       this.workIntervalCount++;
-      remainingWorkIntervals--; // Decrement remaining work intervals only after a successful work interval
-      localStorage.setItem('remainingWorkIntervals', remainingWorkIntervals.toString());
-      
+      localStorage.setItem('workIntervalCount', this.workIntervalCount.toString()); // Persist count
+
       if (this.workIntervalCount >= this.workIntervalsBeforeLongBreak) {
-        this.setMode('longBreak');
-        this.workIntervalCount = 0; // Reset the counter after a long break
+        nextMode = 'longBreak';
+        nextDuration = this.settings?.longBreakDuration || 15;
+        notificationBody = `Work finished! Time for a long break (${nextDuration} minutes).`;
+        this.workIntervalCount = 0; // Reset after long break is set
+        localStorage.setItem('workIntervalCount', '0'); // Persist reset count
       } else {
-        this.setMode('shortBreak');
+        nextMode = 'shortBreak';
+        nextDuration = this.settings?.shortBreakDuration || 5;
+        const remainingWorkIntervals = this.workIntervalsBeforeLongBreak - this.workIntervalCount;
+        notificationBody = `Work finished! Time for a short break (${nextDuration} minutes). ${remainingWorkIntervals} more until a long break.`;
       }
-    } else {
-      this.setMode('work');
+    } else { // Ended a break
+      nextMode = 'work';
+      nextDuration = this.settings?.workDuration || 25;
+      notificationBody = `Break's over! Time for work (${nextDuration} minutes).`;
     }
 
+    this.setMode(nextMode); // Set the next mode *after* determining message and adding history
+
+    // Show notification - Corrected icon path for built assets
     this.notificationService.showNotification('Pomodoro Timer', {
-      body: `Time is up! Take a break. ${remainingWorkIntervals} work intervals until the next long break.`,
-      icon: 'assets/icons/timer-icon.png', // Optional: Add an icon for the notification
-    }).then(notification => {
-      notification.addEventListener('click', () => {
-        this.toggleTimer();
-      });
+      body: notificationBody,
+      icon: 'assets/timer-icon.svg' // Correct path relative to deployed app root
+    }).then(notification => { // No need for 'as any' if service handles it
+      // Event handling is managed by the service worker listener in ngOnInit
     }).catch(error => {
-      console.log('Notification error:', error);
+      // Error handling might still be relevant if showNotification itself rejects
+      console.log('Notification service error:', error);
     });
+
+    // Automatically start the next timer if the setting is enabled
+    if (this.settings?.autoStartNextInterval) {
+       // Use setTimeout to allow the UI to update before starting the timer
+       setTimeout(() => this.startTimer(), 100);
+    }
   }
 }
