@@ -13,7 +13,7 @@
   </div>
 
   <div class="input-group">
-    <label for="shortBreak">Short Break (minutes)</label>
+    <label for="shortBreak">Short Break Duration (minutes)</label>
     <input 
       id="shortBreak"
       type="number" 
@@ -25,7 +25,7 @@
   </div>
 
   <div class="input-group">
-    <label for="longBreak">Long Break (minutes)</label>
+    <label for="longBreak">Long Break Duration (minutes)</label>
     <input 
       id="longBreak"
       type="number" 
@@ -47,4 +47,17 @@
       max="10"
     >
   </div>
-</div> 
+  
+  <div class="toggle-group">
+    <label for="autoStart">Auto-start next interval</label>
+    <div class="toggle-switch">
+      <input 
+        type="checkbox" 
+        id="autoStart" 
+        [(ngModel)]="settings.autoStartNextInterval"
+        (ngModelChange)="saveSettings()"
+      >
+      <span class="slider"></span>
+    </div>
+  </div>
+</div>
