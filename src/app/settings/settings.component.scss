@@ -1,6 +1,6 @@
 .settings-form {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0rem auto;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 2rem;
@@ -114,6 +114,23 @@ input {
   }
 }
 
+/* Component transition animations */
+:host {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Light theme styling */
 :host-context(.light-theme) {
   .settings-form {
@@ -163,6 +180,7 @@ input {
 @media (max-width: 768px) {
   .settings-form {
     padding: 1.5rem;
+    margin: 1rem auto;
   }
   
   .input-group {

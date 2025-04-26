@@ -144,25 +144,6 @@
   }
 }
 
-/* Task history section styles */
-.task-history {
-  width: 100%;
-  margin-top: 1rem;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  overflow: visible;
-}
-
-.task-item {
-  padding: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  display: flex;
-  justify-content: space-between;
-}
-
 /* Bottom navigation/status bar shown in screenshot */
 .bottom-nav {
   position: fixed;
@@ -237,9 +218,8 @@
     }
   }
   
-  /* Ensure task input and history are fully visible */
-  .task-input,
-  .task-history {
+  /* Ensure task input is fully visible */
+  .task-input {
     width: 100%;
     box-sizing: border-box;
   }
