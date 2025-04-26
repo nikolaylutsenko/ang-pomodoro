@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TimerComponent } from './timer/timer.component';
-import { SettingsComponent } from './settings/settings.component';
-
+import { RouterOutlet } from '@angular/router';
+import { NavComponent } from './components/nav/nav.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, TimerComponent, SettingsComponent],
+  imports: [CommonModule, RouterOutlet, NavComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -15,7 +14,6 @@ export class AppComponent implements OnInit {
   title = 'Pomodoro';
   isLightTheme = false;
   isDarkTheme = true;
-  isSettingsOpen = false;
 
   ngOnInit() {
     // asks for permission to show notifications
@@ -41,10 +39,6 @@ export class AppComponent implements OnInit {
     this.isDarkTheme = !this.isDarkTheme;
     localStorage.setItem('theme', this.isLightTheme ? 'light' : 'dark');
     this.updateThemeClass();
-  }
-
-  toggleSettings() {
-    this.isSettingsOpen = !this.isSettingsOpen;
   }
 
   private updateThemeClass() {

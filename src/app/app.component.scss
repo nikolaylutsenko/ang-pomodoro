@@ -1,313 +1,93 @@
 .app-container {
-  min-height: 100vh;
-  width: 100%;
-  background: #1e1e1e;
-  color: white;
-  transition: background-color 0.3s ease;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-
+  min-height: 100vh;
+  background-color: #20232a;
+  color: #ffffff;
+  transition: background-color 0.3s ease;
+  
   &.light-theme {
-    background: #f5f5f5;
-    color: rgba(0, 0, 0, 0.9);
+    background-color: #f8f9fa;
+    color: #212529;
   }
 }
 
 header {
-  padding: 1.5rem 1rem 0.5rem;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-}
+  padding: 0 2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  height: 60px;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between; // Ensure proper spacing
+    align-items: center;
+    height: 100%;
+    
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: #ffffff;
+      white-space: nowrap;
+      margin-right: 10px; // Slightly reduce margin
+    }
+  }
 
-.header-content {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 300;
-    margin: 0;
-    letter-spacing: 2px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
-    color: white;
+  .light-theme & {
+    background-color: rgba(0, 0, 0, 0.05);
+    
+    .header-content h1 {
+      color: #212529;
+    }
   }
 }
 
-.header-controls {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.theme-toggle,
-.settings-btn {
-  color: rgba(255, 255, 255, 0.9);
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
+.theme-toggle {
+  background: none;
   border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
   cursor: pointer;
-  width: 48px;
-  height: 48px;
+  padding: 0.4rem; // Slightly reduce padding
+  margin-left: 10px; // Add some margin to separate from nav
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  i {
-    font-size: 1.5rem;
-  }
-
+  transition: all 0.3s ease;
+  
   &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.1);
   }
-}
-
-.settings-container {
-  position: relative;
-}
-
-.settings-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  z-index: 1000;
-  min-width: 300px;
-  background: #2a2a2a;
-  border-radius: 15px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  animation: dropDown 0.3s ease;
-}
-
-.light-theme {
-  header {
-    border-bottom-color: rgba(0, 0, 0, 0.1);
-
-    h1 {
-      color: black;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-      font-weight: 600;
-    }
-  }
-
-  .theme-toggle,
-  .settings-btn {
-    color: #333333;
-    background: #ffffff;
-    border: 1px solid #dee2e6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
+  
+  .light-theme & {
+    color: rgba(0, 0, 0, 0.7);
+    
     &:hover {
-      color: #000000;
-      background: #f8f9fa;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: rgba(0, 0, 0, 0.05);
     }
-  }
-
-  .settings-dropdown {
-    background: #ffffff;
-    color: #000000;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 }
 
 .main-content {
   flex: 1;
-  width: 100%;
-  padding: 1rem; /* Keep horizontal padding */
-  padding-top: 4rem; /* Added padding to push content down */
+  overflow-y: auto;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Changed from flex-start */
-  box-sizing: border-box;
-  overflow-x: hidden;
-  /* margin-top: 2rem; Removed */
-}
-
-.controls-container {
-  display: flex;
-  gap: 2rem;
-  width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-// Modal styles
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  position: relative;
-  width: 90%;
-  max-width: 500px;
-  margin: 2rem;
-  z-index: 1001;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin: 0;
-  }
-
-  .close-btn {
-    font-size: 2rem;
-    line-height: 1;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 0.5rem;
-    transition: all 0.3s ease;
-
-    &:hover {
-      color: white;
-    }
-  }
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  z-index: 999;
-}
-
-@keyframes dropDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 @media (max-width: 768px) {
-  .app-container {
-    padding: 0;
-  }
-
-  .header-content {
-    padding: 0 0.5rem;
-    
-    h1 {
-      font-size: 1.8rem;
-    }
-  }
-
-  .theme-toggle,
-  .settings-btn {
-    width: 40px;
-    height: 40px;
-    
-    i {
-      font-size: 1.2rem;
-    }
-  }
-
-  .settings-dropdown {
-    width: calc(100vw - 2rem);
-    right: -1rem;
-    max-width: 300px;
-  }
-
-  .modal-content {
-    margin: 1rem;
-  }
-
-  .controls-container {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-@media (max-width: 480px) {
   header {
-    padding: 1rem 0.5rem 0.5rem;
-  }
-  
-  .header-content {
-    flex-direction: column;
+    padding: 0 1rem;
     
-    h1 {
-      font-size: 1.5rem;
-      width: 100%;
-      text-align: center;
-      margin-bottom: 0.75rem;
+    .header-content h1 {
+      font-size: 1.3rem;
     }
-  }
-  
-  .header-controls {
-    width: 100%;
-    justify-content: center;
   }
   
   .main-content {
-    /* Remove margin-top: 1.5rem; Let header push content down */
-    margin-top: 0; /* Reset margin-top for mobile */
-    padding: 0.5rem;
-    padding-top: 2rem; /* Adjusted top padding for smaller screens */
-    justify-content: flex-start; /* Align content to the top after padding */
-  }
-
-  .controls-container {
-    flex-direction: column; // Ensure vertical stacking
-    align-items: center; // Center buttons horizontally
-    gap: 1rem; // Reduce gap for smaller screens
-  }
-}
-
-@media (max-width: 360px) {
-  .header-content h1 {
-    font-size: 1.3rem;
-  }
-  
-  .theme-toggle,
-  .settings-btn {
-    width: 36px;
-    height: 36px;
+    padding: 1rem;
   }
 }

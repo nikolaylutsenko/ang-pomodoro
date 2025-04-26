@@ -183,22 +183,15 @@
   <header>
     <div class="header-content">
       <h1>Yet Another Pomodoro</h1>
-      <div class="header-controls">
-        <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
-          <i class="fas" [class.fa-sun]="isDarkTheme" [class.fa-moon]="!isDarkTheme"></i>
-        </button>
-        <div class="settings-container">
-          <button class="settings-btn" (click)="toggleSettings()" title="Settings">
-            <i class="fas fa-cog"></i>
-          </button>
-          <app-settings *ngIf="isSettingsOpen" class="settings-dropdown"></app-settings>
-        </div>
-      </div>
+      <app-nav></app-nav>
+      <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
+        <i class="fas" [class.fa-sun]="isDarkTheme" [class.fa-moon]="!isDarkTheme"></i>
+      </button>
     </div>
   </header>
   
   <main class="main-content">
-    <app-timer></app-timer>
+    <router-outlet></router-outlet>
   </main>
 </div>
 
@@ -209,5 +202,3 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-

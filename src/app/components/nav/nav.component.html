@@ -1,0 +1,10 @@
+<nav class="main-nav">
+  <ul class="nav-tabs">
+    <li *ngFor="let tab of tabs" class="nav-item">
+      <a [routerLink]="tab.path" routerLinkActive="active" class="nav-link">
+        <i class="fas {{ tab.icon }}"></i>
+        <span>{{ tab.label }}</span>
+      </a>
+    </li>
+  </ul>
+</nav>
