@@ -11,6 +11,18 @@
         rows="4"
         class="task-desc-textarea"
       ></textarea>
+      <!-- Estimated Hours Input -->
+      <div class="estimated-hours-field">
+        <label for="estimated-hours">Estimated Hours:</label>
+        <input
+          id="estimated-hours"
+          type="number"
+          min="1"
+          [(ngModel)]="formTask.estimatedHours"
+          name="estimatedHours"
+          required
+        />
+      </div>
       <div class="priority-and-action-row">
         <div class="priority-slider-container">
           <label for="priority-slider">Priority:</label>
@@ -61,6 +73,10 @@
       <th>Description</th>
       <th>Priority</th>
       <th>Date Created</th>
+      <th>Est. Hours</th>
+      <th>Intervals</th>
+      <th>Completed</th>
+      <th>Status</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -85,13 +101,18 @@
       </td>
       <td>{{ task.priority }}</td>
       <td>{{ task.dateCreated | date:'short' }}</td>
+      <td>{{ task.estimatedHours }}</td>
+      <td>{{ task.workIntervals }}</td>
+      <td>{{ task.completedIntervals }}</td>
+      <td>{{ task.completionStatus }}</td>
       <td>
+        <span class="icon-btn" title="Complete Interval" (click)="completeInterval(task)">✔️</span>
         <span class="icon-btn" title="Edit" (click)="editTask(task)">✏️</span>
         <span class="icon-btn" title="Delete" (click)="deleteTask(task.id)">🗑️</span>
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
-      <td colspan="4">No tasks found.</td>
+      <td colspan="8">No tasks found.</td>
     </tr>
   </tbody>
 </table>
