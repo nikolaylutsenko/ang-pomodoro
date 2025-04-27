@@ -19,7 +19,8 @@ export class TasksComponent {
   expandedDescriptions: { [taskId: string]: boolean } = {};
 
   // Form state
-  formTask: Partial<Task> = { description: '', priority: TaskPriority.Low };
+  formTask: Partial<Task> = { description: '' };
+  formPriority: number = 1;
   editingTaskId: string | null = null;
 
   ngOnInit() {
@@ -36,8 +37,8 @@ export class TasksComponent {
   }
 
   addOrUpdateTask() {
-    if (!this.formTask.description || this.formTask.priority === undefined || this.formTask.priority === null) return;
-    let priority: TaskPriority = this.formTask.priority as TaskPriority;
+    if (!this.formTask.description || this.formPriority === undefined || this.formPriority === null) return;
+    const priority = this.priorityMap[this.formPriority];
     if (this.editingTaskId) {
       // Edit
       const idx = this.tasks.findIndex(t => t.id === this.editingTaskId);
@@ -58,11 +59,13 @@ export class TasksComponent {
       this.tasks.push(newTask);
       this.saveTasks();
     }
-    this.formTask = { description: '', priority: TaskPriority.Low };
+    this.formTask = { description: '' };
+    this.formPriority = 1;
   }
 
   editTask(task: Task) {
-    this.formTask = { description: task.description, priority: task.priority };
+    this.formTask = { description: task.description };
+    this.formPriority = this.priorityMap.indexOf(task.priority);
     this.editingTaskId = task.id;
   }
 
@@ -71,7 +74,8 @@ export class TasksComponent {
     this.saveTasks();
     if (this.editingTaskId === id) {
       this.editingTaskId = null;
-      this.formTask = { description: '', priority: TaskPriority.Low };
+      this.formTask = { description: '' };
+      this.formPriority = 1;
     }
   }
 

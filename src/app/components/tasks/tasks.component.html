@@ -20,7 +20,7 @@
             min="0"
             max="2"
             step="1"
-            [(ngModel)]="formTask.priority"
+            [(ngModel)]="formPriority"
             name="priority"
             [ngStyle]="{'background': getPriorityGradient()}"
             required
@@ -33,7 +33,7 @@
         </div>
         <div class="task-form-actions">
           <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
-          <button type="button" *ngIf="editingTaskId" (click)="editingTaskId = null; formTask = { description: '', priority: priorities[0] }">Cancel</button>
+          <button type="button" *ngIf="editingTaskId" (click)="editingTaskId = null; formTask = { description: '' }; formPriority = 0;">Cancel</button>
         </div>
       </div>
     </div>
