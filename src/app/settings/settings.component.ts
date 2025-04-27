@@ -22,9 +22,6 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit() {
     this.settingsService.getSettings().subscribe(settings => {
-      // Remove autoStartNextInterval if present
-      const { autoStartNextInterval, ...rest } = settings;
-      this.settings = rest;
     });
   }
 

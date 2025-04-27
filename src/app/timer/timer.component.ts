@@ -213,11 +213,5 @@ export class TimerComponent implements OnInit, OnDestroy {
       // Error handling might still be relevant if showNotification itself rejects
       console.log('Notification service error:', error);
     });
-
-    // Automatically start the next timer if the setting is enabled
-    if (this.settings?.autoStartNextInterval) {
-       // Use setTimeout to allow the UI to update before starting the timer
-       setTimeout(() => this.startTimer(), 100);
     }
   }
-}
