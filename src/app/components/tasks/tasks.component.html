@@ -1,1 +1,81 @@
-<div class="tasks-placeholder">Tasks works!</div>
+<!-- Task Form -->
+<div class="task-form-container">
+  <form (ngSubmit)="addOrUpdateTask()" class="task-form">
+    <div class="task-form-fields">
+      <textarea
+        maxlength="1000"
+        placeholder="Task description (max 1000 symbols)"
+        [(ngModel)]="formTask.description"
+        name="description"
+        required
+        rows="4"
+        class="task-desc-textarea"
+      ></textarea>
+      <div class="priority-and-action-row">
+        <div class="priority-slider-container">
+          <label for="priority-slider">Priority:</label>
+          <input
+            id="priority-slider"
+            type="range"
+            min="0"
+            max="2"
+            step="1"
+            [(ngModel)]="formTask.priority"
+            name="priority"
+            [ngStyle]="{'background': getPriorityGradient()}"
+            required
+          />
+          <div class="priority-labels">
+            <span class="priority-low">Low</span>
+            <span class="priority-medium">Medium</span>
+            <span class="priority-high">High</span>
+          </div>
+        </div>
+        <div class="task-form-actions">
+          <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
+          <button type="button" *ngIf="editingTaskId" (click)="editingTaskId = null; formTask = { description: '', priority: priorities[0] }">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<hr class="tasks-separator" />
+
+<!-- Filter and Sort Controls -->
+<div class="task-controls">
+  <input
+    type="text"
+    placeholder="Filter by description"
+    [(ngModel)]="filterText"
+  />
+  <button (click)="toggleSort()">
+    Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
+  </button>
+</div>
+
+<!-- Tasks Table -->
+<table class="tasks-table">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Priority</th>
+      <th>Date Created</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let task of filteredAndSortedTasks">
+      <td>{{ task.description }}</td>
+      <td>{{ task.priority }}</td>
+      <td>{{ task.dateCreated | date:'short' }}</td>
+      <td>
+        <button (click)="editTask(task)">Edit</button>
+        <button (click)="deleteTask(task.id)">Delete</button>
+      </td>
+    </tr>
+    <tr *ngIf="filteredAndSortedTasks.length === 0">
+      <td colspan="4">No tasks found.</td>
+    </tr>
+  </tbody>
+</table>
