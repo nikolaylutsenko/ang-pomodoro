@@ -105,19 +105,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 5px var(--color-shadow); /* Use variable */
+
   &.start-btn {
-    background-color: #f1f1f1;
+    background-color: var(--color-bg); /* Uses variable */
+    color: var(--color-text); /* Uses variable */
+    &:hover { background-color: var(--color-secondary-dark); } /* Use variable */
   }
-  
+
   &.stop-btn {
-    background-color: #ffebee;
+    background-color: var(--color-secondary); /* Use variable */
+    color: var(--color-error); /* Use variable */
+    &:hover { background-color: var(--color-secondary-dark); } /* Use variable */
   }
-  
+
   &.reset-btn {
-    background-color: #f1f1f1;
-    font-size: 1.2rem;
+    background-color: var(--color-bg); /* Uses variable */
+    color: var(--color-text-secondary); /* Uses variable */
+    font-size: 1.5rem;
+    &:hover { background-color: var(--color-secondary-dark); } /* Use variable */
   }
 
   &:disabled {

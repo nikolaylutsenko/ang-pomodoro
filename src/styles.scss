@@ -8,10 +8,23 @@
   --color-bg-card: #ffffff;
   --color-primary: #ff6b6b;
   --color-primary-light: #ff8e8e;
+  --color-primary-dark: #e05252; /* Added */
+  --color-secondary: #e0e0e0; /* Added */
+  --color-secondary-dark: #bdbdbd; /* Added */
+  --color-success: #43a047; /* Added */
+  --color-success-dark: #388e3c; /* Added */
+  --color-error: #e57373; /* Added */
+  --color-error-dark: #b71c1c; /* Added */
+  --color-link: #1976d2; /* Added */
+  --color-link-dark: #115293; /* Added */
   --color-text: #222222;
   --color-text-secondary: #555555;
   --color-border: #e0e0e0;
   --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-slider-thumb-bg: #ffffff; /* Added */
+  --color-slider-thumb-border: #888888; /* Added */
+  --color-slider-thumb-focus-border: var(--color-link); /* Added */
+  --color-slider-track-gradient: linear-gradient(90deg, var(--color-success) 0%, #fbc02d 50%, var(--color-error) 100%); /* Added */
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -75,16 +88,27 @@ button {
   }
 }
 
-/* Example: future theme override */
-/*
 [data-theme="dark"] {
   --color-bg: #181a1b;
   --color-bg-card: #23272a;
   --color-primary: #ff6b6b;
   --color-primary-light: #ff8e8e;
+  --color-primary-dark: #e05252; /* Added */
+  --color-secondary: #333; /* Added */
+  --color-secondary-dark: #444; /* Added */
+  --color-success: #5cb85c; /* Adjusted for dark */
+  --color-success-dark: #4cae4c; /* Adjusted for dark */
+  --color-error: #d9534f; /* Adjusted for dark */
+  --color-error-dark: #c9302c; /* Adjusted for dark */
+  --color-link: #5bc0de; /* Adjusted for dark */
+  --color-link-dark: #46b8da; /* Adjusted for dark */
   --color-text: #f8f9fa;
   --color-text-secondary: #cccccc;
   --color-border: #333;
   --color-shadow: rgba(0,0,0,0.5);
+  --color-slider-thumb-bg: #cccccc; /* Added */
+  --color-slider-thumb-border: #555555; /* Added */
+  --color-slider-thumb-focus-border: var(--color-link); /* Added */
+  /* Slider track gradient might need adjustment for dark theme contrast if desired */
+  /* --color-slider-track-gradient: linear-gradient(90deg, var(--color-success) 0%, #fbc02d 50%, var(--color-error) 100%); */ /* Keeping original for now */
 }
-*/

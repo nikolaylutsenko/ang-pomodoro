@@ -42,10 +42,12 @@ export class AppComponent implements OnInit {
   }
 
   private updateThemeClass() {
-    if (this.isLightTheme) {
-      document.body.classList.add('light-theme');
-    } else {
+    if (this.isDarkTheme) {
+      document.body.setAttribute('data-theme', 'dark');
       document.body.classList.remove('light-theme');
+    } else {
+      document.body.removeAttribute('data-theme');
+      document.body.classList.add('light-theme');
     }
   }
 }
