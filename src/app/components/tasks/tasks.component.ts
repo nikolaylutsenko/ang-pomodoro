@@ -16,6 +16,7 @@ export class TasksComponent {
   sortDesc: boolean = true;
   priorities = Object.values(TaskPriority);
   priorityMap = [TaskPriority.Low, TaskPriority.Mid, TaskPriority.High];
+  expandedDescriptions: { [taskId: string]: boolean } = {};
 
   // Form state
   formTask: Partial<Task> = { description: '', priority: TaskPriority.Low };
@@ -85,5 +86,9 @@ export class TasksComponent {
 
   getPriorityGradient() {
     return 'linear-gradient(90deg, #43a047 0%, #fbc02d 50%, #e53935 100%)';
+  }
+
+  toggleDescription(taskId: string) {
+    this.expandedDescriptions[taskId] = !this.expandedDescriptions[taskId];
   }
 }

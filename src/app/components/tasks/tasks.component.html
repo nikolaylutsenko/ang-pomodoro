@@ -65,13 +65,29 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let task of filteredAndSortedTasks">
-      <td>{{ task.description }}</td>
+    <tr *ngFor="let task of filteredAndSortedTasks" [ngClass]="{
+      'priority-low': task.priority === 'Low',
+      'priority-mid': task.priority === 'Mid',
+      'priority-high': task.priority === 'High'
+    }">
+      <td>
+        <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
+          {{ task.description | slice:0:300 }}... 
+          <a class="show-more-link" (click)="toggleDescription(task.id)">Show more</a>
+        </span>
+        <span *ngIf="expandedDescriptions[task.id] && task.description.length > 300">
+          {{ task.description }}
+          <a class="show-more-link" (click)="toggleDescription(task.id)">Show less</a>
+        </span>
+        <span *ngIf="task.description.length <= 300">
+          {{ task.description }}
+        </span>
+      </td>
       <td>{{ task.priority }}</td>
       <td>{{ task.dateCreated | date:'short' }}</td>
       <td>
-        <button (click)="editTask(task)">Edit</button>
-        <button (click)="deleteTask(task.id)">Delete</button>
+        <span class="icon-btn" title="Edit" (click)="editTask(task)">✏️</span>
+        <span class="icon-btn" title="Delete" (click)="deleteTask(task.id)">🗑️</span>
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
