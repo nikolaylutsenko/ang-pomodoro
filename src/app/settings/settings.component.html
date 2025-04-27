@@ -47,17 +47,4 @@
       max="10"
     >
   </div>
-  
-  <div class="toggle-group">
-    <label for="autoStart">Auto-start next interval</label>
-    <div class="toggle-switch">
-      <input 
-        type="checkbox" 
-        id="autoStart" 
-        [(ngModel)]="settings.autoStartNextInterval"
-        (ngModelChange)="saveSettings()"
-      >
-      <span class="slider"></span>
-    </div>
-  </div>
 </div>

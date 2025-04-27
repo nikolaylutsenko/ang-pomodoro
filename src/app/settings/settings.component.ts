@@ -15,15 +15,16 @@ export class SettingsComponent implements OnInit {
     workDuration: 25,
     shortBreakDuration: 5,
     longBreakDuration: 15,
-    longBreakInterval: 4,
-    autoStartNextInterval: false
+    longBreakInterval: 4
   };
 
   constructor(private settingsService: TimerSettingsService) {}
 
   ngOnInit() {
     this.settingsService.getSettings().subscribe(settings => {
-      this.settings = settings;
+      // Remove autoStartNextInterval if present
+      const { autoStartNextInterval, ...rest } = settings;
+      this.settings = rest;
     });
   }
 

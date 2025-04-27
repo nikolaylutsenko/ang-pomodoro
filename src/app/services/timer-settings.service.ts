@@ -47,4 +47,4 @@ export class TimerSettingsService {
     }
     return DEFAULT_SETTINGS;
   }
-} 
+}
