@@ -25,18 +25,17 @@
   </div>
 
   <div class="task-input">
-    <input 
-      type="text" 
-      [(ngModel)]="taskDescription"
-      (ngModelChange)="updateTaskDescription($event)"
-      placeholder="What are you working on?"
-      [class.has-value]="taskDescription.length > 0">
-    <button 
-      class="clear-task-btn"
-      *ngIf="taskDescription.length > 0"
-      (click)="clearTaskDescription()">
-      ×
-    </button>
+    <select
+      [(ngModel)]="selectedTaskId"
+      (ngModelChange)="onTaskChange($event)"
+      [disabled]="tasks.length === 0"
+      class="task-dropdown"
+    >
+      <option value="">-- Select Task --</option>
+      <option *ngFor="let task of tasks" [value]="task.id">
+        {{ task.description.length > 200 ? (task.description | slice:0:200) + '...' : task.description }}
+      </option>
+    </select>
   </div>
 
   <div class="controls">
@@ -55,5 +54,6 @@
     </button>
   </div>
 
+  <!-- Timer history -->
   <app-timer-history></app-timer-history>
-</div> 
+</div>

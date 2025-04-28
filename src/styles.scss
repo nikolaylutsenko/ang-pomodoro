@@ -112,3 +112,20 @@ button {
   /* Slider track gradient might need adjustment for dark theme contrast if desired */
   /* --color-slider-track-gradient: linear-gradient(90deg, var(--color-success) 0%, #fbc02d 50%, var(--color-error) 100%); */ /* Keeping original for now */
 }
+
+/* Task component specific styles */
+.estimated-hours-input {
+  padding: 8px 12px;
+  border: 1px solid var(--input-border-color, #ccc); // Use theme variable or fallback
+  background-color: var(--input-background, #fff); // Use theme variable or fallback
+  color: var(--text-color, #333); // Use theme variable or fallback
+  border-radius: 4px;
+  width: 80px; // Adjust width as needed
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color, #007bff); // Use theme variable or fallback
+  }
+}

@@ -5,6 +5,7 @@ import { TimerSettingsService } from '../../services/timer-settings.service';
 import { TimerHistoryService } from '../../services/timer-history.service';
 import { Subscription } from 'rxjs';
 import { TimerHistoryComponent } from '../timer-history/timer-history.component';
+import { Task } from '../../models/task.model';
 
 export enum TimerMode {
   WORK = 'work',
@@ -29,6 +30,9 @@ export class TimerComponent implements OnInit, OnDestroy {
   private settingsSubscription: Subscription;
   private settings: any;
   taskDescription: string = '';
+  tasks: Task[] = [];
+  selectedTaskId: string = '';
+
   private timerStartTime: Date | null = null;
   private workIntervalCount: number = 0;
 
@@ -45,10 +49,15 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Load saved task description from localStorage
-    const savedTask = localStorage.getItem('currentTask');
-    if (savedTask) {
-      this.taskDescription = savedTask;
+    // Load tasks list and saved selection
+    const savedTasks = localStorage.getItem('tasks');
+    this.tasks = savedTasks
+      ? JSON.parse(savedTasks).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) }))
+      : [];
+    const savedId = localStorage.getItem('currentTaskId');
+    if (savedId && this.tasks.find(t => t.id === savedId)) {
+      this.selectedTaskId = savedId;
+      this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
     }
 
     // Get work interval count
@@ -114,14 +123,17 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.setTimeForMode(this.currentMode);
   }
 
-  updateTaskDescription(description: string): void {
-    this.taskDescription = description;
-    localStorage.setItem('currentTask', description);
-  }
-
-  clearTaskDescription(): void {
-    this.taskDescription = '';
-    localStorage.removeItem('currentTask');
+  // Handle task selection
+  onTaskChange(taskId: string): void {
+    this.selectedTaskId = taskId;
+    if (taskId) {
+      const task = this.tasks.find(t => t.id === taskId)!;
+      this.taskDescription = task.description;
+      localStorage.setItem('currentTaskId', taskId);
+    } else {
+      this.taskDescription = '';
+      localStorage.removeItem('currentTaskId');
+    }
   }
 
   formatTime(value: number): string {
@@ -157,7 +169,8 @@ export class TimerComponent implements OnInit, OnDestroy {
         startTime: this.timerStartTime,
         type: this.currentMode,
         isSuccessful,
-        taskDescription: this.taskDescription
+        taskDescription: this.taskDescription,
+        taskId: this.selectedTaskId || undefined
       });
       this.timerStartTime = null;
     }

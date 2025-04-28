@@ -20,7 +20,7 @@ export class TasksComponent {
   expandedDescriptions: { [taskId: string]: boolean } = {};
 
   // Form state
-  formTask: Partial<Task> = { description: '', estimatedHours: 0 };
+  formTask: Partial<Task> = { description: '', estimatedHours: 1 }; // Default estimatedHours to 1
   formPriority: number = 1;
   editingTaskId: string | null = null;
   
@@ -49,46 +49,59 @@ export class TasksComponent {
   // Compute number of work intervals based on estimated hours and workDuration
   private calculateWorkIntervals(hours: number): number {
     const totalMinutes = hours * 60;
-    return Math.ceil(totalMinutes / this.currentSettings.workDuration);
+    // Ensure currentSettings and workDuration are available, otherwise default
+    const workDuration = this.currentSettings?.workDuration || 25; 
+    return Math.ceil(totalMinutes / workDuration);
   }
 
   addOrUpdateTask() {
     if (!this.formTask.description || this.formPriority === undefined || this.formPriority === null || this.formTask.estimatedHours === undefined) return;
+    
+    // Ensure estimated hours is at least 1
+    if (this.formTask.estimatedHours < 1) {
+      this.formTask.estimatedHours = 1;
+    }
+
     const priority = this.priorityMap[this.formPriority];
-    const intervals = this.calculateWorkIntervals(this.formTask.estimatedHours);
     if (this.editingTaskId) {
       // Edit
+      // Recalculate intervals on edit based on potentially changed hours
+      const intervals = this.calculateWorkIntervals(this.formTask.estimatedHours);
       const idx = this.tasks.findIndex(t => t.id === this.editingTaskId);
       if (idx > -1) {
         this.tasks[idx].description = this.formTask.description!;
         this.tasks[idx].priority = priority;
         // Update intervals on edit
-        this.tasks[idx].estimatedHours = this.formTask.estimatedHours!;
+        this.tasks[idx].estimatedHours = this.formTask.estimatedHours!; // Already ensured to be >= 1
         this.tasks[idx].workIntervals = intervals;
         this.saveTasks();
       }
       this.editingTaskId = null;
     } else {
       // Add
+      const intervals = 3; // Default workIntervals to 3 for new tasks
       const newTask: Task = {
         id: crypto.randomUUID(),
         description: this.formTask.description!,
         priority,
         dateCreated: new Date(),
-        estimatedHours: this.formTask.estimatedHours!,
-        workIntervals: intervals,
+        estimatedHours: this.formTask.estimatedHours!, // Already ensured to be >= 1
+        workIntervals: intervals, // Set to 3
         completedIntervals: 0,
         completionStatus: TaskStatus.Pending
       };
       this.tasks.push(newTask);
       this.saveTasks();
     }
-    this.formTask = { description: '', estimatedHours: 0 };
+    // Reset form, defaulting hours back to 1
+    this.formTask = { description: '', estimatedHours: 1 }; 
     this.formPriority = 1;
   }
 
   editTask(task: Task) {
-    this.formTask = { description: task.description, estimatedHours: task.estimatedHours };
+    // Ensure form starts with at least 1 hour when editing
+    const editHours = task.estimatedHours < 1 ? 1 : task.estimatedHours;
+    this.formTask = { description: task.description, estimatedHours: editHours };
     this.formPriority = this.priorityMap.indexOf(task.priority);
     this.editingTaskId = task.id;
   }
@@ -98,7 +111,7 @@ export class TasksComponent {
     this.saveTasks();
     if (this.editingTaskId === id) {
       this.editingTaskId = null;
-      this.formTask = { description: '', estimatedHours: 0 };
+      this.formTask = { description: '', estimatedHours: 1 };
       this.formPriority = 1;
     }
   }
