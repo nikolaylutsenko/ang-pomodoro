@@ -1,35 +1,39 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TimerSettingsService } from '../services/timer-settings.service';
-import { Subscription } from 'rxjs';
+import { TimerSettingsService, TimerSettings } from '../services/timer-settings.service';
 
 @Component({
   selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit, OnDestroy {
-  settings: any = {};
-  private settingsSubscription!: Subscription;
+export class SettingsComponent implements OnInit {
+  settings: TimerSettings = {
+    workDuration: 25,
+    shortBreakDuration: 5,
+    longBreakDuration: 15,
+    longBreakInterval: 4
+  };
 
-  constructor(private timerSettingsService: TimerSettingsService) {}
+  constructor(private settingsService: TimerSettingsService) {}
 
   ngOnInit() {
-    this.settingsSubscription = this.timerSettingsService.getSettings().subscribe(settings => {
-      this.settings = { ...settings };
+    this.settingsService.getSettings().subscribe(saved => {
+      this.settings = { ...saved };
     });
   }
 
-  ngOnDestroy() {
-    if (this.settingsSubscription) {
-      this.settingsSubscription.unsubscribe();
-    }
-  }
-
   saveSettings() {
-    this.timerSettingsService.updateSettings(this.settings);
+    // Ensure values are numbers before updating
+    const newSettings: TimerSettings = {
+      workDuration: Number(this.settings.workDuration),
+      shortBreakDuration: Number(this.settings.shortBreakDuration),
+      longBreakDuration: Number(this.settings.longBreakDuration),
+      longBreakInterval: Number(this.settings.longBreakInterval)
+    };
+    this.settingsService.updateSettings(newSettings);
   }
-} 
+}

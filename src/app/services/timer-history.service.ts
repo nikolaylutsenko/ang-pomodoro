@@ -6,6 +6,7 @@ export interface TimerHistoryEntry {
   type: 'work' | 'shortBreak' | 'longBreak';
   isSuccessful: boolean;
   taskDescription?: string;
+  taskId?: string;
 }
 
 @Injectable({
@@ -56,4 +57,4 @@ export class TimerHistoryService {
     }
     return [];
   }
-} 
+}

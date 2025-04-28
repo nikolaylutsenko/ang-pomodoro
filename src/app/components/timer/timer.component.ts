@@ -1,7 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TimerSettingsService } from '../../services/timer-settings.service';
+import { TimerHistoryService } from '../../services/timer-history.service';
 import { Subscription } from 'rxjs';
+import { TimerHistoryComponent } from '../timer-history/timer-history.component';
+import { Task } from '../../models/task.model';
 
 export enum TimerMode {
   WORK = 'work',
@@ -12,7 +16,7 @@ export enum TimerMode {
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, TimerHistoryComponent],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.scss'
 })
@@ -25,8 +29,17 @@ export class TimerComponent implements OnInit, OnDestroy {
   private timerInterval: any;
   private settingsSubscription: Subscription;
   private settings: any;
+  taskDescription: string = '';
+  tasks: Task[] = [];
+  selectedTaskId: string = '';
 
-  constructor(private timerSettingsService: TimerSettingsService) {
+  private timerStartTime: Date | null = null;
+  private workIntervalCount: number = 0;
+
+  constructor(
+    private timerSettingsService: TimerSettingsService,
+    private timerHistoryService: TimerHistoryService
+  ) {
     this.settingsSubscription = this.timerSettingsService.getSettings().subscribe(settings => {
       this.settings = settings;
       if (!this.isRunning) {
@@ -36,7 +49,22 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Timer is initialized through the settings subscription
+    // Load tasks list and saved selection
+    const savedTasks = localStorage.getItem('tasks');
+    this.tasks = savedTasks
+      ? JSON.parse(savedTasks).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) }))
+      : [];
+    const savedId = localStorage.getItem('currentTaskId');
+    if (savedId && this.tasks.find(t => t.id === savedId)) {
+      this.selectedTaskId = savedId;
+      this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
+    }
+
+    // Get work interval count
+    const savedCount = localStorage.getItem('workIntervalCount');
+    if (savedCount) {
+      this.workIntervalCount = parseInt(savedCount, 10);
+    }
   }
 
   ngOnDestroy(): void {
@@ -50,13 +78,13 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.currentMode = mode;
     switch (mode) {
       case TimerMode.WORK:
-        this.minutes = this.settings.workDuration;
+        this.minutes = this.settings?.workDuration || 25;
         break;
       case TimerMode.SHORT_BREAK:
-        this.minutes = this.settings.shortBreakDuration;
+        this.minutes = this.settings?.shortBreakDuration || 5;
         break;
       case TimerMode.LONG_BREAK:
-        this.minutes = this.settings.longBreakDuration;
+        this.minutes = this.settings?.longBreakDuration || 15;
         break;
     }
     this.seconds = 0;
@@ -65,6 +93,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   startTimer(): void {
     if (!this.isRunning) {
       this.isRunning = true;
+      this.timerStartTime = new Date();
       this.timerInterval = setInterval(() => {
         if (this.seconds > 0) {
           this.seconds--;
@@ -73,13 +102,16 @@ export class TimerComponent implements OnInit, OnDestroy {
           this.seconds = 59;
         } else {
           this.stopTimer();
-          this.playNotificationSound();
+          this.onTimerEnd();
         }
       }, 1000);
     }
   }
 
   stopTimer(): void {
+    if (this.isRunning) {
+      this.addHistoryEntry(false);
+    }
     this.isRunning = false;
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -91,8 +123,57 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.setTimeForMode(this.currentMode);
   }
 
+  // Handle task selection
+  onTaskChange(taskId: string): void {
+    this.selectedTaskId = taskId;
+    if (taskId) {
+      const task = this.tasks.find(t => t.id === taskId)!;
+      this.taskDescription = task.description;
+      localStorage.setItem('currentTaskId', taskId);
+    } else {
+      this.taskDescription = '';
+      localStorage.removeItem('currentTaskId');
+    }
+  }
+
   formatTime(value: number): string {
     return value < 10 ? `0${value}` : value.toString();
+  }
+
+  onTimerEnd(): void {
+    this.addHistoryEntry(true);
+    this.playNotificationSound();
+
+    let nextMode: TimerMode;
+    if (this.currentMode === TimerMode.WORK) {
+      this.workIntervalCount++;
+      localStorage.setItem('workIntervalCount', this.workIntervalCount.toString());
+
+      if (this.workIntervalCount >= (this.settings?.longBreakInterval || 4)) {
+        nextMode = TimerMode.LONG_BREAK;
+        this.workIntervalCount = 0;
+        localStorage.setItem('workIntervalCount', '0');
+      } else {
+        nextMode = TimerMode.SHORT_BREAK;
+      }
+    } else {
+      nextMode = TimerMode.WORK;
+    }
+
+    this.setTimeForMode(nextMode);
+  }
+
+  private addHistoryEntry(isSuccessful: boolean): void {
+    if (this.timerStartTime) {
+      this.timerHistoryService.addEntry({
+        startTime: this.timerStartTime,
+        type: this.currentMode,
+        isSuccessful,
+        taskDescription: this.taskDescription,
+        taskId: this.selectedTaskId || undefined
+      });
+      this.timerStartTime = null;
+    }
   }
 
   private playNotificationSound(): void {

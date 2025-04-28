@@ -40,11 +40,17 @@ export class TimerSettingsService {
     const savedSettings = localStorage.getItem('timerSettings');
     if (savedSettings) {
       try {
-        return JSON.parse(savedSettings);
+        const parsed = JSON.parse(savedSettings);
+        return {
+          workDuration: Math.round(Number(parsed.workDuration)),
+          shortBreakDuration: Math.round(Number(parsed.shortBreakDuration)),
+          longBreakDuration: Math.round(Number(parsed.longBreakDuration)),
+          longBreakInterval: Math.round(Number(parsed.longBreakInterval))
+        };
       } catch {
         return DEFAULT_SETTINGS;
       }
     }
     return DEFAULT_SETTINGS;
   }
-} 
+}

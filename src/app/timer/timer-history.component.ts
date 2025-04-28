@@ -9,48 +9,58 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
   imports: [CommonModule],
   template: `
     <div class="history-section">
-      <div class="history-header">
-        <h3>History</h3>
-        <button class="clear-btn" (click)="clearHistory()" *ngIf="history.length > 0">
-          Clear History
-        </button>
+      <!-- Header and buttons section (always visible) -->
+      <div class="history-header-container">
+        <div class="history-header">
+          <h3>History</h3>
+          <button class="clear-btn" (click)="clearHistory()" *ngIf="history.length > 0">
+            Clear History
+          </button>
+        </div>
+
+        <div class="history-legend">
+          <div class="legend-item time-width">Time</div>
+          <div class="legend-item task-width">Task</div>
+          <div class="legend-item type-width">Type</div>
+          <div class="legend-item status-width">Status</div>
+        </div>
       </div>
 
-      <div class="history-legend">
-        <div class="legend-item time-width">Time</div>
-        <div class="legend-item task-width">Task</div>
-        <div class="legend-item type-width">Type</div>
-        <div class="legend-item status-width">Status</div>
-      </div>
-
-      <div class="history-list" *ngIf="history.length > 0; else noHistory">
-        <div class="history-item" *ngFor="let entry of displayedHistory">
-          <div class="entry-time time-width">
-            {{ entry.startTime | date:'HH:mm' }}
-          </div>
-          <div class="entry-task task-width">
-            {{ entry.taskDescription || '—' }}
-          </div>
-          <div class="entry-type type-width" [class]="entry.type">
-            {{ entry.type === 'shortBreak' ? 'Short Break' : 
-               entry.type === 'longBreak' ? 'Long Break' : 'Work' }}
-          </div>
-          <div class="entry-status status-width" [class.successful]="entry.isSuccessful">
-            {{ entry.isSuccessful ? '✓' : '×' }}
+      <!-- Scrollable history list -->
+      <div class="history-list-container" *ngIf="history.length > 0; else noHistory">
+        <div class="history-list">
+          <div class="history-item" *ngFor="let entry of displayedHistory">
+            <div class="entry-time time-width">
+              {{ entry.startTime | date:'HH:mm' }}
+            </div>
+            <div class="entry-task task-width">
+              {{ entry.taskDescription || '—' }}
+            </div>
+            <div class="entry-type type-width" [class]="entry.type">
+              {{ entry.type === 'shortBreak' ? 'Short Break' : 
+                 entry.type === 'longBreak' ? 'Long Break' : 'Work' }}
+            </div>
+            <div class="entry-status status-width" [class.successful]="entry.isSuccessful">
+              {{ entry.isSuccessful ? '✓' : '×' }}
+            </div>
           </div>
         </div>
-        <button 
-          class="show-more-btn" 
-          *ngIf="!showAll && sortedHistory.length > 3"
-          (click)="toggleShowAll()">
-          Show all today's history ({{ sortedHistory.length - 3 }} more)
-        </button>
-        <button 
-          class="show-more-btn" 
-          *ngIf="showAll && sortedHistory.length > 3"
-          (click)="toggleShowAll()">
-          Show less
-        </button>
+
+        <!-- History pagination controls (always visible at bottom) -->
+        <div class="history-controls">
+          <button 
+            class="show-more-btn" 
+            *ngIf="!showAll && sortedHistory.length > 3"
+            (click)="toggleShowAll()">
+            Show all today's history ({{ sortedHistory.length - 3 }} more)
+          </button>
+          <button 
+            class="show-more-btn" 
+            *ngIf="showAll && sortedHistory.length > 3"
+            (click)="toggleShowAll()">
+            Show less
+          </button>
+        </div>
       </div>
       <ng-template #noHistory>
         <div class="no-history">
@@ -68,6 +78,16 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
       align-items: center;
       margin: 0 auto;
       padding: 2rem;
+      max-height: 100%;
+    }
+
+    .history-header-container {
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #20232a; /* Match app background */
+      padding-bottom: 0.5rem;
     }
 
     .history-header {
@@ -139,11 +159,22 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
       }
     }
 
+    .history-list-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      max-height: 400px;
+      overflow: hidden;
+    }
+
     .history-list {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       width: 100%;
+      overflow-y: auto;
+      max-height: calc(100% - 50px);
+      padding-right: 5px; /* Prevent content from touching scrollbar */
     }
 
     .history-item {
@@ -198,6 +229,16 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
       }
     }
 
+    .history-controls {
+      width: 100%;
+      padding: 0.75rem 0 0;
+      position: relative; /* Changed from sticky to relative */
+      bottom: auto; /* Remove sticky positioning */
+      z-index: 5;
+      background: #20232a; /* Match app background */
+      margin-top: 1rem; /* Increased from 0.5rem */
+    }
+
     .show-more-btn {
       background: none;
       border: none;
@@ -208,8 +249,8 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
       width: 100%;
       text-align: center;
       border-radius: 8px;
-      margin-top: 0.75rem;
       transition: all 0.3s ease;
+      margin-bottom: 1rem; /* Add bottom margin for better spacing */
 
       &:hover {
         color: rgba(255, 255, 255, 0.9);
@@ -226,6 +267,14 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
     }
 
     :host-context(.light-theme) {
+      .history-header-container {
+        background: #f8f9fa; /* Match light theme background */
+      }
+      
+      .history-controls {
+        background: #f8f9fa; /* Match light theme background */
+      }
+      
       .history-legend {
         color: rgba(0, 0, 0, 0.4);
       }
@@ -290,6 +339,18 @@ import { TimerHistoryService, TimerHistoryEntry } from '../services/timer-histor
         color: rgba(0, 0, 0, 0.5);
       }
     }
+    
+    @media (max-width: 768px) {
+      .history-section {
+        width: 100%;
+        min-width: unset;
+        padding: 1rem;
+      }
+      
+      .task-width {
+        min-width: 120px;
+      }
+    }
   `]
 })
 export class TimerHistoryComponent implements OnInit, OnDestroy {
@@ -333,4 +394,4 @@ export class TimerHistoryComponent implements OnInit, OnDestroy {
     this.timerHistoryService.clearHistory();
     localStorage.removeItem('currentTask');
   }
-} 
+}

@@ -9,11 +9,12 @@
       (ngModelChange)="saveSettings()"
       min="1" 
       max="60"
+      step="1"
     >
   </div>
 
   <div class="input-group">
-    <label for="shortBreak">Short Break (minutes)</label>
+    <label for="shortBreak">Short Break Duration (minutes)</label>
     <input 
       id="shortBreak"
       type="number" 
@@ -21,11 +22,12 @@
       (ngModelChange)="saveSettings()"
       min="1" 
       max="30"
+      step="1"
     >
   </div>
 
   <div class="input-group">
-    <label for="longBreak">Long Break (minutes)</label>
+    <label for="longBreak">Long Break Duration (minutes)</label>
     <input 
       id="longBreak"
       type="number" 
@@ -33,6 +35,7 @@
       (ngModelChange)="saveSettings()"
       min="1" 
       max="60"
+      step="1"
     >
   </div>
 
@@ -45,6 +48,7 @@
       (ngModelChange)="saveSettings()"
       min="1" 
       max="10"
+      step="1"
     >
   </div>
-</div> 
+</div>

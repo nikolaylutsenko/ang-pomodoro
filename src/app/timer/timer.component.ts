@@ -6,6 +6,7 @@ import { TimerSettingsService } from '../services/timer-settings.service';
 import { TimerHistoryService } from '../services/timer-history.service';
 import { TimerHistoryComponent } from './timer-history.component';
 import { NotificationService } from '../services/notification.service';
+import { Task, TaskStatus } from '../models/task.model';
 
 @Component({
   selector: 'app-timer',
@@ -26,6 +27,8 @@ export class TimerComponent implements OnInit, OnDestroy {
   private timerStartTime: Date | null = null;
   private timerEndTimestamp: number | null = null;
   taskDescription: string = '';
+  tasks: Task[] = [];
+  selectedTaskId: string = '';
   private workIntervalCount: number = 0;
   private readonly workIntervalsBeforeLongBreak: number = 4; // Adjust as needed
 
@@ -41,10 +44,13 @@ export class TimerComponent implements OnInit, OnDestroy {
       this.resetTimer();
     });
 
-    // Load saved task description from localStorage
-    const savedTask = localStorage.getItem('currentTask');
-    if (savedTask) {
-      this.taskDescription = savedTask;
+    // Load tasks list and saved selection
+    const savedTasks = localStorage.getItem('tasks');
+    this.tasks = savedTasks ? JSON.parse(savedTasks).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) })) : [];
+    const savedId = localStorage.getItem('currentTaskId');
+    if (savedId && this.tasks.some(t => t.id === savedId)) {
+      this.selectedTaskId = savedId;
+      this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
     }
 
     // Listen for notification action events
@@ -148,14 +154,17 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.seconds = seconds < 10 ? `0${seconds}` : seconds.toString();
   }
 
-  updateTaskDescription(description: string) {
-    this.taskDescription = description;
-    localStorage.setItem('currentTask', description);
-  }
-
-  clearTaskDescription() {
-    this.taskDescription = '';
-    localStorage.removeItem('currentTask');
+  // Handle selection of a task
+  onTaskChange(taskId: string) {
+    this.selectedTaskId = taskId;
+    if (taskId) {
+      const task = this.tasks.find(t => t.id === taskId)!;
+      this.taskDescription = task.description;
+      localStorage.setItem('currentTaskId', taskId);
+    } else {
+      this.taskDescription = '';
+      localStorage.removeItem('currentTaskId');
+    }
   }
 
   private addHistoryEntry(isSuccessful: boolean) {
@@ -164,7 +173,8 @@ export class TimerComponent implements OnInit, OnDestroy {
         startTime: this.timerStartTime,
         type: this.currentMode,
         isSuccessful,
-        taskDescription: this.taskDescription
+        taskDescription: this.taskDescription,
+        taskId: this.selectedTaskId || undefined
       });
       this.timerStartTime = null;
     }
@@ -172,7 +182,17 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   onTimerEnd() {
     this.addHistoryEntry(true); // Add entry for the completed interval
-
+    // Update completed intervals on selected task
+    if (this.currentMode === 'work' && this.selectedTaskId) {
+      const task = this.tasks.find(t => t.id === this.selectedTaskId);
+      if (task) {
+        task.completedIntervals = (task.completedIntervals || 0) + 1;
+        task.completionStatus = task.completedIntervals >= task.workIntervals ? TaskStatus.Completed : TaskStatus.InProgress;
+        // Persist updated tasks
+        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+      }
+    }
+    
     let nextMode: 'work' | 'shortBreak' | 'longBreak';
     let nextDuration: number;
     let notificationBody: string;
@@ -213,11 +233,5 @@ export class TimerComponent implements OnInit, OnDestroy {
       // Error handling might still be relevant if showNotification itself rejects
       console.log('Notification service error:', error);
     });
-
-    // Automatically start the next timer if the setting is enabled
-    if (this.settings?.autoStartNextInterval) {
-       // Use setTimeout to allow the UI to update before starting the timer
-       setTimeout(() => this.startTimer(), 100);
-    }
   }
 }
