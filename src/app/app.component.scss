@@ -11,7 +11,7 @@
   background-color: #121212;
   color: white;
   transition: background-color 0.3s ease;
-  
+
   &.light-theme {
     background-color: #f5f5f5;
     color: #333;
@@ -32,7 +32,7 @@ header {
   margin: 0 auto;
   padding: 0 1.5rem;
   height: 60px;
-  
+
   h1 {
     font-size: 1.25rem;
     font-weight: 600;
@@ -54,15 +54,15 @@ header {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    
+
     .light-theme & {
       background-color: rgba(0, 0, 0, 0.05);
     }
   }
-  
+
   i {
     font-size: 1.2rem;
   }
@@ -122,8 +122,23 @@ header {
       margin-right: 1rem;
     }
   }
-  
+
   .main-content {
     padding: 0 1rem 1rem 1rem; /* Updated to remove top padding in mobile view as well */
+  }
+}
+
+
+.app-title {
+  text-align: center;
+  padding: 10px 0;
+  font-weight: bold;
+  color: var(--primary-color); /* Or your desired color */
+
+  .version {
+    font-size: 0.7em; /* Make version smaller */
+    font-weight: normal;
+    margin-left: 5px;
+    color: var(--secondary-text-color); /* Or a lighter color */
   }
 }

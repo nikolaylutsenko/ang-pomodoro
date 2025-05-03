@@ -182,14 +182,17 @@
 <div class="app-container" [class.light-theme]="isLightTheme">
   <header>
     <div class="header-content">
-      <h1>Yet Another Pomodoro</h1>
+      <div>Yet Another Pomodoro</div>
+      <div class="app-title">
+        <span class="version">{{ version }}</span>
+      </div>
       <app-nav></app-nav>
       <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
         <i class="fas" [class.fa-sun]="isDarkTheme" [class.fa-moon]="!isDarkTheme"></i>
       </button>
     </div>
   </header>
-  
+
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
