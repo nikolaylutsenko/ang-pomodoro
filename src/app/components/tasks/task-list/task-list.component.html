@@ -1,0 +1,63 @@
+<!-- Filter and Sort Controls -->
+<div class="task-controls">
+  <input
+    type="text"
+    placeholder="Filter by description"
+    [(ngModel)]="filterText"
+    (ngModelChange)="filterChanged.emit(filterText)"
+  />
+  <button (click)="toggleSort()">
+    Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
+  </button>
+</div>
+
+<!-- Tasks Table -->
+<table class="tasks-table">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Priority</th>
+      <th>Date Created</th>
+      <th>Est. Hours</th>
+      <th>Intervals</th>
+      <th>Completed</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let task of filteredAndSortedTasks" [ngClass]="{
+      'priority-low': task.priority === 'Low',
+      'priority-mid': task.priority === 'Mid',
+      'priority-high': task.priority === 'High'
+    }">
+      <td>
+        <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
+          {{ task.description | slice:0:300 }}...
+          <a class="show-more-link" (click)="toggleDescription(task.id)">Show more</a>
+        </span>
+        <span *ngIf="expandedDescriptions[task.id] && task.description.length > 300">
+          {{ task.description }}
+          <a class="show-more-link" (click)="toggleDescription(task.id)">Show less</a>
+        </span>
+        <span *ngIf="task.description.length <= 300">
+          {{ task.description }}
+        </span>
+      </td>
+      <td>{{ task.priority }}</td>
+      <td>{{ task.dateCreated | date:'short' }}</td>
+      <td>{{ task.estimatedHours }}</td>
+      <td>{{ task.workIntervals }}</td>
+      <td>{{ task.completedIntervals }}</td>
+      <td>{{ task.completionStatus }}</td>
+      <td>
+        <span class="icon-btn" title="Complete Interval" (click)="completeIntervalClicked(task)">✔️</span>
+        <span class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
+        <span class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">🗑️</span>
+      </td>
+    </tr>
+    <tr *ngIf="filteredAndSortedTasks.length === 0">
+      <td colspan="8">No tasks found.</td>
+    </tr>
+  </tbody>
+</table>

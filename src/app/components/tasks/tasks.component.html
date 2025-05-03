@@ -1,119 +1,14 @@
-<!-- Task Form -->
-<div class="task-form-container">
-  <form (ngSubmit)="addOrUpdateTask()" class="task-form">
-    <div class="task-form-fields">
-      <textarea
-        maxlength="1000"
-        placeholder="Task description (max 1000 symbols)"
-        [(ngModel)]="formTask.description"
-        name="description"
-        required
-        rows="4"
-        class="task-desc-textarea"
-      ></textarea>
-      <!-- Estimated Hours Input -->
-      <div class="estimated-hours-field">
-        <label for="estimated-hours">Estimated Hours:</label>
-        <input
-          id="estimated-hours"
-          type="number"
-          min="1"
-          [(ngModel)]="formTask.estimatedHours"
-          name="estimatedHours"
-          class="estimated-hours-input"
-          required
-        />
-      </div>
-      <div class="priority-and-action-row">
-        <div class="priority-slider-container">
-          <label for="priority-slider">Priority:</label>
-          <input
-            id="priority-slider"
-            type="range"
-            min="0"
-            max="2"
-            step="1"
-            [(ngModel)]="formPriority"
-            name="priority"
-            [ngStyle]="{'background': getPriorityGradient()}"
-            required
-          />
-          <div class="priority-labels">
-            <span class="priority-low">Low</span>
-            <span class="priority-medium">Medium</span>
-            <span class="priority-high">High</span>
-          </div>
-        </div>
-        <div class="task-form-actions">
-          <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
-          <button type="button" *ngIf="editingTaskId" (click)="editingTaskId = null; formTask = { description: '' }; formPriority = 0;">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </form>
-</div>
+<app-create-task
+    [taskToEdit]="editingTask"
+    (taskSaved)="handleTaskSaved($event)"
+    (cancelEdit)="handleCancelEdit()">
+</app-create-task>
 
 <hr class="tasks-separator" />
 
-<!-- Filter and Sort Controls -->
-<div class="task-controls">
-  <input
-    type="text"
-    placeholder="Filter by description"
-    [(ngModel)]="filterText"
-  />
-  <button (click)="toggleSort()">
-    Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
-  </button>
-</div>
-
-<!-- Tasks Table -->
-<table class="tasks-table">
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Priority</th>
-      <th>Date Created</th>
-      <th>Est. Hours</th>
-      <th>Intervals</th>
-      <th>Completed</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let task of filteredAndSortedTasks" [ngClass]="{
-      'priority-low': task.priority === 'Low',
-      'priority-mid': task.priority === 'Mid',
-      'priority-high': task.priority === 'High'
-    }">
-      <td>
-        <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
-          {{ task.description | slice:0:300 }}... 
-          <a class="show-more-link" (click)="toggleDescription(task.id)">Show more</a>
-        </span>
-        <span *ngIf="expandedDescriptions[task.id] && task.description.length > 300">
-          {{ task.description }}
-          <a class="show-more-link" (click)="toggleDescription(task.id)">Show less</a>
-        </span>
-        <span *ngIf="task.description.length <= 300">
-          {{ task.description }}
-        </span>
-      </td>
-      <td>{{ task.priority }}</td>
-      <td>{{ task.dateCreated | date:'short' }}</td>
-      <td>{{ task.estimatedHours }}</td>
-      <td>{{ task.workIntervals }}</td>
-      <td>{{ task.completedIntervals }}</td>
-      <td>{{ task.completionStatus }}</td>
-      <td>
-        <span class="icon-btn" title="Complete Interval" (click)="completeInterval(task)">✔️</span>
-        <span class="icon-btn" title="Edit" (click)="editTask(task)">✏️</span>
-        <span class="icon-btn" title="Delete" (click)="deleteTask(task.id)">🗑️</span>
-      </td>
-    </tr>
-    <tr *ngIf="filteredAndSortedTasks.length === 0">
-      <td colspan="8">No tasks found.</td>
-    </tr>
-  </tbody>
-</table>
+<app-task-list
+    [tasks]="tasks"
+    (editTask)="handleEditTask($event)"
+    (deleteTask)="handleDeleteTask($event)"
+    (completeInterval)="handleCompleteInterval($event)">
+</app-task-list>

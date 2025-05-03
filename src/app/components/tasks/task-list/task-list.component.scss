@@ -1,0 +1,114 @@
+.tasks-separator {
+  border-top: 2px solid var(--color-border);
+  margin: 2rem 0; /* Add margin for separation */
+}
+
+.task-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  input[type="text"] {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    min-width: 200px;
+    background: var(--color-bg-card);
+    color: var(--color-text);
+  }
+
+  button {
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    background: var(--color-secondary);
+    color: var(--color-text);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover {
+      background: var(--color-secondary-dark);
+    }
+  }
+}
+
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-bg-card);
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* Ensure border radius applies to table content */
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border); /* Apply border to all rows initially */
+  }
+
+  th {
+    background: var(--color-bg); /* Slightly different background for header */
+    color: var(--color-text-secondary);
+    font-weight: 600; /* Make header text bolder */
+  }
+
+  /* Remove bottom border from the last row's cells */
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  .icon-btn {
+    cursor: pointer;
+    font-size: 1.3rem;
+    margin-right: 0.8rem; /* Increased spacing */
+    user-select: none;
+    transition: color 0.2s, transform 0.1s ease-in-out;
+    display: inline-block; /* Ensure transform works */
+
+    &:hover {
+      color: var(--color-primary); /* General hover color */
+      transform: scale(1.1); /* Slight scale effect */
+    }
+
+    &[title="Complete Interval"]:hover {
+        color: var(--color-success-dark);
+    }
+    &[title="Edit"]:hover {
+        color: var(--color-warning-dark); /* Or another appropriate color */
+    }
+    &[title="Delete"]:hover {
+        color: var(--color-error-dark);
+    }
+
+    &:last-child {
+        margin-right: 0;
+    }
+  }
+}
+
+.show-more-link {
+  color: var(--color-link);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 0.5rem;
+  &:hover {
+    color: var(--color-link-dark);
+  }
+}
+
+/* Priority row styling */
+.priority-low {
+  border-left: 10px solid var(--color-success);
+}
+.priority-mid {
+  border-left: 10px solid var(--color-primary-yellow); /* Using primary for mid */
+}
+.priority-high {
+  border-left: 10px solid var(--color-error);
+}
