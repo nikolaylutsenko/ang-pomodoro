@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core'; // Added Inject, PLATFORM_ID
+import { CommonModule, isPlatformBrowser } from '@angular/common'; // Added isPlatformBrowser
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { TimerSettingsService } from '../services/timer-settings.service';
@@ -7,6 +7,16 @@ import { TimerHistoryService } from '../services/timer-history.service';
 import { TimerHistoryComponent } from './timer-history.component';
 import { NotificationService } from '../services/notification.service';
 import { Task, TaskStatus } from '../models/task.model';
+
+interface TimerState {
+  endTimestamp: number | null;
+  remainingSeconds: number;
+  mode: 'work' | 'shortBreak' | 'longBreak';
+  isRunning: boolean;
+  selectedTaskId: string;
+  workIntervalCount: number;
+  startTimeTimestamp: number | null; // Added to store the start time
+}
 
 @Component({
   selector: 'app-timer',
@@ -31,50 +41,168 @@ export class TimerComponent implements OnInit, OnDestroy {
   selectedTaskId: string = '';
   private workIntervalCount: number = 0;
   private readonly workIntervalsBeforeLongBreak: number = 4; // Adjust as needed
+  private isBrowser: boolean; // To check if running in browser
 
   constructor(
     private timerSettingsService: TimerSettingsService,
     private timerHistoryService: TimerHistoryService,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    @Inject(PLATFORM_ID) private platformId: Object // Inject PLATFORM_ID
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId); // Check if browser
+  }
 
   ngOnInit() {
     this.settingsSubscription = this.timerSettingsService.getSettings().subscribe(settings => {
       this.settings = settings;
-      this.resetTimer();
-    });
-
-    // Load tasks list and saved selection
-    const savedTasks = localStorage.getItem('tasks');
-    this.tasks = savedTasks ? JSON.parse(savedTasks).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) })) : [];
-    const savedId = localStorage.getItem('currentTaskId');
-    if (savedId && this.tasks.some(t => t.id === savedId)) {
-      this.selectedTaskId = savedId;
-      this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
-    }
-
-    // Listen for notification action events
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data && event.data.action === 'startNextInterval') {
-        this.toggleTimer();
+      // Only reset if no state is restored
+      if (!this.restoreState()) {
+        this.resetTimer();
       }
     });
+
+    // Load tasks list (keep existing logic)
+    if (this.isBrowser) {
+      const savedTasks = localStorage.getItem('tasks');
+      this.tasks = savedTasks ? JSON.parse(savedTasks).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) })) : [];
+      // Restore selected task ID if not already restored by timer state
+      if (!this.selectedTaskId) {
+        const savedId = localStorage.getItem('currentTaskId');
+        if (savedId && this.tasks.some(t => t.id === savedId)) {
+          this.selectedTaskId = savedId;
+          this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
+        }
+      }
+    }
+
+    // Listen for notification action events (keep existing logic)
+    if (this.isBrowser && 'serviceWorker' in navigator) {
+       navigator.serviceWorker.addEventListener('message', (event) => {
+         if (event.data && event.data.action === 'startNextInterval') {
+           this.toggleTimer(); // Consider if this needs adjustment with state saving
+         }
+       });
+    }
   }
 
   ngOnDestroy() {
     if (this.settingsSubscription) {
       this.settingsSubscription.unsubscribe();
     }
-    this.stopTimer();
+    // Don't stop timer here, let state persistence handle it
+    // this.stopTimer();
+    if (this.timer) {
+      clearInterval(this.timer); // Still clear interval on destroy
+    }
+  }
+
+  private saveState() {
+    if (!this.isBrowser) return; // Don't save state on server
+
+    const state: TimerState = {
+      endTimestamp: this.timerEndTimestamp,
+      remainingSeconds: this.currentTimeInSeconds,
+      mode: this.currentMode,
+      isRunning: this.isRunning,
+      selectedTaskId: this.selectedTaskId,
+      workIntervalCount: this.workIntervalCount,
+      startTimeTimestamp: this.timerStartTime?.getTime() || null // Save timestamp
+    };
+    localStorage.setItem('timerState', JSON.stringify(state));
+    // Keep currentTaskId separate for task component use? Or rely on timerState?
+    // Let's keep it separate for now for simplicity elsewhere.
+    if (this.selectedTaskId) {
+        localStorage.setItem('currentTaskId', this.selectedTaskId);
+    } else {
+        localStorage.removeItem('currentTaskId');
+    }
+  }
+
+  private restoreState(): boolean {
+    if (!this.isBrowser) return false; // Don't restore state on server
+
+    const savedState = localStorage.getItem('timerState');
+    if (savedState) {
+      try {
+        const state: TimerState = JSON.parse(savedState);
+        this.currentMode = state.mode;
+        this.selectedTaskId = state.selectedTaskId;
+        this.workIntervalCount = state.workIntervalCount || 0;
+        this.taskDescription = this.tasks.find(t => t.id === state.selectedTaskId)?.description || '';
+        // Restore timerStartTime if it was saved
+        this.timerStartTime = state.startTimeTimestamp ? new Date(state.startTimeTimestamp) : null;
+
+
+        if (state.isRunning && state.endTimestamp) {
+          const now = Date.now();
+          const remaining = Math.max(0, Math.round((state.endTimestamp - now) / 1000));
+          if (remaining > 0) {
+            this.currentTimeInSeconds = remaining;
+            this.timerEndTimestamp = state.endTimestamp;
+            this.isRunning = true;
+            // Ensure timerStartTime is set if restoring a running timer
+            if (!this.timerStartTime && state.startTimeTimestamp) {
+                 this.timerStartTime = new Date(state.startTimeTimestamp);
+            }
+            this.startTimerInterval(); // Start the interval without resetting timestamps
+            this.updateDisplay();
+            return true; // State restored and running
+          } else {
+            // Timer finished while the page was closed/reloaded
+            this.currentTimeInSeconds = 0;
+            this.updateDisplay();
+            // Treat it as if it just ended *now*.
+            // Pass the original start time if available for history accuracy
+            const originalStartTime = this.timerStartTime;
+            this.timerStartTime = null; // Clear start time before calling onTimerEnd
+            this.onTimerEnd(true, originalStartTime ?? undefined); // Pass flag and potentially original start time
+            return true; // State processed (ended)
+          }
+        } else if (!state.isRunning && state.remainingSeconds > 0) {
+          // Restore paused state
+          this.currentTimeInSeconds = state.remainingSeconds;
+          this.isRunning = false;
+          this.timerEndTimestamp = null; // Ensure timestamp is null for paused
+          // Keep restored timerStartTime if paused (might be needed if resumed later)
+          this.updateDisplay();
+          return true; // State restored (paused)
+        } else {
+           // Timer was stopped or finished, clear state and reset
+           this.clearState();
+           return false; // State was invalid or stopped, proceed with normal init
+        }
+
+      } catch (e) {
+        console.error("Error restoring timer state:", e);
+        this.clearState(); // Clear corrupted state
+        return false; // Error parsing, proceed with normal init
+      }
+    }
+    return false; // No state found
+  }
+
+  private clearState() {
+    if (!this.isBrowser) return;
+    localStorage.removeItem('timerState');
+    // Keep currentTaskId removal separate?
+    // localStorage.removeItem('currentTaskId'); // Let's manage this separately for now
+    // Reset component state variables explicitly
+    this.timerEndTimestamp = null;
+    this.isRunning = false;
+    this.timerStartTime = null; // Clear start time as well
+    // Don't reset mode or selected task here, let resetTimer handle defaults
   }
 
   setMode(mode: 'work' | 'shortBreak' | 'longBreak') {
-    if (this.isRunning) {
-      this.addHistoryEntry(false);
-    }
+    // No need to add history entry here if stopping
+    // if (this.isRunning) {
+    //   this.addHistoryEntry(false);
+    // }
     this.currentMode = mode;
-    this.stopTimer();
-    this.resetTimer();
+    this.stopTimer(); // Stop timer also clears state and resets
+    // resetTimer is called within stopTimer
+    // this.resetTimer(); // Already called by stopTimer
+    this.saveState(); // Save the new mode and stopped state
   }
 
   toggleTimer() {
@@ -88,48 +216,80 @@ export class TimerComponent implements OnInit, OnDestroy {
   startTimer() {
     if (!this.isRunning) {
       this.isRunning = true;
-      this.timerStartTime = new Date();
-      // Calculate the end timestamp based on current time and remaining seconds
-      this.timerEndTimestamp = Date.now() + this.currentTimeInSeconds * 1000;
-      this.timer = setInterval(() => {
-        if (this.timerEndTimestamp) {
-          const now = Date.now();
-          const remaining = Math.max(0, Math.round((this.timerEndTimestamp - now) / 1000));
-          this.currentTimeInSeconds = remaining;
-          this.updateDisplay();
-          if (remaining <= 0) {
-            clearInterval(this.timer);
-            this.onTimerEnd();
-          }
-        }
-      }, 1000);
+      this.timerStartTime = new Date(); // Keep track of session start time for history
+      // Calculate end timestamp only if it's not already set (i.e., not resuming)
+      if (!this.timerEndTimestamp) {
+         this.timerEndTimestamp = Date.now() + this.currentTimeInSeconds * 1000;
+      }
+      this.startTimerInterval();
+      this.saveState(); // Save running state
     }
   }
 
+  // Extracted interval logic
+  private startTimerInterval() {
+     if (this.timer) { // Clear any existing interval first
+       clearInterval(this.timer);
+     }
+     this.timer = setInterval(() => {
+       if (this.timerEndTimestamp) {
+         const now = Date.now();
+         const remaining = Math.max(0, Math.round((this.timerEndTimestamp - now) / 1000));
+         this.currentTimeInSeconds = remaining;
+         this.updateDisplay();
+         // Save state periodically? Or rely on pause/stop/destroy? Let's save less frequently for now.
+         // this.saveState(); // Saving every second might be excessive
+
+         if (remaining <= 0) {
+           clearInterval(this.timer);
+           this.onTimerEnd();
+         }
+       } else {
+         // Should not happen if timer is running, maybe clear interval?
+         console.warn("Timer interval running without an end timestamp!");
+         clearInterval(this.timer);
+         this.isRunning = false; // Correct state
+         this.resetTimer(); // Reset to be safe
+         this.saveState();
+       }
+     }, 1000);
+  }
+
   pauseTimer() {
-    this.addHistoryEntry(false);
+    // Only add history if it was actually running for a bit
+    if (this.isRunning && this.timerStartTime) {
+       this.addHistoryEntry(false); // Log pause as unsuccessful completion of interval
+       // Don't nullify timerStartTime here, keep it for potential resume
+    }
     this.isRunning = false;
     if (this.timer) {
       clearInterval(this.timer);
     }
-    // Adjust currentTimeInSeconds in case of pause
+    // Update remaining seconds based on timestamp before clearing it
     if (this.timerEndTimestamp) {
       const now = Date.now();
       this.currentTimeInSeconds = Math.max(0, Math.round((this.timerEndTimestamp - now) / 1000));
-      this.timerEndTimestamp = null;
+      this.timerEndTimestamp = null; // Clear timestamp for paused state
     }
+    this.updateDisplay(); // Ensure display updates on pause
+    this.saveState(); // Save paused state (including timerStartTime)
   }
 
   stopTimer() {
-    if (this.isRunning) {
-      this.addHistoryEntry(false);
+    // Only add history if it was actually running for a bit
+    if (this.isRunning && this.timerStartTime) {
+      this.addHistoryEntry(false); // Log stop as unsuccessful completion
     }
     this.isRunning = false;
     if (this.timer) {
       clearInterval(this.timer);
     }
     this.timerEndTimestamp = null;
-    this.resetTimer();
+    this.timerStartTime = null; // Explicitly clear start time on stop
+    this.resetTimer(); // Reset time based on current mode
+    this.clearState(); // Clear saved state from localStorage
+    // Save the reset state (stopped, default time for mode, null start time)
+    this.saveState();
   }
 
   resetTimer() {
@@ -144,7 +304,11 @@ export class TimerComponent implements OnInit, OnDestroy {
         this.currentTimeInSeconds = this.settings?.longBreakDuration * 60 || 900;
         break;
     }
+    this.timerEndTimestamp = null; // Ensure timestamp is cleared on reset
+    this.isRunning = false; // Ensure running is false
+    this.timerStartTime = null; // Ensure start time is null on reset
     this.updateDisplay();
+    // Don't save state here, let callers handle saving after reset if needed (like stopTimer, setMode)
   }
 
   updateDisplay() {
@@ -160,39 +324,54 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (taskId) {
       const task = this.tasks.find(t => t.id === taskId)!;
       this.taskDescription = task.description;
-      localStorage.setItem('currentTaskId', taskId);
+      // localStorage.setItem('currentTaskId', taskId); // Managed by saveState now
     } else {
       this.taskDescription = '';
-      localStorage.removeItem('currentTaskId');
+      // localStorage.removeItem('currentTaskId'); // Managed by saveState now
     }
+    this.saveState(); // Save state when task changes
   }
 
-  private addHistoryEntry(isSuccessful: boolean) {
-    if (this.timerStartTime) {
+  private addHistoryEntry(isSuccessful: boolean, explicitStartTime?: Date) {
+    const startTimeToUse = explicitStartTime ?? this.timerStartTime; // Use explicit if provided
+    if (startTimeToUse) {
       this.timerHistoryService.addEntry({
-        startTime: this.timerStartTime,
+        startTime: startTimeToUse, // Use the determined start time
         type: this.currentMode,
         isSuccessful,
         taskDescription: this.taskDescription,
         taskId: this.selectedTaskId || undefined
       });
-      this.timerStartTime = null;
+      // Only nullify the component's timerStartTime if we used it (not an explicit one)
+      if (!explicitStartTime) {
+          this.timerStartTime = null;
+      }
     }
   }
 
-  onTimerEnd() {
-    this.addHistoryEntry(true); // Add entry for the completed interval
-    // Update completed intervals on selected task
+  // Modify onTimerEnd slightly to handle restored end and save state
+  onTimerEnd(wasRestoredEnd: boolean = false, originalStartTime?: Date) {
+    if (!wasRestoredEnd) {
+        // Use the component's timerStartTime for natural end
+        this.addHistoryEntry(true);
+    } else if (originalStartTime) {
+        // Use the passed originalStartTime for restored end
+        this.addHistoryEntry(true, originalStartTime);
+    }
+
+    // Update completed intervals on selected task (keep existing logic)
     if (this.currentMode === 'work' && this.selectedTaskId) {
       const task = this.tasks.find(t => t.id === this.selectedTaskId);
       if (task) {
         task.completedIntervals = (task.completedIntervals || 0) + 1;
         task.completionStatus = task.completedIntervals >= task.workIntervals ? TaskStatus.Completed : TaskStatus.InProgress;
         // Persist updated tasks
-        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+        if (this.isBrowser) {
+          localStorage.setItem('tasks', JSON.stringify(this.tasks));
+        }
       }
     }
-    
+
     let nextMode: 'work' | 'shortBreak' | 'longBreak';
     let nextDuration: number;
     let notificationBody: string;
@@ -201,14 +380,14 @@ export class TimerComponent implements OnInit, OnDestroy {
 
     if (endedMode === 'work') {
       this.workIntervalCount++;
-      localStorage.setItem('workIntervalCount', this.workIntervalCount.toString()); // Persist count
+      // localStorage.setItem('workIntervalCount', this.workIntervalCount.toString()); // Saved in saveState
 
       if (this.workIntervalCount >= this.workIntervalsBeforeLongBreak) {
         nextMode = 'longBreak';
         nextDuration = this.settings?.longBreakDuration || 15;
         notificationBody = `Work finished! Time for a long break (${nextDuration} minutes).`;
         this.workIntervalCount = 0; // Reset after long break is set
-        localStorage.setItem('workIntervalCount', '0'); // Persist reset count
+        // localStorage.setItem('workIntervalCount', '0'); // Saved in saveState
       } else {
         nextMode = 'shortBreak';
         nextDuration = this.settings?.shortBreakDuration || 5;
@@ -221,17 +400,17 @@ export class TimerComponent implements OnInit, OnDestroy {
       notificationBody = `Break's over! Time for work (${nextDuration} minutes).`;
     }
 
-    this.setMode(nextMode); // Set the next mode *after* determining message and adding history
+    // Set the next mode, which calls stopTimer -> resetTimer -> clearState -> saveState
+    this.setMode(nextMode);
 
-    // Show notification - Corrected icon path for built assets
-    this.notificationService.showNotification('Pomodoro Timer', {
-      body: notificationBody,
-      icon: 'assets/timer-icon.svg' // Correct path relative to deployed app root
-    }).then(notification => { // No need for 'as any' if service handles it
-      // Event handling is managed by the service worker listener in ngOnInit
-    }).catch(error => {
-      // Error handling might still be relevant if showNotification itself rejects
-      console.log('Notification service error:', error);
-    });
+    // Show notification (only if not a restored end state)
+    if (!wasRestoredEnd && this.isBrowser) {
+        this.notificationService.showNotification('Pomodoro Timer', {
+          body: notificationBody,
+          icon: 'assets/timer-icon.svg'
+        }).catch(error => {
+          console.log('Notification service error:', error);
+        });
+    }
   }
 }
