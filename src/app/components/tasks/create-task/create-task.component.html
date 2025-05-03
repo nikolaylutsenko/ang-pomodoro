@@ -1,0 +1,54 @@
+<!-- Task Form -->
+<div class="task-form-container">
+  <form (ngSubmit)="addOrUpdateTask()" class="task-form">
+    <div class="task-form-fields">
+      <textarea
+        maxlength="1000"
+        placeholder="Task description (max 1000 symbols)"
+        [(ngModel)]="formTask.description"
+        name="description"
+        required
+        rows="4"
+        class="task-desc-textarea"
+      ></textarea>
+      <!-- Estimated Hours Input -->
+      <div class="estimated-hours-field">
+        <label for="estimated-hours">Estimated Hours:</label>
+        <input
+          id="estimated-hours"
+          type="number"
+          min="1"
+          [(ngModel)]="formTask.estimatedHours"
+          name="estimatedHours"
+          class="estimated-hours-input"
+          required
+        />
+      </div>
+      <div class="priority-and-action-row">
+        <div class="priority-slider-container">
+          <label for="priority-slider">Priority:</label>
+          <input
+            id="priority-slider"
+            type="range"
+            min="0"
+            max="2"
+            step="1"
+            [(ngModel)]="formPriority"
+            name="priority"
+            [ngStyle]="{'background': getPriorityGradient()}"
+            required
+          />
+          <div class="priority-labels">
+            <span class="priority-low">Low</span>
+            <span class="priority-medium">Medium</span>
+            <span class="priority-high">High</span>
+          </div>
+        </div>
+        <div class="task-form-actions">
+          <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
+          <button type="button" *ngIf="editingTaskId" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

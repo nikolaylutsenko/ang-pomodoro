@@ -39,23 +39,23 @@
   transition: all 0.2s ease;
   border-bottom: 3px solid transparent;
   text-align: center; // Center text
-  
+
   i {
     font-size: 1rem;
   }
-  
+
   span {
     font-size: 0.9rem;
     font-weight: 500;
     white-space: nowrap; // Prevent text wrapping
   }
-  
+
   &.active {
     color: rgba(255, 255, 255, 1);
     border-bottom-color: rgba(255, 255, 255, 0.8);
     background: rgba(255, 255, 255, 0.08);
   }
-  
+
   &:hover:not(.active) {
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.9);
@@ -65,13 +65,13 @@
 :host-context(.light-theme) {
   .nav-link {
     color: rgba(0, 0, 0, 0.6);
-    
+
     &.active {
       color: rgba(0, 0, 0, 0.9);
       border-bottom-color: rgba(0, 0, 0, 0.6);
       background: rgba(0, 0, 0, 0.03);
     }
-    
+
     &:hover:not(.active) {
       background: rgba(0, 0, 0, 0.02);
       color: rgba(0, 0, 0, 0.8);
@@ -82,11 +82,11 @@
 @media (max-width: 768px) {
   .nav-link {
     padding: 0 0.5rem; // Further reduce padding on mobile
-    
+
     span {
       display: none;
     }
-    
+
     i {
       margin: 0;
       font-size: 1.1rem;

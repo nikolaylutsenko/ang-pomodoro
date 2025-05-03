@@ -10,6 +10,8 @@ import { RouterModule, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './nav.component.scss'
 })
 export class NavComponent {
+
+
   tabs = [
     { path: '/timer', label: 'Timer', icon: 'fa-clock' },
     { path: '/statistics', label: 'Statistics', icon: 'fa-chart-bar' },

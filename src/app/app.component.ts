@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './components/nav/nav.component';
+import packageJson from '../../package.json'; // Import package.json
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,8 @@ export class AppComponent implements OnInit {
   title = 'Pomodoro';
   isLightTheme = false;
   isDarkTheme = true;
+  version: string = packageJson.version; // Add version property
+
 
   ngOnInit() {
     // asks for permission to show notifications
@@ -25,6 +28,7 @@ export class AppComponent implements OnInit {
           console.log('Notification permission denied.');
         }
       });
+
     }
 
     // Check if there's a saved theme preference

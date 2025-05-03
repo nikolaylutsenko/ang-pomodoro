@@ -1,30 +1,27 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskPriority, TaskStatus } from '../../models/task.model';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TimerSettingsService, TimerSettings } from '../../services/timer-settings.service';
+import { CreateTaskComponent } from './create-task/create-task.component';
+import { TaskListComponent } from './task-list/task-list.component';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CreateTaskComponent,
+    TaskListComponent
+  ],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })
-export class TasksComponent {
+export class TasksComponent implements OnInit {
   tasks: Task[] = [];
-  filterText: string = '';
-  sortDesc: boolean = true;
-  priorities = Object.values(TaskPriority);
-  priorityMap = [TaskPriority.Low, TaskPriority.Mid, TaskPriority.High];
-  expandedDescriptions: { [taskId: string]: boolean } = {};
+  editingTask: Task | null = null;
 
-  // Form state
-  formTask: Partial<Task> = { description: '', estimatedHours: 1 }; // Default estimatedHours to 1
-  formPriority: number = 1;
-  editingTaskId: string | null = null;
-  
-  // Timer settings for calculating intervals
   currentSettings!: TimerSettings;
 
   constructor(private timerSettings: TimerSettingsService) {}
@@ -34,7 +31,6 @@ export class TasksComponent {
     this.timerSettings.getSettings().subscribe(s => this.currentSettings = s);
   }
 
-  // Restore load and save tasks
   private loadTasks(): void {
     const data = localStorage.getItem('tasks');
     this.tasks = data
@@ -46,103 +42,80 @@ export class TasksComponent {
     localStorage.setItem('tasks', JSON.stringify(this.tasks));
   }
 
-  // Compute number of work intervals based on estimated hours and workDuration
   private calculateWorkIntervals(hours: number): number {
     const totalMinutes = hours * 60;
-    // Ensure currentSettings and workDuration are available, otherwise default
-    const workDuration = this.currentSettings?.workDuration || 25; 
+    const workDuration = this.currentSettings?.workDuration || 25;
     return Math.ceil(totalMinutes / workDuration);
   }
 
-  addOrUpdateTask() {
-    if (!this.formTask.description || this.formPriority === undefined || this.formPriority === null || this.formTask.estimatedHours === undefined) return;
-    
-    // Ensure estimated hours is at least 1
-    if (this.formTask.estimatedHours < 1) {
-      this.formTask.estimatedHours = 1;
-    }
-
-    const priority = this.priorityMap[this.formPriority];
-    if (this.editingTaskId) {
-      // Edit
-      // Recalculate intervals on edit based on potentially changed hours
-      const intervals = this.calculateWorkIntervals(this.formTask.estimatedHours);
-      const idx = this.tasks.findIndex(t => t.id === this.editingTaskId);
+  handleTaskSaved(taskData: Partial<Task>) {
+    if (taskData.id) { // Editing existing task
+      const idx = this.tasks.findIndex(t => t.id === taskData.id);
       if (idx > -1) {
-        this.tasks[idx].description = this.formTask.description!;
-        this.tasks[idx].priority = priority;
-        // Update intervals on edit
-        this.tasks[idx].estimatedHours = this.formTask.estimatedHours!; // Already ensured to be >= 1
-        this.tasks[idx].workIntervals = intervals;
+        const intervals = this.calculateWorkIntervals(taskData.estimatedHours!);
+        // Create a new object for the updated task to help with change detection if needed elsewhere
+        const updatedTask = {
+          ...this.tasks[idx],
+          description: taskData.description!,
+          priority: taskData.priority!,
+          estimatedHours: taskData.estimatedHours!,
+          workIntervals: intervals
+        };
+        // Create a new array with the updated task
+        this.tasks = this.tasks.map((task, index) => index === idx ? updatedTask : task);
         this.saveTasks();
       }
-      this.editingTaskId = null;
-    } else {
-      // Add
-      const intervals = 3; // Default workIntervals to 3 for new tasks
+      this.editingTask = null;
+    } else { // Adding new task
+      const intervals = this.calculateWorkIntervals(taskData.estimatedHours!);
       const newTask: Task = {
         id: crypto.randomUUID(),
-        description: this.formTask.description!,
-        priority,
+        description: taskData.description!,
+        priority: taskData.priority!,
         dateCreated: new Date(),
-        estimatedHours: this.formTask.estimatedHours!, // Already ensured to be >= 1
-        workIntervals: intervals, // Set to 3
+        estimatedHours: taskData.estimatedHours!,
+        workIntervals: intervals,
         completedIntervals: 0,
         completionStatus: TaskStatus.Pending
       };
-      this.tasks.push(newTask);
+      // Create a new array by spreading the existing tasks and adding the new one
+      this.tasks = [...this.tasks, newTask];
       this.saveTasks();
     }
-    // Reset form, defaulting hours back to 1
-    this.formTask = { description: '', estimatedHours: 1 }; 
-    this.formPriority = 1;
   }
 
-  editTask(task: Task) {
-    // Ensure form starts with at least 1 hour when editing
-    const editHours = task.estimatedHours < 1 ? 1 : task.estimatedHours;
-    this.formTask = { description: task.description, estimatedHours: editHours };
-    this.formPriority = this.priorityMap.indexOf(task.priority);
-    this.editingTaskId = task.id;
+  handleCancelEdit() {
+    this.editingTask = null;
   }
 
-  deleteTask(id: string) {
+  handleEditTask(task: Task) {
+    // Pass a copy to avoid potential direct mutation issues if CreateTaskComponent modifies the object
+    this.editingTask = { ...task };
+  }
+
+  handleDeleteTask(id: string) {
+    // filter already returns a new array reference
     this.tasks = this.tasks.filter(t => t.id !== id);
     this.saveTasks();
-    if (this.editingTaskId === id) {
-      this.editingTaskId = null;
-      this.formTask = { description: '', estimatedHours: 1 };
-      this.formPriority = 1;
+    if (this.editingTask?.id === id) {
+      this.editingTask = null;
     }
   }
 
-  get filteredAndSortedTasks() {
-    let filtered = this.tasks.filter(t => t.description.toLowerCase().includes(this.filterText.toLowerCase()));
-    return filtered.sort((a, b) => this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime());
-  }
-
-  toggleSort() {
-    this.sortDesc = !this.sortDesc;
-  }
-
-  getPriorityGradient() {
-    return 'linear-gradient(90deg, #43a047 0%, #fbc02d 50%, #e53935 100%)';
-  }
-
-  toggleDescription(taskId: string) {
-    this.expandedDescriptions[taskId] = !this.expandedDescriptions[taskId];
-  }
-
-  // Mark a work interval as completed and update task status
-  completeInterval(task: Task): void {
-    if (task.completedIntervals < task.workIntervals) {
-      task.completedIntervals++;
-      task.completionStatus =
-        task.completedIntervals >= task.workIntervals
-          ? TaskStatus.Completed
-          : TaskStatus.InProgress;
-      this.saveTasks();
+  handleCompleteInterval(task: Task): void {
+    const taskIndex = this.tasks.findIndex(t => t.id === task.id);
+    if (taskIndex > -1 && this.tasks[taskIndex].completedIntervals < this.tasks[taskIndex].workIntervals) {
+        // Create a new object for the updated task
+        const updatedTask = {
+            ...this.tasks[taskIndex],
+            completedIntervals: this.tasks[taskIndex].completedIntervals + 1,
+            completionStatus: (this.tasks[taskIndex].completedIntervals + 1) >= this.tasks[taskIndex].workIntervals
+                                ? TaskStatus.Completed
+                                : TaskStatus.InProgress
+        };
+        // Create a new array with the updated task
+        this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
+        this.saveTasks();
     }
   }
-
 }
