@@ -4,7 +4,7 @@
 <!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 <style>
@@ -176,16 +176,70 @@
       margin-block: 1.5rem;
     }
   }
+
+  /* Styles for circular SVG text */
+  .circular-logo-svg {
+    /* Adjust size/position as needed */
+    margin-right: 10px; /* Example spacing */
+    vertical-align: middle; /* Align with other header items */
+    color: tomato; /* Set the color to tomato red */
+  }
+
+  .circular-text textPath {
+    fill: currentColor; /* Use the text color from the parent */
+    font-size: 17px; /* Increased font size */
+    font-weight: 500; /* Example */
+    font-family: 'Roboto', bold; /* Apply Lobster font */
+    letter-spacing: 1px; /* Adjust spacing */
+  }
+
+  /* Style for the version text inside the SVG */
+  .version-text {
+    font-size: 12px; /* Adjust size as needed */
+    font-weight: bold;
+    fill: currentColor; /* Use text color from parent */
+    font-family: 'Roboto', sans-serif; /* Use a standard font */
+  }
 </style>
 
 <!-- Main container -->
 <div class="app-container" [class.light-theme]="isLightTheme">
   <header>
     <div class="header-content">
-      <div>Yet Another Pomodoro</div>
-      <div class="app-title">
-        <span class="version">{{ version }}</span>
-      </div>
+      <!-- Replace div with SVG for circular text -->
+      <!-- Adjusted viewBox, width, and height for oval shape -->
+      <svg class="circular-logo-svg" viewBox="0 0 120 100" width="72" height="60">
+        <!-- Define the elliptical paths -->
+        <!-- Adjusted radii (50, 40) for oval shape -->
+        <path id="circlePathTop" fill="none" stroke="none" d="M 10,50 A 50,40 0 0 1 110,50"/>
+        <path id="circlePathBottom" fill="none" stroke="none" d="M 10,50 A 50,40 0 0 0 110,50"/>
+
+        <!-- Text on the top path -->
+        <text class="circular-text">
+          <textPath href="#circlePathTop" startOffset="50%" text-anchor="middle">
+            YET ANOTHER
+          </textPath>
+        </text>
+
+        <!-- Text on the bottom path -->
+        <text class="circular-text">
+          <textPath href="#circlePathBottom" startOffset="50%" text-anchor="middle">
+            POMODORO
+          </textPath>
+        </text>
+
+        <!-- Version text in the center -->
+        <text x="60" y="53" text-anchor="middle" dominant-baseline="middle" class="version-text">
+          {{ version }}
+        </text>
+
+        <!-- Simple Green Leaf -->
+        <!-- Adjusted scale to be ~15% of oval viewBox height (100 units * 0.15 = 15 units. Path height is ~10 units. Scale = 15/10 = 1.5) -->
+        <g transform="translate(60, 8) rotate(-30) scale(1.5)">
+          <path d="M 0 0 C 5 -5, 10 -5, 15 0 C 10 5, 5 5, 0 0 Z" fill="limegreen" /> <!-- Leaf shape and color -->
+        </g>
+      </svg>
+      <!-- Removed the separate div for version -->
       <app-nav></app-nav>
       <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
         <i class="fas" [class.fa-sun]="isDarkTheme" [class.fa-moon]="!isDarkTheme"></i>

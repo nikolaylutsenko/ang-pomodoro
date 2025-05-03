@@ -1,5 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap');
+
+/* You can add global styles to this file, and also import other style files */
 
 /* Global Theme Variables */
 :root {
@@ -77,12 +79,12 @@ button {
   padding: var(--spacing-sm) var(--spacing-xl);
   font-weight: 500;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
