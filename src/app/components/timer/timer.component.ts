@@ -32,6 +32,8 @@ export class TimerComponent implements OnInit, OnDestroy {
   taskDescription: string = '';
   tasks: Task[] = [];
   selectedTaskId: string = '';
+  private audioContextUnlocked = false; // Flag to track if audio is unlocked
+  private notificationAudio: HTMLAudioElement; // Declare Audio object property
 
   private timerStartTime: Date | null = null;
   private workIntervalCount: number = 0;
@@ -46,6 +48,9 @@ export class TimerComponent implements OnInit, OnDestroy {
         this.setTimeForMode(this.currentMode);
       }
     });
+    // Initialize the Audio object here
+    this.notificationAudio = new Audio('assets/notification.mp3');
+    this.notificationAudio.load(); // Preload the audio
   }
 
   ngOnInit(): void {
@@ -65,6 +70,9 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (savedCount) {
       this.workIntervalCount = parseInt(savedCount, 10);
     }
+
+    // Attempt to unlock audio context silently if possible (might not work)
+    // this.unlockAudioContext(true); // Pass true for silent attempt
   }
 
   ngOnDestroy(): void {
@@ -92,35 +100,53 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   startTimer(): void {
     if (!this.isRunning) {
+      console.log('[TimerComponent] startTimer called, isRunning=false'); // Log entry
+      // Attempt to unlock audio on the first *user-initiated* start
+      if (!this.audioContextUnlocked) {
+        console.log('[TimerComponent] Attempting to call unlockAudioContext...'); // Log before call
+        this.unlockAudioContext();
+      } else {
+         console.log('[TimerComponent] Audio context already unlocked.');
+      }
+
       this.isRunning = true;
       this.timerStartTime = new Date();
+      console.log('[TimerComponent] Starting setInterval...'); // Log before interval
       this.timerInterval = setInterval(() => {
+        // console.log(`[TimerComponent] Interval tick: ${this.minutes}:${this.seconds}`); // Optional: very verbose logging
         if (this.seconds > 0) {
           this.seconds--;
         } else if (this.minutes > 0) {
           this.minutes--;
           this.seconds = 59;
         } else {
-          this.stopTimer();
+          // Interval reached zero
+          console.log('[TimerComponent] Timer reached zero, calling onTimerEnd...'); // Log before call
           this.onTimerEnd();
         }
       }, 1000);
+    } else {
+       console.log('[TimerComponent] startTimer called, but already running.');
     }
   }
 
   stopTimer(): void {
+    // Only add history entry if timer was running and stopped manually
     if (this.isRunning) {
-      this.addHistoryEntry(false);
+       this.addHistoryEntry(false); // Log incomplete interval if stopped manually
     }
     this.isRunning = false;
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
+      this.timerInterval = null; // Clear the interval reference
     }
+     // Reset start time when stopped manually
+    this.timerStartTime = null;
   }
 
   resetTimer(): void {
-    this.stopTimer();
-    this.setTimeForMode(this.currentMode);
+    this.stopTimer(); // Stop first
+    this.setTimeForMode(this.currentMode); // Then reset time
   }
 
   // Handle task selection
@@ -141,8 +167,18 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   onTimerEnd(): void {
-    this.addHistoryEntry(true);
-    this.playNotificationSound();
+    console.log('[TimerComponent] onTimerEnd called.'); // Log entry
+    // Clear the interval *before* potentially starting the next one
+    if (this.timerInterval) {
+        console.log('[TimerComponent] Clearing interval in onTimerEnd.');
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+    }
+    this.isRunning = false; // Mark as not running
+
+    this.addHistoryEntry(true); // Log successful interval
+    console.log('[TimerComponent] Attempting to call playNotificationSound...'); // Log before call
+    this.playNotificationSound(); // Play sound
 
     let nextMode: TimerMode;
     if (this.currentMode === TimerMode.WORK) {
@@ -151,7 +187,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
       if (this.workIntervalCount >= (this.settings?.longBreakInterval || 4)) {
         nextMode = TimerMode.LONG_BREAK;
-        this.workIntervalCount = 0;
+        this.workIntervalCount = 0; // Reset count for long break
         localStorage.setItem('workIntervalCount', '0');
       } else {
         nextMode = TimerMode.SHORT_BREAK;
@@ -159,7 +195,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     } else {
       nextMode = TimerMode.WORK;
     }
-
+    console.log(`[TimerComponent] Setting next mode to: ${nextMode}`);
     this.setTimeForMode(nextMode);
   }
 
@@ -176,8 +212,47 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
   }
 
+  private unlockAudioContext(): void {
+    // Use the existing audio object
+    console.log('[TimerComponent] Inside unlockAudioContext method.'); // Log entry
+    // Ensure volume is 0 for the unlock attempt
+    this.notificationAudio.volume = 0;
+    const playPromise = this.notificationAudio.play();
+
+    if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            this.notificationAudio.pause(); // Pause immediately after unlock
+            this.notificationAudio.currentTime = 0; // Reset time
+            this.notificationAudio.volume = 1; // Reset volume for actual playback later
+            this.audioContextUnlocked = true;
+            console.log('Audio context unlocked by user interaction.');
+        }).catch(error => {
+            console.error('Audio context unlock failed:', error);
+             this.notificationAudio.volume = 1; // Reset volume even if unlock failed
+            // Might still fail later
+        });
+    } else {
+         console.warn('Audio unlock: play() did not return a promise.');
+         this.notificationAudio.volume = 1; // Reset volume
+    }
+  }
+
   private playNotificationSound(): void {
-    const audio = new Audio('assets/notification.mp3');
-    audio.play().catch(error => console.log('Error playing notification sound:', error));
+     console.log('[TimerComponent] Inside playNotificationSound method.'); // Log entry
+    // Ensure volume is audible
+    this.notificationAudio.volume = 1; // Or use a setting
+
+    const playPromise = this.notificationAudio.play();
+
+     if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            console.log('Notification sound playback started.');
+        }).catch(error => {
+            console.error('Error playing notification sound:', error);
+            // Inform user? e.g., display a message "Could not play sound."
+        });
+    } else {
+         console.warn('Notification sound: play() did not return a promise.');
+    }
   }
 }

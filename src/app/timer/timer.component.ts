@@ -42,6 +42,8 @@ export class TimerComponent implements OnInit, OnDestroy {
   private workIntervalCount: number = 0;
   private readonly workIntervalsBeforeLongBreak: number = 4; // Adjust as needed
   private isBrowser: boolean; // To check if running in browser
+  private audioContextUnlocked = false; // Flag for audio unlock
+  private notificationAudio: HTMLAudioElement | null = null; // Audio object
 
   constructor(
     private timerSettingsService: TimerSettingsService,
@@ -50,6 +52,11 @@ export class TimerComponent implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object // Inject PLATFORM_ID
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId); // Check if browser
+    if (this.isBrowser) {
+        // Initialize Audio only in the browser
+        this.notificationAudio = new Audio('assets/notification.mp3');
+        this.notificationAudio.load(); // Preload
+    }
   }
 
   ngOnInit() {
@@ -194,14 +201,8 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   setMode(mode: 'work' | 'shortBreak' | 'longBreak') {
-    // No need to add history entry here if stopping
-    // if (this.isRunning) {
-    //   this.addHistoryEntry(false);
-    // }
     this.currentMode = mode;
     this.stopTimer(); // Stop timer also clears state and resets
-    // resetTimer is called within stopTimer
-    // this.resetTimer(); // Already called by stopTimer
     this.saveState(); // Save the new mode and stopped state
   }
 
@@ -215,6 +216,11 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   startTimer() {
     if (!this.isRunning) {
+       // Attempt to unlock audio on the first *user-initiated* start
+      if (this.isBrowser && !this.audioContextUnlocked) {
+        this.unlockAudioContext();
+      }
+
       this.isRunning = true;
       this.timerStartTime = new Date(); // Keep track of session start time for history
       // Calculate end timestamp only if it's not already set (i.e., not resuming)
@@ -359,6 +365,9 @@ export class TimerComponent implements OnInit, OnDestroy {
         this.addHistoryEntry(true, originalStartTime);
     }
 
+    // Play sound!
+    this.playNotificationSound();
+
     // Update completed intervals on selected task (keep existing logic)
     if (this.currentMode === 'work' && this.selectedTaskId) {
       const task = this.tasks.find(t => t.id === this.selectedTaskId);
@@ -411,6 +420,52 @@ export class TimerComponent implements OnInit, OnDestroy {
         }).catch(error => {
           console.log('Notification service error:', error);
         });
+    }
+  }
+
+  // --- Audio Methods ---
+
+  private unlockAudioContext(): void {
+    if (!this.isBrowser || !this.notificationAudio) return; // Guard clause
+
+    this.notificationAudio.volume = 0; // Mute for unlock attempt
+    const playPromise = this.notificationAudio.play();
+
+    if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            this.notificationAudio!.pause(); // Use non-null assertion
+            this.notificationAudio!.currentTime = 0;
+            this.notificationAudio!.volume = 1; // Reset volume
+            this.audioContextUnlocked = true;
+        }).catch(error => {
+            console.error('[TimerComponent] Audio context unlock failed:', error);
+             if (this.notificationAudio) this.notificationAudio.volume = 1; // Reset volume even if failed
+        });
+    } else {
+         console.warn('[TimerComponent] Audio unlock: play() did not return a promise.');
+         if (this.notificationAudio) this.notificationAudio.volume = 1; // Reset volume
+    }
+  }
+
+  private playNotificationSound(): void {
+    if (!this.isBrowser || !this.notificationAudio) return; // Guard clause
+
+    if (!this.audioContextUnlocked) {
+        console.warn('[TimerComponent] Audio context may not be unlocked. Playback might fail.');
+    }
+
+    this.notificationAudio.currentTime = 0; // Reset playback position
+    this.notificationAudio.volume = 1; // Ensure volume is audible (use setting later?)
+
+    const playPromise = this.notificationAudio.play();
+
+     if (playPromise !== undefined) {
+        playPromise.then(_ => {
+        }).catch(error => {
+            console.error('[TimerComponent] Error playing notification sound:', error);
+        });
+    } else {
+         console.warn('[TimerComponent] Notification sound: play() did not return a promise.');
     }
   }
 }
