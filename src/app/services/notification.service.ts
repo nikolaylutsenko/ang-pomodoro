@@ -22,7 +22,9 @@ export class NotificationService {
       // Use Service Worker registration to show notification which supports actions
       try {
         const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification(title, options);
+        // Add silent: true to the options
+        const finalOptions = { ...options, silent: true };
+        await registration.showNotification(title, finalOptions);
         // Note: We don't get a Notification object back directly here to attach listeners
         // Event handling for actions is done in the service worker (service-worker.js)
         console.log('Notification shown via Service Worker.');
