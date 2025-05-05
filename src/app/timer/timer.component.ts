@@ -416,7 +416,8 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (!wasRestoredEnd && this.isBrowser) {
         this.notificationService.showNotification('Pomodoro Timer', {
           body: notificationBody,
-          icon: 'assets/timer-icon.svg'
+          icon: 'assets/timer-icon.svg',
+          requireInteraction: true // Make notification persistent
         }).catch(error => {
           console.log('Notification service error:', error);
         });
