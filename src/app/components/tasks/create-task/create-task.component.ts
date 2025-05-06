@@ -47,6 +47,9 @@ export class CreateTaskComponent implements OnChanges {
     };
 
     this.taskSaved.emit(taskData);
+    if (!this.editingTaskId) { // If it's a new task (not an edit)
+      this.resetForm(); // Reset the form
+    }
     // Reset form handled by parent or ngOnChanges when taskToEdit becomes null
   }
 
