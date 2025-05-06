@@ -112,3 +112,28 @@
 .priority-high {
   border-left: 10px solid var(--color-error);
 }
+
+.dragging-preview {
+  background-color: lightblue; // Example background color
+  opacity: 0.8;
+  border: 1px dashed gray;
+  // Ensure the cells in the preview have a similar width to the original table
+  td {
+    padding: 8px; // Match your original table padding
+    border: 1px solid #ddd; // Match your original table border
+    white-space: nowrap; // Prevent text wrapping in preview if desired
+  }
+}
+
+// Optional: Style for the placeholder (where the item will be dropped)
+.cdk-drop-list-dragging .cdk-drag-placeholder {
+  opacity: 0.3;
+  background-color: lightgray;
+  border: 1px dashed darkgray;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Optional: Style for the item being dragged (the original item that is now hidden)
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

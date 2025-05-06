@@ -2,11 +2,12 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../../../models/task.model';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -16,6 +17,7 @@ export class TaskListComponent implements OnChanges {
   @Output() deleteTask = new EventEmitter<string>();
   @Output() completeInterval = new EventEmitter<Task>();
   @Output() filterChanged = new EventEmitter<string>(); // Optional: Emit filter changes if parent needs it
+  @Output() taskOrderChanged = new EventEmitter<Task[]>();
 
   filterText: string = '';
   sortDesc: boolean = true;
@@ -56,5 +58,17 @@ export class TaskListComponent implements OnChanges {
 
   completeIntervalClicked(task: Task): void {
     this.completeInterval.emit(task);
+  }
+
+  drop(event: CdkDragDrop<Task[]>) {
+    moveItemInArray(this.filteredAndSortedTasks, event.previousIndex, event.currentIndex);
+    // Emit an event to notify the parent component of the order change.
+    // The parent component can then decide if/how to persist this new order.
+    // We emit a copy of the array to avoid direct modification issues.
+    this.taskOrderChanged.emit([...this.filteredAndSortedTasks]);
+    // If you want to reflect the order change in the original 'tasks' array immediately,
+    // you might need a more complex logic to map sorted/filtered indices back to original indices,
+    // or update the main 'tasks' array in the parent component based on the emitted event.
+    // For now, this reorders the displayed list.
   }
 }
