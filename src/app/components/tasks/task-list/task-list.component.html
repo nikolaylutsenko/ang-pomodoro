@@ -41,7 +41,7 @@
           <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
           <td>{{ task.priority }}</td>
           <td>{{ task.dateCreated | date:'short' }}</td>
-          <td>{{ task.estimatedHours }}</td>
+          <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
           <td>{{ task.workIntervals }}</td>
           <td>{{ task.completedIntervals }}</td>
           <td>{{ task.completionStatus }}</td>
@@ -63,7 +63,7 @@
       </td>
       <td>{{ task.priority }}</td>
       <td>{{ task.dateCreated | date:'short' }}</td>
-      <td>{{ task.estimatedHours }}</td>
+      <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>
       <td>{{ task.completedIntervals }}</td>
       <td>{{ task.completionStatus }}</td>

@@ -15,42 +15,57 @@ export class CreateTaskComponent implements OnChanges {
   @Output() taskSaved = new EventEmitter<Partial<Task>>();
   @Output() cancelEdit = new EventEmitter<void>();
 
-  formTask: Partial<Task> = { description: '', estimatedHours: 1 };
-  formPriority: number = 1; // Default to Medium
+  currentDescription: string = '';
+  currentPriorityValue: number = 1; // Index for priorityMap
+
   editingTaskId: string | null = null;
   priorityMap = [TaskPriority.Low, TaskPriority.Mid, TaskPriority.High];
+
+  timeOptions: (number | string)[] = [1, 2, 3, 5, 8, 13, 20, 40, 100, '∞', '?'];
+  selectedTime: number | string = 1; // Default to 1 hour
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['taskToEdit'] && this.taskToEdit) {
       this.editingTaskId = this.taskToEdit.id;
-      // Ensure form starts with at least 1 hour when editing
-      const editHours = this.taskToEdit.estimatedHours < 1 ? 1 : this.taskToEdit.estimatedHours;
-      this.formTask = { description: this.taskToEdit.description, estimatedHours: editHours };
-      this.formPriority = this.priorityMap.indexOf(this.taskToEdit.priority);
+      const task = this.taskToEdit;
+      this.currentDescription = task.description;
+      this.currentPriorityValue = this.priorityMap.indexOf(task.priority);
+
+      if (task.workIntervals === '∞' || task.workIntervals === '?') {
+        this.selectedTime = task.workIntervals;
+      } else {
+        this.selectedTime = task.estimatedHours;
+      }
+      if (!this.timeOptions.includes(this.selectedTime)) {
+        this.selectedTime = 1;
+      }
     } else if (!this.taskToEdit) {
-      this.resetForm(); // Reset if taskToEdit becomes null (e.g., after saving or cancelling)
+      this.resetForm();
     }
   }
 
   addOrUpdateTask() {
-    if (!this.formTask.description || this.formPriority === undefined || this.formPriority === null || this.formTask.estimatedHours === undefined) return;
+    if (!this.currentDescription || this.currentPriorityValue === undefined || this.currentPriorityValue === null || this.selectedTime === undefined) return;
 
-    // Ensure estimated hours is at least 1
-    if (this.formTask.estimatedHours < 1) {
-      this.formTask.estimatedHours = 1;
+    let emittedEstimatedHours: number;
+    if (typeof this.selectedTime === 'number') {
+      emittedEstimatedHours = this.selectedTime;
+    } else {
+      emittedEstimatedHours = 0;
     }
 
     const taskData: Partial<Task> = {
-      ...this.formTask,
-      priority: this.priorityMap[this.formPriority],
-      id: this.editingTaskId ?? undefined // Include id only if editing
+      description: this.currentDescription,
+      priority: this.priorityMap[this.currentPriorityValue],
+      id: this.editingTaskId ?? undefined,
+      estimatedHours: emittedEstimatedHours,
+      workIntervals: this.selectedTime
     };
 
     this.taskSaved.emit(taskData);
-    if (!this.editingTaskId) { // If it's a new task (not an edit)
-      this.resetForm(); // Reset the form
+    if (!this.editingTaskId) {
+      this.resetForm();
     }
-    // Reset form handled by parent or ngOnChanges when taskToEdit becomes null
   }
 
   cancel() {
@@ -59,13 +74,17 @@ export class CreateTaskComponent implements OnChanges {
   }
 
   resetForm() {
-    this.formTask = { description: '', estimatedHours: 1 };
-    this.formPriority = 1;
+    this.currentDescription = '';
+    this.currentPriorityValue = 1;
+    this.selectedTime = 1;
     this.editingTaskId = null;
   }
 
+  selectTime(time: number | string): void {
+    this.selectedTime = time;
+  }
+
   getPriorityGradient() {
-    // Simple gradient, adjust colors as needed or use SCSS variables
     return 'linear-gradient(90deg, #43a047 0%, #fbc02d 50%, #e53935 100%)';
   }
 }

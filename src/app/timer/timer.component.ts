@@ -368,13 +368,26 @@ export class TimerComponent implements OnInit, OnDestroy {
     // Play sound!
     this.playNotificationSound();
 
-    // Update completed intervals on selected task (keep existing logic)
+    // Update completed intervals on selected task
     if (this.currentMode === 'work' && this.selectedTaskId) {
-      const task = this.tasks.find(t => t.id === this.selectedTaskId);
-      if (task) {
-        task.completedIntervals = (task.completedIntervals || 0) + 1;
-        task.completionStatus = task.completedIntervals >= task.workIntervals ? TaskStatus.Completed : TaskStatus.InProgress;
-        // Persist updated tasks
+      const taskIndex = this.tasks.findIndex(t => t.id === this.selectedTaskId);
+      if (taskIndex > -1) {
+        const task = this.tasks[taskIndex];
+        const updatedCompletedIntervals = (task.completedIntervals || 0) + 1;
+        let newStatus = task.completionStatus;
+
+        if (typeof task.workIntervals === 'number') {
+          newStatus = updatedCompletedIntervals >= task.workIntervals ? TaskStatus.Completed : TaskStatus.InProgress;
+        } else if (task.workIntervals === '∞' || task.workIntervals === '?') {
+          newStatus = TaskStatus.InProgress; // Remains InProgress for special cases
+        }
+
+        this.tasks[taskIndex] = {
+          ...task,
+          completedIntervals: updatedCompletedIntervals,
+          completionStatus: newStatus
+        };
+
         if (this.isBrowser) {
           localStorage.setItem('tasks', JSON.stringify(this.tasks));
         }

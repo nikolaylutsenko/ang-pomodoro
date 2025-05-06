@@ -5,25 +5,29 @@
       <textarea
         maxlength="1000"
         placeholder="Task description (max 1000 symbols)"
-        [(ngModel)]="formTask.description"
+        [(ngModel)]="currentDescription"
         name="description"
         required
         rows="4"
         class="task-desc-textarea"
       ></textarea>
-      <!-- Estimated Hours Input -->
-      <div class="estimated-hours-field">
-        <label for="estimated-hours">Estimated Hours:</label>
-        <input
-          id="estimated-hours"
-          type="number"
-          min="1"
-          [(ngModel)]="formTask.estimatedHours"
-          name="estimatedHours"
-          class="estimated-hours-input"
-          required
-        />
+
+      <!-- Time Selection Buttons -->
+      <div class="time-selector">
+        <label>Time (hours):</label>
+        <div class="time-buttons">
+          <button
+            *ngFor="let time of timeOptions"
+            type="button"
+            [class.selected]="selectedTime === time"
+            (click)="selectTime(time)"
+            class="time-button"
+          >
+            {{ time }}
+          </button>
+        </div>
       </div>
+
       <div class="priority-and-action-row">
         <div class="priority-slider-container">
           <label for="priority-slider">Priority:</label>
@@ -33,7 +37,7 @@
             min="0"
             max="2"
             step="1"
-            [(ngModel)]="formPriority"
+            [(ngModel)]="currentPriorityValue"
             name="priority"
             [ngStyle]="{'background': getPriorityGradient()}"
             required

@@ -22,7 +22,7 @@ export interface Task {
 
   // New fields
   estimatedHours: number;
-  workIntervals: number;
+  workIntervals: number | string; // Changed from number
   completedIntervals: number;
   completionStatus: TaskStatus;
 }
