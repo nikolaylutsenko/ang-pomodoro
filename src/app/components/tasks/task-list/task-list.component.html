@@ -16,7 +16,7 @@
   <thead>
     <tr>
       <th>Description</th>
-      <th>Priority</th>
+      <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
       <th>Est. Hours</th>
       <th>Intervals</th>
@@ -27,19 +27,19 @@
   </thead>
   <tbody cdkDropList [cdkDropListData]="filteredAndSortedTasks" (cdkDropListDropped)="drop($event)">
     <tr *ngFor="let task of filteredAndSortedTasks" cdkDrag [ngClass]="{
-      'priority-low': task.priority === 'Low',
-      'priority-mid': task.priority === 'Mid',
-      'priority-high': task.priority === 'High'
+      'urgency-low': task.urgency === 'Low',
+      'urgency-mid': task.urgency === 'Mid',
+      'urgency-high': task.urgency === 'High'
     }">
       <ng-template cdkDragPreview>
         <tr [ngClass]="{
-          'priority-low': task.priority === 'Low',
-          'priority-mid': task.priority === 'Mid',
-          'priority-high': task.priority === 'High',
+          'urgency-low': task.urgency === 'Low',
+          'urgency-mid': task.urgency === 'Mid',
+          'urgency-high': task.urgency === 'High',
           'dragging-preview': true
         }">
           <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
-          <td>{{ task.priority }}</td>
+          <td>{{ task.urgency }}</td>
           <td>{{ task.dateCreated | date:'short' }}</td>
           <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
           <td>{{ task.workIntervals }}</td>
@@ -61,7 +61,7 @@
           {{ task.description }}
         </span>
       </td>
-      <td>{{ task.priority }}</td>
+      <td>{{ task.urgency }}</td>
       <td>{{ task.dateCreated | date:'short' }}</td>
       <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>

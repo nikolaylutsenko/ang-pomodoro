@@ -102,14 +102,14 @@
   }
 }
 
-/* Priority row styling */
-.priority-low {
+/* Urgency row styling */ // Changed from Priority row styling
+.urgency-low { // Changed from .priority-low
   border-left: 10px solid var(--color-success);
 }
-.priority-mid {
+.urgency-mid { // Changed from .priority-mid
   border-left: 10px solid var(--color-primary-yellow); /* Using primary for mid */
 }
-.priority-high {
+.urgency-high { // Changed from .priority-high
   border-left: 10px solid var(--color-error);
 }
 

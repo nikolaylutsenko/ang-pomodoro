@@ -29,23 +29,23 @@
       </div>
 
       <div class="priority-and-action-row">
-        <div class="priority-slider-container">
-          <label for="priority-slider">Priority:</label>
+        <div class="urgency-slider-container">
+          <label for="urgency-slider">Urgency:</label>
           <input
-            id="priority-slider"
+            id="urgency-slider"
             type="range"
             min="0"
             max="2"
             step="1"
-            [(ngModel)]="currentPriorityValue"
-            name="priority"
-            [ngStyle]="{'background': getPriorityGradient()}"
+            [(ngModel)]="currentUrgencyValue"
+            name="urgency"
+            [ngStyle]="{'background': getUrgencyGradient()}"
             required
           />
-          <div class="priority-labels">
-            <span class="priority-low">Low</span>
-            <span class="priority-medium">Medium</span>
-            <span class="priority-high">High</span>
+          <div class="urgency-labels">
+            <span class="urgency-low">Low</span>
+            <span class="urgency-medium">Medium</span>
+            <span class="urgency-high">High</span>
           </div>
         </div>
         <div class="task-form-actions">

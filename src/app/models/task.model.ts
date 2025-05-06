@@ -1,5 +1,5 @@
-// Task Priority Enum
-export enum TaskPriority {
+// Task Urgency Enum
+export enum TaskUrgency {
   Low = 'Low',
   Mid = 'Mid',
   High = 'High'
@@ -18,7 +18,7 @@ export interface Task {
   id: string; // UUID
   description: string; // max 1000 symbols
   dateCreated: Date;
-  priority: TaskPriority;
+  urgency: TaskUrgency;
 
   // New fields
   estimatedHours: number;

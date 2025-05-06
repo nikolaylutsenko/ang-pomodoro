@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task, TaskPriority } from '../../../models/task.model';
+import { Task, TaskUrgency } from '../../../models/task.model';
 
 @Component({
   selector: 'app-create-task',
@@ -16,10 +16,10 @@ export class CreateTaskComponent implements OnChanges {
   @Output() cancelEdit = new EventEmitter<void>();
 
   currentDescription: string = '';
-  currentPriorityValue: number = 1; // Index for priorityMap
+  currentUrgencyValue: number = 1; // Index for urgencyMap
 
   editingTaskId: string | null = null;
-  priorityMap = [TaskPriority.Low, TaskPriority.Mid, TaskPriority.High];
+  urgencyMap = [TaskUrgency.Low, TaskUrgency.Mid, TaskUrgency.High];
 
   timeOptions: (number | string)[] = [1, 2, 3, 5, 8, 13, 20, 40, 100, '∞', '?'];
   selectedTime: number | string = 1; // Default to 1 hour
@@ -29,7 +29,7 @@ export class CreateTaskComponent implements OnChanges {
       this.editingTaskId = this.taskToEdit.id;
       const task = this.taskToEdit;
       this.currentDescription = task.description;
-      this.currentPriorityValue = this.priorityMap.indexOf(task.priority);
+      this.currentUrgencyValue = this.urgencyMap.indexOf(task.urgency);
 
       if (task.workIntervals === '∞' || task.workIntervals === '?') {
         this.selectedTime = task.workIntervals;
@@ -45,7 +45,7 @@ export class CreateTaskComponent implements OnChanges {
   }
 
   addOrUpdateTask() {
-    if (!this.currentDescription || this.currentPriorityValue === undefined || this.currentPriorityValue === null || this.selectedTime === undefined) return;
+    if (!this.currentDescription || this.currentUrgencyValue === undefined || this.currentUrgencyValue === null || this.selectedTime === undefined) return;
 
     let emittedEstimatedHours: number;
     if (typeof this.selectedTime === 'number') {
@@ -56,7 +56,7 @@ export class CreateTaskComponent implements OnChanges {
 
     const taskData: Partial<Task> = {
       description: this.currentDescription,
-      priority: this.priorityMap[this.currentPriorityValue],
+      urgency: this.urgencyMap[this.currentUrgencyValue],
       id: this.editingTaskId ?? undefined,
       estimatedHours: emittedEstimatedHours,
       workIntervals: this.selectedTime
@@ -75,7 +75,7 @@ export class CreateTaskComponent implements OnChanges {
 
   resetForm() {
     this.currentDescription = '';
-    this.currentPriorityValue = 1;
+    this.currentUrgencyValue = 1;
     this.selectedTime = 1;
     this.editingTaskId = null;
   }
@@ -84,7 +84,7 @@ export class CreateTaskComponent implements OnChanges {
     this.selectedTime = time;
   }
 
-  getPriorityGradient() {
+  getUrgencyGradient() {
     return 'linear-gradient(90deg, #43a047 0%, #fbc02d 50%, #e53935 100%)';
   }
 }

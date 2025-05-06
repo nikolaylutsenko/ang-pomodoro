@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task, TaskPriority, TaskStatus } from '../../models/task.model';
+import { Task, TaskUrgency, TaskStatus } from '../../models/task.model';
 import { Component, OnInit } from '@angular/core';
 import { TimerSettingsService, TimerSettings } from '../../services/timer-settings.service';
 import { CreateTaskComponent } from './create-task/create-task.component';
@@ -73,7 +73,7 @@ export class TasksComponent implements OnInit {
         const updatedTask = {
           ...this.tasks[idx],
           description: taskData.description!,
-          priority: taskData.priority!,
+          urgency: taskData.urgency!, // Changed priority to urgency
           estimatedHours: estimatedHoursToSave, // This is the numeric hour value from button or 0
           workIntervals: finalWorkIntervals // This is the calculated intervals or '∞', '?'
         };
@@ -85,7 +85,7 @@ export class TasksComponent implements OnInit {
       const newTask: Task = {
         id: crypto.randomUUID(),
         description: taskData.description!,
-        priority: taskData.priority!,
+        urgency: taskData.urgency!, // Changed priority to urgency
         dateCreated: new Date(),
         estimatedHours: estimatedHoursToSave, // Numeric hours or 0
         workIntervals: finalWorkIntervals, // Calculated intervals or '∞', '?'
