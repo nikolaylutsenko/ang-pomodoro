@@ -16,7 +16,7 @@
   <thead>
     <tr>
       <th>Description</th>
-      <th>Priority</th>
+      <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
       <th>Est. Hours</th>
       <th>Intervals</th>
@@ -25,12 +25,29 @@
       <th>Actions</th>
     </tr>
   </thead>
-  <tbody>
-    <tr *ngFor="let task of filteredAndSortedTasks" [ngClass]="{
-      'priority-low': task.priority === 'Low',
-      'priority-mid': task.priority === 'Mid',
-      'priority-high': task.priority === 'High'
-    }">
+  <tbody cdkDropList [cdkDropListData]="filteredAndSortedTasks" (cdkDropListDropped)="drop($event)">
+    <tr *ngFor="let task of filteredAndSortedTasks" cdkDrag [cdkDragDisabled]="task.completionStatus === TaskStatus.Completed" [ngClass]="{
+      'urgency-low': task.urgency === 'Low',
+      'urgency-mid': task.urgency === 'Mid',
+      'urgency-high': task.urgency === 'High'
+    }" [class.completed]="task.completionStatus === TaskStatus.Completed">
+      <ng-template cdkDragPreview>
+        <tr [ngClass]="{
+          'urgency-low': task.urgency === 'Low',
+          'urgency-mid': task.urgency === 'Mid',
+          'urgency-high': task.urgency === 'High',
+          'dragging-preview': true
+        }">
+          <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
+          <td>{{ task.urgency }}</td>
+          <td>{{ task.dateCreated | date:'short' }}</td>
+          <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
+          <td>{{ task.workIntervals }}</td>
+          <td>{{ task.completedIntervals }}</td>
+          <td>{{ task.completionStatus }}</td>
+          <td>Actions</td>
+        </tr>
+      </ng-template>
       <td>
         <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
           {{ task.description | slice:0:300 }}...
@@ -44,15 +61,15 @@
           {{ task.description }}
         </span>
       </td>
-      <td>{{ task.priority }}</td>
+      <td>{{ task.urgency }}</td>
       <td>{{ task.dateCreated | date:'short' }}</td>
-      <td>{{ task.estimatedHours }}</td>
+      <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>
       <td>{{ task.completedIntervals }}</td>
       <td>{{ task.completionStatus }}</td>
       <td>
-        <span class="icon-btn" title="Complete Interval" (click)="completeIntervalClicked(task)">✔️</span>
-        <span class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
+        <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">✔️</span>
+        <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
         <span class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">🗑️</span>
       </td>
     </tr>

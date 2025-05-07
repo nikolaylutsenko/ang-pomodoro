@@ -49,18 +49,25 @@
   width: 100%;
 }
 
+/* NEW STYLES for description and urgency side-by-side */
+.description-and-urgency-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem; /* Space between textarea and urgency slider */
+  align-items: flex-start; /* Align items to the top */
+}
+
 .task-desc-textarea {
-  width: 100%;
-  min-height: 90px;
-  max-width: 100%; /* Make textarea as wide as the form container */
-  font-size: 1.1rem;
-  padding: 0.8rem 1rem;
-  background: var(--color-bg-card);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  resize: vertical;
-  box-sizing: border-box;
+  background: var(--color-bg-card); /* ADDED: Ensure theme background is used */
+  color: var(--color-text);         /* ADDED: Ensure theme text color is used */
+  border: 1px solid var(--color-border); /* ADDED: Consistent border with other inputs */
+  border-radius: 4px; /* ADDED: Consistent border-radius */
+  padding: 0.8rem 1rem; /* ADDED: Consistent padding */
+  font-size: 1.1rem; /* ADDED: Consistent font-size */
+  resize: vertical; /* ADDED: Allow vertical resize */
+  box-sizing: border-box; /* ADDED: Consistent box-sizing */
+  flex-grow: 1;
+  height: 150px; /* MODIFIED: Set height to match slider-and-labels-wrapper */
 }
 
 .estimated-hours-field {
@@ -85,32 +92,45 @@
     color: var(--color-text);
 }
 
-
-.priority-slider-container {
+.urgency-slider-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3rem;
-  width: 700px;
-  max-width: 100%;
+  flex-direction: column; /* Label on top of slider+labels */
+  align-items: center; /* Center the 'Urgency:' label */
+  gap: 0.3rem; /* Gap between label and slider group */
+  width: auto; /* Adjust as needed, e.g., 60px for slider + labels */
+  // width: 700px; /* REMOVED - was for horizontal */
+  // max-width: 100%; /* REMOVED */
 }
 
-.priority-slider-container label {
-  font-size: 1rem;
-  margin-bottom: 0.2rem;
+// .urgency-slider-container label is mostly existing, ensure it's fine
+
+/* NEW STYLES for the vertical slider and its immediate labels */
+.slider-and-labels-wrapper {
+  display: flex;
+  flex-direction: row; /* Slider | Labels */
+  align-items: center;
+  gap: 0.5rem; /* Space between slider and its text labels */
+  height: 150px; /* Define the height for the vertical slider and labels */
 }
 
-.priority-slider-container input[type="range"] {
-  width: 100%;
-  height: 6px;
-  border-radius: 5px;
-  background: var(--color-slider-track-gradient);
-  outline: none;
-  margin: 0.2rem 0 0.3rem 0;
+.urgency-slider-container input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
+  background: transparent; /* ngStyle will set the actual track gradient */
+  outline: none;
+  margin: 0;
+  padding: 0;
+
+  /* Vertical styling */
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  width: 8px;  /* Thickness of the slider track */
+  height: 100%; /* Length of the slider, takes full height of wrapper (150px) */
+  border-radius: 5px;
+  // ... existing styles like :focus might need review ...
 }
-.priority-slider-container input[type="range"]::-webkit-slider-thumb {
+
+.urgency-slider-container input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 22px;
@@ -121,63 +141,88 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   cursor: pointer;
   transition: border 0.2s;
-}
-.priority-slider-container input[type="range"]:focus::-webkit-slider-thumb {
-  border-color: var(--color-slider-thumb-focus-border);
-}
-.priority-slider-container input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid #888;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: border 0.2s;
-}
-.priority-slider-container input[type="range"]:focus::-moz-range-thumb {
-  border: 2px solid #1976d2;
-}
-.priority-slider-container input[type="range"]::-ms-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid #888;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: border 0.2s;
-}
-.priority-slider-container input[type="range"]:focus::-ms-thumb {
-  border: 2px solid #1976d2;
-}
-.priority-slider-container input[type="range"]:focus {
-  outline: none;
+  /* Adjust margins if needed to center thumb on vertical track */
+  margin-left: -7px; /* (Thumb width - Track width) / 2 roughly */
 }
 
-.priority-labels {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 0.95rem;
-  margin-top: 0.1rem;
+.urgency-slider-container input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-slider-thumb-bg, #fff); /* Use variable */
+  border: 2px solid var(--color-slider-thumb-border, #888); /* Use variable */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: border 0.2s;
 }
-.priority-labels .priority-low {
+
+.urgency-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Match the height of slider-and-labels-wrapper (150px) */
+  font-size: 0.95rem; /* Reverted from 0.9rem to original 0.95rem */
+  // width: 100%; /* REMOVED */
+  // margin-top: 0.1rem; /* REMOVED */
+}
+
+.urgency-labels .urgency-low {
   color: var(--color-success);
 }
-.priority-labels .priority-medium {
+.urgency-labels .urgency-medium {
   color: var(--color-primary);
 }
-.priority-labels .priority-high {
+.urgency-labels .urgency-high {
   color: var(--color-error);
 }
 
-.priority-and-action-row {
+.urgency-labels span {
+  cursor: pointer; /* Add pointer cursor to indicate clickable */
+  padding: 0.2em 0; /* Add some padding for easier clicking */
+}
+
+/* NEW STYLES for time and actions row */
+.time-and-actions-row {
   display: flex;
-  align-items: flex-end;
-  gap: 2rem;
-  margin-top: 0.5rem;
   justify-content: space-between;
+  align-items: flex-end; /* Align items to the bottom of the row */
+  gap: 1rem; /* Space between time selector and action buttons */
+  margin-top: 1rem; /* Add some space above this row */
+}
+
+.time-selector {
+  display: flex;
+  flex-direction: column; /* Label on top of buttons */
+  gap: 0.5rem; /* Space between label and buttons */
+}
+
+.time-buttons {
+  display: flex;
+  gap: 0.5rem; /* Space between individual time buttons */
+  flex-wrap: wrap; /* Allow buttons to wrap if not enough space */
+}
+
+.time-button {
+  /* Base styles for time buttons if they differ from global button styles */
+  /* For example, if you want specific padding/margin/border for these buttons */
+  padding: 0.5rem 0.8rem; /* Example padding */
+  border-radius: var(--radius-sm); /* Example border-radius */
+  background: var(--color-secondary); /* Default background from theme */
+  color: var(--color-text); /* Default text color from theme */
+  transition: background-color 0.2s, color 0.2s; /* Smooth transition */
+
+  &:hover:not(:disabled) {
+    background: var(--color-secondary-dark);
+  }
+}
+
+/* Increased specificity for the selected time button */
+.time-buttons .time-button.selected {
+  background-color: tomato !important; /* Using !important to ensure override */
+  color: #FFFFFF !important;           /* Using !important to ensure override */
+  opacity: 1;
+  cursor: default;
+  border: 1px solid #000000;
 }
 
 .task-form-actions {
@@ -186,7 +231,7 @@
   align-items: flex-end;
   gap: 1rem;
   margin-top: 0;
-  margin-left: auto; /* Push actions to the right */
+  // margin-left: auto; /* This might not be needed if using space-between in the new row */
 }
 
 .add-task-btn {

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task, TaskPriority, TaskStatus } from '../../models/task.model';
+import { Task, TaskUrgency, TaskStatus } from '../../models/task.model';
 import { Component, OnInit } from '@angular/core';
 import { TimerSettingsService, TimerSettings } from '../../services/timer-settings.service';
 import { CreateTaskComponent } from './create-task/create-task.component';
@@ -42,43 +42,56 @@ export class TasksComponent implements OnInit {
     localStorage.setItem('tasks', JSON.stringify(this.tasks));
   }
 
-  private calculateWorkIntervals(hours: number): number {
-    const totalMinutes = hours * 60;
-    const workDuration = this.currentSettings?.workDuration || 25;
-    return Math.ceil(totalMinutes / workDuration);
+  private calculateWorkIntervals(taskData: Partial<Task>): number | string {
+    const selectedTime = taskData.workIntervals; // This now holds the button value (hours or symbol)
+
+    if (selectedTime === '∞' || selectedTime === '?') {
+      return selectedTime; // Return symbol directly
+    }
+
+    if (typeof selectedTime === 'number') {
+      if (selectedTime === 0) return 0; // If 0 hours was somehow selected, 0 intervals.
+      const totalMinutes = selectedTime * 60;
+      const workDuration = this.currentSettings?.workDuration || 25; // Default to 25 if not set
+      if (workDuration === 0) return '∞'; // Avoid division by zero, treat as infinite intervals
+      return Math.ceil(totalMinutes / workDuration);
+    }
+
+    // Fallback for unexpected types, though selectedTime should be number or string from buttons
+    return 1;
   }
 
   handleTaskSaved(taskData: Partial<Task>) {
+    // taskData.workIntervals now holds the raw button value (e.g., 5, '∞', '?')
+    // taskData.estimatedHours holds the numeric hours (or 0 for symbols)
+    const finalWorkIntervals = this.calculateWorkIntervals(taskData);
+    const estimatedHoursToSave = taskData.estimatedHours!;
+
     if (taskData.id) { // Editing existing task
       const idx = this.tasks.findIndex(t => t.id === taskData.id);
       if (idx > -1) {
-        const intervals = this.calculateWorkIntervals(taskData.estimatedHours!);
-        // Create a new object for the updated task to help with change detection if needed elsewhere
         const updatedTask = {
           ...this.tasks[idx],
           description: taskData.description!,
-          priority: taskData.priority!,
-          estimatedHours: taskData.estimatedHours!,
-          workIntervals: intervals
+          urgency: taskData.urgency!, // Changed priority to urgency
+          estimatedHours: estimatedHoursToSave, // This is the numeric hour value from button or 0
+          workIntervals: finalWorkIntervals // This is the calculated intervals or '∞', '?'
         };
-        // Create a new array with the updated task
         this.tasks = this.tasks.map((task, index) => index === idx ? updatedTask : task);
         this.saveTasks();
       }
       this.editingTask = null;
     } else { // Adding new task
-      const intervals = this.calculateWorkIntervals(taskData.estimatedHours!);
       const newTask: Task = {
         id: crypto.randomUUID(),
         description: taskData.description!,
-        priority: taskData.priority!,
+        urgency: taskData.urgency!, // Changed priority to urgency
         dateCreated: new Date(),
-        estimatedHours: taskData.estimatedHours!,
-        workIntervals: intervals,
+        estimatedHours: estimatedHoursToSave, // Numeric hours or 0
+        workIntervals: finalWorkIntervals, // Calculated intervals or '∞', '?'
         completedIntervals: 0,
         completionStatus: TaskStatus.Pending
       };
-      // Create a new array by spreading the existing tasks and adding the new one
       this.tasks = [...this.tasks, newTask];
       this.saveTasks();
     }
@@ -102,20 +115,18 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  handleCompleteInterval(task: Task): void {
+  handleTaskCompleted(task: Task): void {
     const taskIndex = this.tasks.findIndex(t => t.id === task.id);
-    if (taskIndex > -1 && this.tasks[taskIndex].completedIntervals < this.tasks[taskIndex].workIntervals) {
-        // Create a new object for the updated task
-        const updatedTask = {
-            ...this.tasks[taskIndex],
-            completedIntervals: this.tasks[taskIndex].completedIntervals + 1,
-            completionStatus: (this.tasks[taskIndex].completedIntervals + 1) >= this.tasks[taskIndex].workIntervals
-                                ? TaskStatus.Completed
-                                : TaskStatus.InProgress
-        };
-        // Create a new array with the updated task
-        this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
-        this.saveTasks();
+    if (taskIndex > -1) {
+      const updatedTask = {
+        ...this.tasks[taskIndex],
+        completionStatus: TaskStatus.Completed,
+        // Optionally, you might want to set completedIntervals to workIntervals
+        // if that makes sense for your application logic when a task is manually completed.
+        // completedIntervals: this.tasks[taskIndex].workIntervals
+      };
+      this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
+      this.saveTasks();
     }
   }
 }

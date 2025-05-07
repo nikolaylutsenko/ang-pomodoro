@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task } from '../../../models/task.model';
+import { Task, TaskStatus } from '../../../models/task.model'; // Import TaskStatus
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -14,13 +15,19 @@ export class TaskListComponent implements OnChanges {
   @Input() tasks: Task[] = [];
   @Output() editTask = new EventEmitter<Task>();
   @Output() deleteTask = new EventEmitter<string>();
-  @Output() completeInterval = new EventEmitter<Task>();
+  @Output() taskCompleted = new EventEmitter<Task>(); // Changed from completeInterval
   @Output() filterChanged = new EventEmitter<string>(); // Optional: Emit filter changes if parent needs it
+  @Output() taskOrderChanged = new EventEmitter<Task[]>();
 
   filterText: string = '';
   sortDesc: boolean = true;
   filteredAndSortedTasks: Task[] = [];
   expandedDescriptions: { [taskId: string]: boolean } = {};
+
+  // Make TaskStatus available in the template
+  public get TaskStatus(): typeof TaskStatus {
+    return TaskStatus;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tasks']) {
@@ -32,9 +39,17 @@ export class TaskListComponent implements OnChanges {
     let filtered = this.tasks.filter(t =>
       t.description.toLowerCase().includes(this.filterText.toLowerCase())
     );
-    this.filteredAndSortedTasks = filtered.sort((a, b) =>
-      this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime()
-    );
+    this.filteredAndSortedTasks = filtered.sort((a, b) => {
+      // Sort by completion status first (completed tasks at the bottom)
+      if (a.completionStatus === TaskStatus.Completed && b.completionStatus !== TaskStatus.Completed) {
+        return 1;
+      }
+      if (a.completionStatus !== TaskStatus.Completed && b.completionStatus === TaskStatus.Completed) {
+        return -1;
+      }
+      // Then sort by date
+      return this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime();
+    });
   }
 
   toggleSort() {
@@ -54,7 +69,19 @@ export class TaskListComponent implements OnChanges {
     this.deleteTask.emit(id);
   }
 
-  completeIntervalClicked(task: Task): void {
-    this.completeInterval.emit(task);
+  completeTaskClicked(task: Task): void { // Renamed from completeIntervalClicked
+    this.taskCompleted.emit(task); // Emit taskCompleted event
+  }
+
+  drop(event: CdkDragDrop<Task[]>) {
+    moveItemInArray(this.filteredAndSortedTasks, event.previousIndex, event.currentIndex);
+    // Emit an event to notify the parent component of the order change.
+    // The parent component can then decide if/how to persist this new order.
+    // We emit a copy of the array to avoid direct modification issues.
+    this.taskOrderChanged.emit([...this.filteredAndSortedTasks]);
+    // If you want to reflect the order change in the original 'tasks' array immediately,
+    // you might need a more complex logic to map sorted/filtered indices back to original indices,
+    // or update the main 'tasks' array in the parent component based on the emitted event.
+    // For now, this reorders the displayed list.
   }
 }
