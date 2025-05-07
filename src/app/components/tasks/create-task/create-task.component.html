@@ -2,52 +2,57 @@
 <div class="task-form-container">
   <form (ngSubmit)="addOrUpdateTask()" class="task-form">
     <div class="task-form-fields">
-      <textarea
-        maxlength="1000"
-        placeholder="Task description (max 1000 symbols)"
-        [(ngModel)]="currentDescription"
-        name="description"
-        required
-        rows="4"
-        class="task-desc-textarea"
-      ></textarea>
+      <div class="description-and-urgency-wrapper">
+        <textarea
+          maxlength="1000"
+          placeholder="Task description (max 1000 symbols)"
+          [(ngModel)]="currentDescription"
+          name="description"
+          required
+          rows="6"
+          class="task-desc-textarea"
+        ></textarea>
 
-      <!-- Time Selection Buttons -->
-      <div class="time-selector">
-        <label>Time (hours):</label>
-        <div class="time-buttons">
-          <button
-            *ngFor="let time of timeOptions"
-            type="button"
-            [class.selected]="selectedTime === time"
-            (click)="selectTime(time)"
-            class="time-button"
-          >
-            {{ time }}
-          </button>
+        <div class="urgency-slider-container">
+          <label for="urgency-slider">Urgency:</label>
+          <div class="slider-and-labels-wrapper">
+            <input
+              id="urgency-slider"
+              type="range"
+              min="0"
+              max="2"
+              step="1"
+              [(ngModel)]="currentUrgencyValue"
+              name="urgency"
+              [ngStyle]="{'background': getUrgencyGradient()}"
+              required
+              orient="vertical"
+            />
+            <div class="urgency-labels">
+              <span class="urgency-high" (click)="setUrgency(2)">High</span>
+              <span class="urgency-medium" (click)="setUrgency(1)">Medium</span>
+              <span class="urgency-low" (click)="setUrgency(0)">Low</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="priority-and-action-row">
-        <div class="urgency-slider-container">
-          <label for="urgency-slider">Urgency:</label>
-          <input
-            id="urgency-slider"
-            type="range"
-            min="0"
-            max="2"
-            step="1"
-            [(ngModel)]="currentUrgencyValue"
-            name="urgency"
-            [ngStyle]="{'background': getUrgencyGradient()}"
-            required
-          />
-          <div class="urgency-labels">
-            <span class="urgency-low">Low</span>
-            <span class="urgency-medium">Medium</span>
-            <span class="urgency-high">High</span>
+      <div class="time-and-actions-row">
+        <div class="time-selector">
+          <label>Time (hours):</label>
+          <div class="time-buttons">
+            <button
+              *ngFor="let time of timeOptions"
+              type="button"
+              [class.selected]="selectedTime === time"
+              (click)="selectTime(time)"
+              [disabled]="selectedTime === time"
+              class="time-button">
+              {{ time }}
+            </button>
           </div>
         </div>
+
         <div class="task-form-actions">
           <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
           <button type="button" *ngIf="editingTaskId" (click)="cancel()">Cancel</button>

@@ -84,7 +84,12 @@ export class CreateTaskComponent implements OnChanges {
     this.selectedTime = time;
   }
 
+  // ADDED: Method to set urgency from label clicks
+  setUrgency(value: number): void {
+    this.currentUrgencyValue = value;
+  }
+
   getUrgencyGradient() {
-    return 'linear-gradient(90deg, #43a047 0%, #fbc02d 50%, #e53935 100%)';
+    return 'linear-gradient(0deg, #43a047 0%, #fbc02d 50%, #e53935 100%)'; // Changed 90deg to 0deg for vertical
   }
 }
