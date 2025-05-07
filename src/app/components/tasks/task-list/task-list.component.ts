@@ -39,9 +39,17 @@ export class TaskListComponent implements OnChanges {
     let filtered = this.tasks.filter(t =>
       t.description.toLowerCase().includes(this.filterText.toLowerCase())
     );
-    this.filteredAndSortedTasks = filtered.sort((a, b) =>
-      this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime()
-    );
+    this.filteredAndSortedTasks = filtered.sort((a, b) => {
+      // Sort by completion status first (completed tasks at the bottom)
+      if (a.completionStatus === TaskStatus.Completed && b.completionStatus !== TaskStatus.Completed) {
+        return 1;
+      }
+      if (a.completionStatus !== TaskStatus.Completed && b.completionStatus === TaskStatus.Completed) {
+        return -1;
+      }
+      // Then sort by date
+      return this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime();
+    });
   }
 
   toggleSort() {
