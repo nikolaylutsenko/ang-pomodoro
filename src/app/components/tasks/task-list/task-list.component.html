@@ -30,7 +30,7 @@
       'urgency-low': task.urgency === 'Low',
       'urgency-mid': task.urgency === 'Mid',
       'urgency-high': task.urgency === 'High'
-    }">
+    }" [class.completed]="task.completionStatus === TaskStatus.Completed">
       <ng-template cdkDragPreview>
         <tr [ngClass]="{
           'urgency-low': task.urgency === 'Low',

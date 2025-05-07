@@ -90,6 +90,16 @@
         margin-right: 0;
     }
   }
+
+  tbody tr {
+    // Style for completed tasks
+    &.completed {
+      td:first-child { // Target the description cell (first td)
+        text-decoration: line-through;
+        color: #aaa; // Make text less prominent
+      }
+    }
+  }
 }
 
 .show-more-link {

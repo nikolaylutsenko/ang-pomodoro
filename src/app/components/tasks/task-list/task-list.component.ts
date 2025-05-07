@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task } from '../../../models/task.model';
+import { Task, TaskStatus } from '../../../models/task.model'; // Import TaskStatus
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
@@ -23,6 +23,11 @@ export class TaskListComponent implements OnChanges {
   sortDesc: boolean = true;
   filteredAndSortedTasks: Task[] = [];
   expandedDescriptions: { [taskId: string]: boolean } = {};
+
+  // Make TaskStatus available in the template
+  public get TaskStatus(): typeof TaskStatus {
+    return TaskStatus;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tasks']) {
