@@ -115,39 +115,18 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  handleCompleteInterval(task: Task): void {
+  handleTaskCompleted(task: Task): void {
     const taskIndex = this.tasks.findIndex(t => t.id === task.id);
     if (taskIndex > -1) {
-      let newCompletionStatus = this.tasks[taskIndex].completionStatus;
-      const currentWorkIntervals = this.tasks[taskIndex].workIntervals;
-      const currentCompletedIntervals = this.tasks[taskIndex].completedIntervals;
-
-      // Only increment if not '∞' or '?' or if it's a number and not yet completed
-      if (typeof currentWorkIntervals === 'number' && currentCompletedIntervals < currentWorkIntervals) {
-        const updatedCompletedIntervals = currentCompletedIntervals + 1;
-        newCompletionStatus = updatedCompletedIntervals >= currentWorkIntervals ? TaskStatus.Completed : TaskStatus.InProgress;
-
-        const updatedTask = {
-          ...this.tasks[taskIndex],
-          completedIntervals: updatedCompletedIntervals,
-          completionStatus: newCompletionStatus
-        };
-        this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
-        this.saveTasks();
-      } else if (typeof currentWorkIntervals === 'string' && (currentWorkIntervals === '∞' || currentWorkIntervals === '?')) {
-        // For '∞' or '?', increment completedIntervals, but status remains InProgress unless changed manually
-        const updatedCompletedIntervals = currentCompletedIntervals + 1;
-        newCompletionStatus = TaskStatus.InProgress; // Or keep existing if it could be manually set to Completed
-
-        const updatedTask = {
-          ...this.tasks[taskIndex],
-          completedIntervals: updatedCompletedIntervals,
-          completionStatus: newCompletionStatus // Explicitly InProgress or allow manual completion
-        };
-        this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
-        this.saveTasks();
-      }
-      // If workIntervals is a number and completedIntervals is already >= workIntervals, do nothing.
+      const updatedTask = {
+        ...this.tasks[taskIndex],
+        completionStatus: TaskStatus.Completed,
+        // Optionally, you might want to set completedIntervals to workIntervals
+        // if that makes sense for your application logic when a task is manually completed.
+        // completedIntervals: this.tasks[taskIndex].workIntervals
+      };
+      this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
+      this.saveTasks();
     }
   }
 }

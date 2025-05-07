@@ -15,7 +15,7 @@ export class TaskListComponent implements OnChanges {
   @Input() tasks: Task[] = [];
   @Output() editTask = new EventEmitter<Task>();
   @Output() deleteTask = new EventEmitter<string>();
-  @Output() completeInterval = new EventEmitter<Task>();
+  @Output() taskCompleted = new EventEmitter<Task>(); // Changed from completeInterval
   @Output() filterChanged = new EventEmitter<string>(); // Optional: Emit filter changes if parent needs it
   @Output() taskOrderChanged = new EventEmitter<Task[]>();
 
@@ -56,8 +56,8 @@ export class TaskListComponent implements OnChanges {
     this.deleteTask.emit(id);
   }
 
-  completeIntervalClicked(task: Task): void {
-    this.completeInterval.emit(task);
+  completeTaskClicked(task: Task): void { // Renamed from completeIntervalClicked
+    this.taskCompleted.emit(task); // Emit taskCompleted event
   }
 
   drop(event: CdkDragDrop<Task[]>) {
