@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Task, TaskUrgency, TaskStatus } from '../../models/task.model';
 import { Component, OnInit } from '@angular/core';
 import { TimerSettingsService, TimerSettings } from '../../services/timer-settings.service';
-import { CreateTaskComponent } from './create-task/create-task.component';
+// import { CreateTaskComponent } from './create-task/create-task.component'; // Removed import
 import { TaskListComponent } from './task-list/task-list.component';
 
 @Component({
@@ -12,7 +12,7 @@ import { TaskListComponent } from './task-list/task-list.component';
   imports: [
     CommonModule,
     FormsModule,
-    CreateTaskComponent,
+    // CreateTaskComponent, // Removed from imports
     TaskListComponent
   ],
   templateUrl: './tasks.component.html',
@@ -20,7 +20,7 @@ import { TaskListComponent } from './task-list/task-list.component';
 })
 export class TasksComponent implements OnInit {
   tasks: Task[] = [];
-  editingTask: Task | null = null;
+  // editingTask: Task | null = null; // Removed unused property
 
   currentSettings!: TimerSettings;
 
@@ -103,7 +103,7 @@ export class TasksComponent implements OnInit {
         this.tasks = this.tasks.map((task, index) => index === idx ? updatedTask : task);
         this.saveTasks();
       }
-      this.editingTask = null;
+      // this.editingTask = null; // Removed as editingTask is removed
     } else { // Adding new task
       const newTask: Task = {
         id: crypto.randomUUID(),
@@ -120,22 +120,21 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  handleCancelEdit() {
-    this.editingTask = null;
-  }
+  // handleCancelEdit() { // Removed unused method
+  //   this.editingTask = null;
+  // }
 
-  handleEditTask(task: Task) {
-    // Pass a copy to avoid potential direct mutation issues if CreateTaskComponent modifies the object
-    this.editingTask = { ...task };
-  }
+  // handleEditTask(task: Task) { // Removed unused method
+  //   this.editingTask = { ...task };
+  // }
 
   handleDeleteTask(id: string) {
     // filter already returns a new array reference
     this.tasks = this.tasks.filter(t => t.id !== id);
     this.saveTasks();
-    if (this.editingTask?.id === id) {
-      this.editingTask = null;
-    }
+    // if (this.editingTask?.id === id) { // Removed as editingTask is removed
+    //   this.editingTask = null;
+    // }
   }
 
   handleTaskCompleted(task: Task): void {

@@ -1,14 +1,8 @@
-<app-create-task
-    [taskToEdit]="editingTask"
-    (taskSaved)="handleTaskSaved($event)"
-    (cancelEdit)="handleCancelEdit()">
-</app-create-task>
 
 <hr class="tasks-separator" />
 
 <app-task-list
     [tasks]="tasks"
-    (editTask)="handleEditTask($event)"
     (deleteTask)="handleDeleteTask($event)"
     (taskCompleted)="handleTaskCompleted($event)"
     (taskCreated)="handleTaskSaved($event)"

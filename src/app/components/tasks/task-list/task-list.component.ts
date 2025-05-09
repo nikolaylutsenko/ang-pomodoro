@@ -14,7 +14,7 @@ import { CreateTaskComponent } from '../create-task/create-task.component'; // I
 })
 export class TaskListComponent implements OnChanges {
   @Input() tasks: Task[] = [];
-  @Output() editTask = new EventEmitter<Task>();
+  // @Output() editTask = new EventEmitter<Task>(); // Comment out or remove this line
   @Output() deleteTask = new EventEmitter<string>();
   @Output() taskCompleted = new EventEmitter<Task>();
   @Output() filterChanged = new EventEmitter<string>();
@@ -69,7 +69,9 @@ export class TaskListComponent implements OnChanges {
   }
 
   editTaskClicked(task: Task): void {
-    this.editTask.emit(task); // This will be handled by the parent for non-modal editing
+    // this.editTask.emit(task); // Comment out or remove this line
+    this.taskToEditInModal = { ...task }; // Set task for modal editing
+    this.showCreateTaskModal = true; // Open modal
   }
 
   deleteTaskClicked(id: string): void {
