@@ -10,5 +10,7 @@
     [tasks]="tasks"
     (editTask)="handleEditTask($event)"
     (deleteTask)="handleDeleteTask($event)"
-    (taskCompleted)="handleTaskCompleted($event)">
+    (taskCompleted)="handleTaskCompleted($event)"
+    (taskCreated)="handleTaskSaved($event)"
+    (taskOrderChanged)="handleTaskOrderChanged($event)">
 </app-task-list>

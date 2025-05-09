@@ -1,13 +1,14 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task, TaskStatus } from '../../../models/task.model'; // Import TaskStatus
+import { Task, TaskStatus } from '../../../models/task.model';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { CreateTaskComponent } from '../create-task/create-task.component'; // Import CreateTaskComponent
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [CommonModule, FormsModule, DragDropModule, CreateTaskComponent], // Add CreateTaskComponent
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -15,14 +16,20 @@ export class TaskListComponent implements OnChanges {
   @Input() tasks: Task[] = [];
   @Output() editTask = new EventEmitter<Task>();
   @Output() deleteTask = new EventEmitter<string>();
-  @Output() taskCompleted = new EventEmitter<Task>(); // Changed from completeInterval
-  @Output() filterChanged = new EventEmitter<string>(); // Optional: Emit filter changes if parent needs it
+  @Output() taskCompleted = new EventEmitter<Task>();
+  @Output() filterChanged = new EventEmitter<string>();
   @Output() taskOrderChanged = new EventEmitter<Task[]>();
+  @Output() taskCreated = new EventEmitter<Partial<Task>>(); // For tasks created via modal
 
   filterText: string = '';
   sortDesc: boolean = true;
   filteredAndSortedTasks: Task[] = [];
   expandedDescriptions: { [taskId: string]: boolean } = {};
+
+  showCreateTaskModal: boolean = false;
+  taskToEditInModal: Task | null = null;
+
+  constructor() {}
 
   // Make TaskStatus available in the template
   public get TaskStatus(): typeof TaskStatus {
@@ -62,26 +69,35 @@ export class TaskListComponent implements OnChanges {
   }
 
   editTaskClicked(task: Task): void {
-    this.editTask.emit(task);
+    this.editTask.emit(task); // This will be handled by the parent for non-modal editing
   }
 
   deleteTaskClicked(id: string): void {
     this.deleteTask.emit(id);
   }
 
-  completeTaskClicked(task: Task): void { // Renamed from completeIntervalClicked
-    this.taskCompleted.emit(task); // Emit taskCompleted event
+  completeTaskClicked(task: Task): void {
+    this.taskCompleted.emit(task);
   }
 
   drop(event: CdkDragDrop<Task[]>) {
     moveItemInArray(this.filteredAndSortedTasks, event.previousIndex, event.currentIndex);
-    // Emit an event to notify the parent component of the order change.
-    // The parent component can then decide if/how to persist this new order.
-    // We emit a copy of the array to avoid direct modification issues.
     this.taskOrderChanged.emit([...this.filteredAndSortedTasks]);
-    // If you want to reflect the order change in the original 'tasks' array immediately,
-    // you might need a more complex logic to map sorted/filtered indices back to original indices,
-    // or update the main 'tasks' array in the parent component based on the emitted event.
-    // For now, this reorders the displayed list.
+  }
+
+  // Methods for the modal
+  openCreateTaskModal(): void {
+    this.taskToEditInModal = null; // Ensure it's for creation
+    this.showCreateTaskModal = true;
+  }
+
+  closeCreateTaskModal(): void {
+    this.showCreateTaskModal = false;
+    this.taskToEditInModal = null;
+  }
+
+  handleTaskSavedFromModal(task: Partial<Task>): void {
+    this.taskCreated.emit(task); // Emit event for parent component to handle actual save
+    this.closeCreateTaskModal();
   }
 }

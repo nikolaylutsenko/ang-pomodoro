@@ -31,6 +31,29 @@ export class TasksComponent implements OnInit {
     this.timerSettings.getSettings().subscribe(s => this.currentSettings = s);
   }
 
+  handleTaskOrderChanged(reorderedTasks: Task[]): void {
+    // Assuming reorderedTasks contains the tasks in their new order,
+    // and these tasks are already part of the main `this.tasks` array but possibly in a different order.
+    // The goal is to update `this.tasks` to reflect this new order.
+
+    // Create a map for quick lookup of new order by ID
+    const orderMap = new Map(reorderedTasks.map((task, index) => [task.id, index]));
+
+    // Sort the original `this.tasks` array based on the new order from `reorderedTasks`
+    this.tasks.sort((a, b) => {
+      const orderA = orderMap.get(a.id);
+      const orderB = orderMap.get(b.id);
+
+      // Handle cases where a task might not be in reorderedTasks (should not happen if logic is correct)
+      if (orderA === undefined) return 1;
+      if (orderB === undefined) return -1;
+
+      return orderA - orderB;
+    });
+
+    this.saveTasks();
+  }
+
   private loadTasks(): void {
     const data = localStorage.getItem('tasks');
     this.tasks = data

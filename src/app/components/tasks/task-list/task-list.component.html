@@ -78,3 +78,19 @@
     </tr>
   </tbody>
 </table>
+
+<!-- Add New Task Button -->
+<button class="add-task-btn" (click)="openCreateTaskModal()">
+  <span>+</span>
+</button>
+
+<!-- Create Task Modal -->
+<div *ngIf="showCreateTaskModal" class="modal-overlay" (click)="closeCreateTaskModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-create-task
+      [taskToEdit]="taskToEditInModal"
+      (taskSaved)="handleTaskSavedFromModal($event)"
+      (cancelEdit)="closeCreateTaskModal()">
+    </app-create-task>
+  </div>
+</div>
