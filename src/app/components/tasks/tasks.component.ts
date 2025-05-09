@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskUrgency, TaskStatus } from '../../models/task.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core'; // Added ViewChild
 import { TimerSettingsService, TimerSettings } from '../../services/timer-settings.service';
-// import { CreateTaskComponent } from './create-task/create-task.component'; // Removed import
 import { TaskListComponent } from './task-list/task-list.component';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop'; // Added DragDropModule
 
 @Component({
   selector: 'app-tasks',
@@ -13,14 +13,22 @@ import { TaskListComponent } from './task-list/task-list.component';
     CommonModule,
     FormsModule,
     // CreateTaskComponent, // Removed from imports
-    TaskListComponent
+    TaskListComponent,
+    DragDropModule // Added DragDropModule here
   ],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })
 export class TasksComponent implements OnInit {
-  tasks: Task[] = [];
-  // editingTask: Task | null = null; // Removed unused property
+  @ViewChild(TaskListComponent) taskListComponent!: TaskListComponent;
+  allTasks: Task[] = []; // Renamed from tasks
+  backlogTasks: Task[] = [];
+  tasksForList: Task[] = [];
+
+  selectedBacklogTaskIds: Set<string> = new Set();
+  selectedActiveTaskIds: Set<string> = new Set();
+
+  activeSubTab: 'taskList' | 'backlog' = 'taskList'; // New property for active sub-tab
 
   currentSettings!: TimerSettings;
 
@@ -31,38 +39,62 @@ export class TasksComponent implements OnInit {
     this.timerSettings.getSettings().subscribe(s => this.currentSettings = s);
   }
 
+  private updateTaskLists(): void {
+    this.backlogTasks = this.allTasks.filter(task => task.completionStatus === TaskStatus.Pending);
+    // Ensure tasksForList maintains the order from allTasks for non-pending items
+    this.tasksForList = this.allTasks.filter(task => task.completionStatus !== TaskStatus.Pending);
+    // Clear selections when lists are updated to avoid stale selections
+    // It might be better to preserve selection if items are still present in their respective lists
+    // For now, let's clear them for simplicity after a move operation.
+    // When lists update, if the current active tab has no items and the other does, switch.
+    // Or simply ensure selections are appropriate for the visible tab.
+  }
+
+  // New method to change sub-tab
+  selectSubTab(tabName: 'taskList' | 'backlog'): void {
+    this.activeSubTab = tabName;
+    // Potentially clear selections in the non-visible tab if desired, or manage as is.
+  }
+
   handleTaskOrderChanged(reorderedTasks: Task[]): void {
-    // Assuming reorderedTasks contains the tasks in their new order,
-    // and these tasks are already part of the main `this.tasks` array but possibly in a different order.
-    // The goal is to update `this.tasks` to reflect this new order.
+    // This event now comes from task-list, which only knows about tasksForList
+    // We need to merge this order back into allTasks
 
-    // Create a map for quick lookup of new order by ID
-    const orderMap = new Map(reorderedTasks.map((task, index) => [task.id, index]));
+    const activeTaskOrderMap = new Map(reorderedTasks.map((task, index) => [task.id, index]));
 
-    // Sort the original `this.tasks` array based on the new order from `reorderedTasks`
-    this.tasks.sort((a, b) => {
-      const orderA = orderMap.get(a.id);
-      const orderB = orderMap.get(b.id);
+    // Create a new allTasks array reflecting the new order of active tasks
+    // and keeping pending tasks at their relative positions (e.g., at the start or end, or filtered out if not managed by this reorder)
+    // For simplicity, let's assume pending tasks are not part of this reordering
+    // and active tasks are reordered amongst themselves.
 
-      // Handle cases where a task might not be in reorderedTasks (should not happen if logic is correct)
+    const pendingTasks = this.allTasks.filter(t => t.completionStatus === TaskStatus.Pending);
+    const activeTasks = this.allTasks.filter(t => t.completionStatus !== TaskStatus.Pending);
+
+    activeTasks.sort((a, b) => {
+      const orderA = activeTaskOrderMap.get(a.id);
+      const orderB = activeTaskOrderMap.get(b.id);
+      if (orderA === undefined && orderB === undefined) return 0; // Should not happen if reorderedTasks are from activeTasks
       if (orderA === undefined) return 1;
       if (orderB === undefined) return -1;
-
       return orderA - orderB;
     });
 
+    this.allTasks = [...pendingTasks, ...activeTasks]; // Or maintain original relative order if needed
+
     this.saveTasks();
+    this.updateTaskLists(); // Refresh both lists
   }
 
   private loadTasks(): void {
     const data = localStorage.getItem('tasks');
-    this.tasks = data
-      ? JSON.parse(data).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated) }))
+    this.allTasks = data
+      ? JSON.parse(data).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated), completionStatus: t.completionStatus || TaskStatus.Pending })) // Ensure completionStatus exists
       : [];
+    this.updateTaskLists();
   }
 
   private saveTasks(): void {
-    localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    localStorage.setItem('tasks', JSON.stringify(this.allTasks));
   }
 
   private calculateWorkIntervals(taskData: Partial<Task>): number | string {
@@ -91,64 +123,172 @@ export class TasksComponent implements OnInit {
     const estimatedHoursToSave = taskData.estimatedHours!;
 
     if (taskData.id) { // Editing existing task
-      const idx = this.tasks.findIndex(t => t.id === taskData.id);
+      const idx = this.allTasks.findIndex(t => t.id === taskData.id);
       if (idx > -1) {
         const updatedTask = {
-          ...this.tasks[idx],
+          ...this.allTasks[idx],
           description: taskData.description!,
-          urgency: taskData.urgency!, // Changed priority to urgency
-          estimatedHours: estimatedHoursToSave, // This is the numeric hour value from button or 0
-          workIntervals: finalWorkIntervals // This is the calculated intervals or '∞', '?'
+          urgency: taskData.urgency!,
+          estimatedHours: estimatedHoursToSave,
+          workIntervals: finalWorkIntervals,
+          // completionStatus is not changed here, it's changed by other actions like complete or move to active
         };
-        this.tasks = this.tasks.map((task, index) => index === idx ? updatedTask : task);
-        this.saveTasks();
+        this.allTasks = this.allTasks.map((task, index) => index === idx ? updatedTask : task);
       }
-      // this.editingTask = null; // Removed as editingTask is removed
     } else { // Adding new task
       const newTask: Task = {
         id: crypto.randomUUID(),
         description: taskData.description!,
-        urgency: taskData.urgency!, // Changed priority to urgency
+        urgency: taskData.urgency!,
         dateCreated: new Date(),
-        estimatedHours: estimatedHoursToSave, // Numeric hours or 0
-        workIntervals: finalWorkIntervals, // Calculated intervals or '∞', '?'
+        estimatedHours: estimatedHoursToSave,
+        workIntervals: finalWorkIntervals,
         completedIntervals: 0,
-        completionStatus: TaskStatus.Pending
+        completionStatus: TaskStatus.InProgress // Changed from TaskStatus.Pending
       };
-      this.tasks = [...this.tasks, newTask];
-      this.saveTasks();
+      this.allTasks = [...this.allTasks, newTask];
     }
+    this.saveTasks();
+    this.updateTaskLists();
   }
 
-  // handleCancelEdit() { // Removed unused method
-  //   this.editingTask = null;
-  // }
-
-  // handleEditTask(task: Task) { // Removed unused method
-  //   this.editingTask = { ...task };
-  // }
-
   handleDeleteTask(id: string) {
-    // filter already returns a new array reference
-    this.tasks = this.tasks.filter(t => t.id !== id);
+    this.allTasks = this.allTasks.filter(t => t.id !== id);
     this.saveTasks();
-    // if (this.editingTask?.id === id) { // Removed as editingTask is removed
-    //   this.editingTask = null;
-    // }
+    this.updateTaskLists();
   }
 
   handleTaskCompleted(task: Task): void {
-    const taskIndex = this.tasks.findIndex(t => t.id === task.id);
+    const taskIndex = this.allTasks.findIndex(t => t.id === task.id);
     if (taskIndex > -1) {
       const updatedTask = {
-        ...this.tasks[taskIndex],
+        ...this.allTasks[taskIndex],
         completionStatus: TaskStatus.Completed,
-        // Optionally, you might want to set completedIntervals to workIntervals
-        // if that makes sense for your application logic when a task is manually completed.
-        // completedIntervals: this.tasks[taskIndex].workIntervals
       };
-      this.tasks = this.tasks.map((t, index) => index === taskIndex ? updatedTask : t);
+      this.allTasks = this.allTasks.map((t, index) => index === taskIndex ? updatedTask : t);
       this.saveTasks();
+      this.updateTaskLists();
     }
+  }
+
+  // Method to handle selection change from backlog list
+  onBacklogSelectionChange(taskId: string, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.selectedBacklogTaskIds.add(taskId);
+    } else {
+      this.selectedBacklogTaskIds.delete(taskId);
+    }
+  }
+
+  // Method to handle selection change from active tasks list (task-list.component)
+  onActiveTaskSelectionChange(event: {taskId: string, selected: boolean}): void {
+    if (event.selected) {
+      this.selectedActiveTaskIds.add(event.taskId);
+    } else {
+      this.selectedActiveTaskIds.delete(event.taskId);
+    }
+  }
+
+  // Method to handle select all for backlog list
+  toggleSelectAllBacklog(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.backlogTasks.forEach(task => this.selectedBacklogTaskIds.add(task.id));
+    } else {
+      this.selectedBacklogTaskIds.clear();
+    }
+  }
+
+  moveSelectedTasksToActive(): void {
+    if (this.selectedBacklogTaskIds.size === 0) return;
+
+    this.allTasks = this.allTasks.map(task => {
+      if (this.selectedBacklogTaskIds.has(task.id)) {
+        return { ...task, completionStatus: TaskStatus.InProgress };
+      }
+      return task;
+    });
+    this.selectedBacklogTaskIds.clear();
+    this.saveTasks();
+    this.updateTaskLists();
+  }
+
+  moveSelectedTasksToBacklog(): void {
+    if (this.selectedActiveTaskIds.size === 0) return;
+
+    const idsToMove = new Set(this.selectedActiveTaskIds);
+
+    this.allTasks = this.allTasks.map(task => {
+      if (idsToMove.has(task.id)) {
+        return { ...task, completionStatus: TaskStatus.Pending };
+      }
+      return task;
+    });
+
+    // Clear selection in the child component for the moved tasks
+    if (this.taskListComponent) {
+      this.taskListComponent.clearSelectionByIds(idsToMove);
+    }
+    this.selectedActiveTaskIds.clear();
+    this.saveTasks();
+    this.updateTaskLists();
+  }
+
+  // Remove or comment out the old moveToActive method as it's replaced
+  /*
+  moveToActive(taskId: string): void {
+    const taskIndex = this.allTasks.findIndex(t => t.id === taskId);
+    if (taskIndex > -1 && this.allTasks[taskIndex].completionStatus === TaskStatus.Pending) {
+      const updatedTask = {
+        ...this.allTasks[taskIndex],
+        completionStatus: TaskStatus.InProgress // Or your default active status
+      };
+      this.allTasks = this.allTasks.map((t, index) => index === taskIndex ? updatedTask : t);
+      this.saveTasks();
+      this.updateTaskLists();
+    }
+  }
+  */
+
+  dropBacklog(event: CdkDragDrop<Task[]>): void {
+    // Reorder the backlogTasks array locally
+    moveItemInArray(this.backlogTasks, event.previousIndex, event.currentIndex);
+
+    // Update the allTasks array to reflect the new order of backlog items
+    // This assumes backlogTasks are contiguous in allTasks or their relative order needs to be preserved among themselves
+    const backlogTaskIdsOrder = this.backlogTasks.map(t => t.id);
+    const nonBacklogTasks = this.allTasks.filter(t => t.completionStatus !== TaskStatus.Pending);
+
+    // Create a new allTasks array with backlog tasks in their new order, followed by non-backlog tasks
+    // Or, if backlog tasks are interspersed, a more complex merge would be needed.
+    // For simplicity, we'll sort allTasks by putting newly ordered backlog tasks first, then others.
+    // This might change the overall order of allTasks if backlog items were not already grouped.
+
+    const reorderedAllTasks = [
+      ...this.backlogTasks, // These are already in the new order
+      ...nonBacklogTasks
+    ];
+
+    // A more robust way if backlog tasks can be anywhere in allTasks:
+    // Create a map of the new order for backlog tasks
+    const backlogOrderMap = new Map(this.backlogTasks.map((task, index) => [task.id, index]));
+
+    this.allTasks.sort((a, b) => {
+      const isABacklog = a.completionStatus === TaskStatus.Pending;
+      const isBBacklog = b.completionStatus === TaskStatus.Pending;
+
+      if (isABacklog && isBBacklog) {
+        return (backlogOrderMap.get(a.id) ?? 0) - (backlogOrderMap.get(b.id) ?? 0);
+      }
+      if (isABacklog) return -1; // Backlog items come before non-backlog items
+      if (isBBacklog) return 1;  // Non-backlog items come after backlog items
+      return 0; // Preserve original order for non-backlog items relative to each other
+    });
+
+    this.saveTasks();
+    // No need to call updateTaskLists() if allTasks is directly manipulated and backlogTasks is already updated.
+    // However, if allTasks structure is complexly changed, updateTaskLists() ensures consistency.
+    this.updateTaskLists();
   }
 }

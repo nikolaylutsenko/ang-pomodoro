@@ -15,6 +15,7 @@
 <table class="tasks-table">
   <thead>
     <tr>
+      <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
       <th>Description</th>
       <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
@@ -29,7 +30,8 @@
     <tr *ngFor="let task of filteredAndSortedTasks" cdkDrag [cdkDragDisabled]="task.completionStatus === TaskStatus.Completed" [ngClass]="{
       'urgency-low': task.urgency === 'Low',
       'urgency-mid': task.urgency === 'Mid',
-      'urgency-high': task.urgency === 'High'
+      'urgency-high': task.urgency === 'High',
+      'selected': selectedTaskIds.has(task.id)
     }" [class.completed]="task.completionStatus === TaskStatus.Completed">
       <ng-template cdkDragPreview>
         <tr [ngClass]="{
@@ -38,6 +40,7 @@
           'urgency-high': task.urgency === 'High',
           'dragging-preview': true
         }">
+          <td><!-- Checkbox for preview can be omitted or static --></td>
           <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
           <td>{{ task.urgency }}</td>
           <td>{{ task.dateCreated | date:'short' }}</td>
@@ -48,6 +51,7 @@
           <td>Actions</td>
         </tr>
       </ng-template>
+      <td><input type="checkbox" [checked]="selectedTaskIds.has(task.id)" (change)="onTaskSelectionChange(task.id, $event)"></td> <!-- Added checkbox to each row -->
       <td>
         <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
           {{ task.description | slice:0:300 }}...
@@ -74,7 +78,7 @@
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
-      <td colspan="8">No tasks found.</td>
+      <td colspan="9">No tasks found.</td> <!-- Adjusted colspan -->
     </tr>
   </tbody>
 </table>
