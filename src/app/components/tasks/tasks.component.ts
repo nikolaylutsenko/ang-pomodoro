@@ -57,39 +57,55 @@ export class TasksComponent implements OnInit {
   }
 
   handleTaskOrderChanged(reorderedTasks: Task[]): void {
-    // This event now comes from task-list, which only knows about tasksForList
-    // We need to merge this order back into allTasks
+    // reorderedTasks comes from task-list.component and already has updated priorities
+    // based on their new order in that list.
+    // We need to update these priorities in the main allTasks list.
 
-    const activeTaskOrderMap = new Map(reorderedTasks.map((task, index) => [task.id, index]));
+    const reorderedTaskMap = new Map(reorderedTasks.map(task => [task.id, task.priority]));
 
-    // Create a new allTasks array reflecting the new order of active tasks
-    // and keeping pending tasks at their relative positions (e.g., at the start or end, or filtered out if not managed by this reorder)
-    // For simplicity, let's assume pending tasks are not part of this reordering
-    // and active tasks are reordered amongst themselves.
-
-    const pendingTasks = this.allTasks.filter(t => t.completionStatus === TaskStatus.Pending);
-    const activeTasks = this.allTasks.filter(t => t.completionStatus !== TaskStatus.Pending);
-
-    activeTasks.sort((a, b) => {
-      const orderA = activeTaskOrderMap.get(a.id);
-      const orderB = activeTaskOrderMap.get(b.id);
-      if (orderA === undefined && orderB === undefined) return 0; // Should not happen if reorderedTasks are from activeTasks
-      if (orderA === undefined) return 1;
-      if (orderB === undefined) return -1;
-      return orderA - orderB;
+    this.allTasks = this.allTasks.map(task => {
+      if (reorderedTaskMap.has(task.id)) {
+        // Update priority for tasks that were reordered
+        return { ...task, priority: reorderedTaskMap.get(task.id)! };
+      }
+      return task;
     });
 
-    this.allTasks = [...pendingTasks, ...activeTasks]; // Or maintain original relative order if needed
+    // After updating priorities, re-sort allTasks if necessary, or ensure lists are correctly derived.
+    // The task-list component will sort its own view. We just need to ensure allTasks is consistent for saving.
+    // If tasksForList is derived from allTasks and then sorted by priority, this should be fine.
 
     this.saveTasks();
-    this.updateTaskLists(); // Refresh both lists
+    this.updateTaskLists(); // Refresh both lists, which should respect new priorities if sorted by them.
   }
 
   private loadTasks(): void {
     const data = localStorage.getItem('tasks');
-    this.allTasks = data
-      ? JSON.parse(data).map((t: any) => ({ ...t, dateCreated: new Date(t.dateCreated), completionStatus: t.completionStatus || TaskStatus.Pending })) // Ensure completionStatus exists
+    let loadedTasks: Task[] = data
+      ? JSON.parse(data).map((t: any, index: number) => ({
+          ...t,
+          dateCreated: new Date(t.dateCreated),
+          completionStatus: t.completionStatus || TaskStatus.Pending,
+          // Ensure priority is at least 1, if it exists, otherwise assign index + 1
+          priority: t.priority !== undefined ? (t.priority === 0 ? 1 : t.priority) : index + 1
+        }))
       : [];
+
+    // Re-prioritize all tasks to be sequential and 1-based if loading from older data or for consistency
+    // This part can be sophisticated. For now, let's ensure active tasks and backlog tasks have sequential priorities
+    // within their groups, starting from 1.
+
+    const activeTasks = loadedTasks
+      .filter(t => t.completionStatus !== TaskStatus.Pending)
+      .sort((a, b) => a.priority - b.priority)
+      .map((task, index) => ({ ...task, priority: index + 1 }));
+
+    const pendingTasks = loadedTasks
+      .filter(t => t.completionStatus === TaskStatus.Pending)
+      .sort((a, b) => a.priority - b.priority)
+      .map((task, index) => ({ ...task, priority: index + 1 }));
+
+    this.allTasks = [...activeTasks, ...pendingTasks];
     this.updateTaskLists();
   }
 
@@ -131,11 +147,17 @@ export class TasksComponent implements OnInit {
           urgency: taskData.urgency!,
           estimatedHours: estimatedHoursToSave,
           workIntervals: finalWorkIntervals,
-          // completionStatus is not changed here, it's changed by other actions like complete or move to active
+          // priority is NOT changed here; it's managed by drag/drop or creation
         };
         this.allTasks = this.allTasks.map((task, index) => index === idx ? updatedTask : task);
       }
     } else { // Adding new task
+      // New tasks are added to InProgress, their priority should be at the end of the current active tasks + 1
+      const newPriority =
+        this.tasksForList.length > 0
+          ? Math.max(...this.tasksForList.map(t => t.priority)) + 1
+          : 1; // Start with 1 if no active tasks
+
       const newTask: Task = {
         id: crypto.randomUUID(),
         description: taskData.description!,
@@ -144,7 +166,8 @@ export class TasksComponent implements OnInit {
         estimatedHours: estimatedHoursToSave,
         workIntervals: finalWorkIntervals,
         completedIntervals: 0,
-        completionStatus: TaskStatus.InProgress // Changed from TaskStatus.Pending
+        completionStatus: TaskStatus.InProgress, // Changed from TaskStatus.Pending
+        priority: newPriority
       };
       this.allTasks = [...this.allTasks, newTask];
     }
@@ -203,9 +226,18 @@ export class TasksComponent implements OnInit {
   moveSelectedTasksToActive(): void {
     if (this.selectedBacklogTaskIds.size === 0) return;
 
+    let maxPriorityInActive = 0; // Start with 0 to ensure the first priority is 1 if list is empty
+    this.tasksForList.forEach(task => {
+      if (task.priority > maxPriorityInActive) {
+        maxPriorityInActive = task.priority;
+      }
+    });
+
+    let newPriorityCounter = maxPriorityInActive + 1;
+
     this.allTasks = this.allTasks.map(task => {
       if (this.selectedBacklogTaskIds.has(task.id)) {
-        return { ...task, completionStatus: TaskStatus.InProgress };
+        return { ...task, completionStatus: TaskStatus.InProgress, priority: newPriorityCounter++ };
       }
       return task;
     });
@@ -218,10 +250,18 @@ export class TasksComponent implements OnInit {
     if (this.selectedActiveTaskIds.size === 0) return;
 
     const idsToMove = new Set(this.selectedActiveTaskIds);
+    let maxPriorityInBacklog = 0; // Start with 0 to ensure the first priority is 1 if list is empty
+    this.backlogTasks.forEach(task => {
+      if (task.priority > maxPriorityInBacklog) {
+        maxPriorityInBacklog = task.priority;
+      }
+    });
+    let newPriorityCounter = maxPriorityInBacklog + 1;
 
     this.allTasks = this.allTasks.map(task => {
       if (idsToMove.has(task.id)) {
-        return { ...task, completionStatus: TaskStatus.Pending };
+        // Assign a new priority suitable for backlog, e.g., at the end of current backlog
+        return { ...task, completionStatus: TaskStatus.Pending, priority: newPriorityCounter++ };
       }
       return task;
     });
@@ -255,40 +295,22 @@ export class TasksComponent implements OnInit {
     // Reorder the backlogTasks array locally
     moveItemInArray(this.backlogTasks, event.previousIndex, event.currentIndex);
 
-    // Update the allTasks array to reflect the new order of backlog items
-    // This assumes backlogTasks are contiguous in allTasks or their relative order needs to be preserved among themselves
-    const backlogTaskIdsOrder = this.backlogTasks.map(t => t.id);
-    const nonBacklogTasks = this.allTasks.filter(t => t.completionStatus !== TaskStatus.Pending);
+    // Update priorities for the reordered backlog tasks, starting from 1
+    this.backlogTasks.forEach((task, index) => {
+      task.priority = index + 1;
+    });
 
-    // Create a new allTasks array with backlog tasks in their new order, followed by non-backlog tasks
-    // Or, if backlog tasks are interspersed, a more complex merge would be needed.
-    // For simplicity, we'll sort allTasks by putting newly ordered backlog tasks first, then others.
-    // This might change the overall order of allTasks if backlog items were not already grouped.
+    // Update allTasks with the new priorities from backlogTasks
+    const backlogTaskMap = new Map(this.backlogTasks.map(task => [task.id, task.priority]));
 
-    const reorderedAllTasks = [
-      ...this.backlogTasks, // These are already in the new order
-      ...nonBacklogTasks
-    ];
-
-    // A more robust way if backlog tasks can be anywhere in allTasks:
-    // Create a map of the new order for backlog tasks
-    const backlogOrderMap = new Map(this.backlogTasks.map((task, index) => [task.id, index]));
-
-    this.allTasks.sort((a, b) => {
-      const isABacklog = a.completionStatus === TaskStatus.Pending;
-      const isBBacklog = b.completionStatus === TaskStatus.Pending;
-
-      if (isABacklog && isBBacklog) {
-        return (backlogOrderMap.get(a.id) ?? 0) - (backlogOrderMap.get(b.id) ?? 0);
+    this.allTasks = this.allTasks.map(task => {
+      if (task.completionStatus === TaskStatus.Pending && backlogTaskMap.has(task.id)) {
+        return { ...task, priority: backlogTaskMap.get(task.id)! };
       }
-      if (isABacklog) return -1; // Backlog items come before non-backlog items
-      if (isBBacklog) return 1;  // Non-backlog items come after backlog items
-      return 0; // Preserve original order for non-backlog items relative to each other
+      return task;
     });
 
     this.saveTasks();
-    // No need to call updateTaskLists() if allTasks is directly manipulated and backlogTasks is already updated.
-    // However, if allTasks structure is complexly changed, updateTaskLists() ensures consistency.
-    this.updateTaskLists();
+    this.updateTaskLists(); // This will re-filter and re-sort based on allTasks
   }
 }

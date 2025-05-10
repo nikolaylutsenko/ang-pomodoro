@@ -16,6 +16,7 @@
   <thead>
     <tr>
       <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
+      <th>Priority</th> <!-- Added Priority Header -->
       <th>Description</th>
       <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
@@ -41,6 +42,7 @@
           'dragging-preview': true
         }">
           <td><!-- Checkbox for preview can be omitted or static --></td>
+          <td>{{ task.priority }}</td> <!-- Added Priority to Drag Preview -->
           <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
           <td>{{ task.urgency }}</td>
           <td>{{ task.dateCreated | date:'short' }}</td>
@@ -52,6 +54,7 @@
         </tr>
       </ng-template>
       <td><input type="checkbox" [checked]="selectedTaskIds.has(task.id)" (change)="onTaskSelectionChange(task.id, $event)"></td> <!-- Added checkbox to each row -->
+      <td>{{ task.priority }}</td> <!-- Added Priority Cell -->
       <td>
         <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
           {{ task.description | slice:0:300 }}...
@@ -78,7 +81,7 @@
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
-      <td colspan="9">No tasks found.</td> <!-- Adjusted colspan -->
+      <td colspan="10">No tasks found.</td> <!-- Adjusted colspan -->
     </tr>
   </tbody>
 </table>

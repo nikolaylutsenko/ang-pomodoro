@@ -19,6 +19,7 @@ export interface Task {
   description: string; // max 1000 symbols
   dateCreated: Date;
   urgency: TaskUrgency;
+  priority: number; // Lower number means higher priority
 
   // New fields
   estimatedHours: number;

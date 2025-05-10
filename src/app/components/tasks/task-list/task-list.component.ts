@@ -24,7 +24,7 @@ export class TaskListComponent implements OnChanges {
 
   filterText: string = '';
   sortDesc: boolean = true;
-  sortMode: 'date' | 'manual' = 'date'; // Added: property to track sort mode, default to date
+  sortMode: 'date' | 'manual' | 'priority' = 'priority'; // Added: property to track sort mode, default to priority
   filteredAndSortedTasks: Task[] = [];
   expandedDescriptions: { [taskId: string]: boolean } = {};
   selectedTaskIds: Set<string> = new Set(); // New property to track selections
@@ -68,7 +68,20 @@ export class TaskListComponent implements OnChanges {
         // Then sort by date
         return this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime();
       });
-    } else {
+    } else if (this.sortMode === 'priority') {
+      // Sort by priority if sortMode is 'priority'
+      this.filteredAndSortedTasks = filtered.sort((a, b) => {
+        // Sort by completion status first (completed tasks at the bottom)
+        if (a.completionStatus === TaskStatus.Completed && b.completionStatus !== TaskStatus.Completed) { // Fixed typo here
+          return 1;
+        }
+        if (a.completionStatus !== TaskStatus.Completed && b.completionStatus === TaskStatus.Completed) {
+          return -1;
+        }
+        // Then sort by priority
+        return a.priority - b.priority;
+      });
+    } else { // manual sort mode
       // If sortMode is 'manual', just apply the filter. The order is presumed to be manual.
       // We need to ensure `filtered` maintains the order from `this.tasks` if `this.tasks` itself is correctly ordered manually.
       // Since `this.tasks` is the input from the parent, which should reflect the manual order after a drag, this should be okay.
@@ -77,9 +90,18 @@ export class TaskListComponent implements OnChanges {
   }
 
   toggleSort() { // This is the "Sort by Date" button
-    this.sortMode = 'date'; // Set sort mode to date when this button is clicked
-    this.sortDesc = !this.sortDesc;
+    if (this.sortMode === 'date') {
+      this.sortDesc = !this.sortDesc;
+    } else {
+      this.sortMode = 'date';
+      this.sortDesc = true; // Default to descending when switching to date sort
+    }
     this.applyFiltersAndSorting(); // Re-sort when toggle changes
+  }
+
+  switchToPrioritySort() {
+    this.sortMode = 'priority';
+    this.applyFiltersAndSorting();
   }
 
   toggleDescription(taskId: string) {
@@ -101,13 +123,26 @@ export class TaskListComponent implements OnChanges {
   }
 
   drop(event: CdkDragDrop<Task[]>) {
-    // Create a new array for filteredAndSortedTasks to ensure immutability if other parts rely on it
+    // Create a new array from the current view model to reorder
     const newOrderedTasks = [...this.filteredAndSortedTasks];
     moveItemInArray(newOrderedTasks, event.previousIndex, event.currentIndex);
-    this.filteredAndSortedTasks = newOrderedTasks; // Update the local list immediately
 
-    this.sortMode = 'manual'; // Set sort mode to manual after drag-drop
-    this.taskOrderChanged.emit([...this.filteredAndSortedTasks]);
+    // Update priorities based on the new order in the reordered list
+    const updatedTasksWithNewPriorities = newOrderedTasks.map((task, index) => ({
+      ...task,
+      priority: index + 1 // Priority is the new index + 1 in this specific view
+    }));
+
+    // Set sort mode to priority so that when ngOnChanges triggers applyFiltersAndSorting,
+    // it uses the new priorities.
+    this.sortMode = 'priority';
+
+    // Emit the tasks with their newly assigned priorities.
+    // The parent component (TasksComponent) will update these tasks in `allTasks`.
+    // Then, the @Input() tasks of this component will be updated,
+    // triggering ngOnChanges, which calls applyFiltersAndSorting.
+    // applyFiltersAndSorting will then use the new priorities because sortMode is 'priority'.
+    this.taskOrderChanged.emit(updatedTasksWithNewPriorities);
   }
 
   // Methods for the modal
