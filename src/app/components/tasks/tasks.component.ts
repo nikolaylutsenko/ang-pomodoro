@@ -253,8 +253,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.selectedActiveTaskIds.clear();
     this.taskService.saveTasks(allTasks);
   }
-
-  // ADDED: New comprehensive drop method
+  // Method for handling task drag and drop operations
   drop(event: CdkDragDrop<Task[]>): void {
     const previousListId = event.previousContainer.id;
     const currentListId = event.container.id;
@@ -273,8 +272,20 @@ export class TasksComponent implements OnInit, OnDestroy {
         return;
       }
 
+      // Move the item in the array and update priorities
       moveItemInArray(listToReorder, event.previousIndex, event.currentIndex);
-      listToReorder.forEach((task, index) => task.priority = index + 1);
+        // Assign new sequential priorities (1-based index)
+      listToReorder.forEach((task, index) => {
+        const newPriority = index + 1;
+        // Store old priority to see if it changed
+        const oldPriority = task.priority;
+        task.priority = newPriority;
+
+        // Log priority changes for debugging
+        if (oldPriority !== newPriority) {
+          console.log(`Task "${task.description.substring(0, 20)}..." priority changed: ${oldPriority} → ${newPriority}`);
+        }
+      });
 
       // Update priorities in the main task list
       const listMap = new Map(listToReorder.map(t => [t.id, t.priority]));

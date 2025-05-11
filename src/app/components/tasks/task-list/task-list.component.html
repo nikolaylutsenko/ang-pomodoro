@@ -11,12 +11,25 @@
   </button>
 </div>
 
+<!-- Help tooltip for drag and drop -->
+<div *ngIf="showDragHelp && filteredAndSortedTasks.length > 1 && listType !== 'completed'" class="drag-help-tooltip">
+  <div class="tooltip-content">
+    <span class="tooltip-title">💡 Tip: Reorder tasks by dragging</span>
+    <p>You can change the priority of tasks by dragging them up or down.</p>
+    <button (click)="dismissDragHelp()">Got it!</button>
+  </div>
+</div>
+
 <!-- Tasks Table -->
-<table class="tasks-table">
-  <thead>
+<table class="tasks-table">  <thead>
     <tr>
       <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
-      <th>Priority</th> <!-- Added Priority Header -->
+      <th class="priority-header" title="Drag & drop tasks to change priority">
+        <div class="priority-header-content">
+          <span>Priority</span>
+          <small *ngIf="listType !== 'completed'">(Drag to reorder)</small>
+        </div>
+      </th>
       <th>Description</th>
       <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
@@ -31,8 +44,9 @@
       'urgency-low': task.urgency === 'Low',
       'urgency-mid': task.urgency === 'Mid',
       'urgency-high': task.urgency === 'High',
-      'selected': selectedTaskIds.has(task.id)
-    }" [class.completed]="task.completionStatus === TaskStatus.Completed">      <ng-template cdkDragPreview>
+      'selected': selectedTaskIds.has(task.id),
+      'draggable-row': task.completionStatus !== TaskStatus.Completed
+    }" [class.completed]="task.completionStatus === TaskStatus.Completed"><ng-template cdkDragPreview>
         <div class="dragging-preview-container" [ngClass]="{
           'urgency-low': task.urgency === 'Low',
           'urgency-mid': task.urgency === 'Mid',
@@ -64,8 +78,10 @@
             </svg>
           </span>
         </div>
+      </td>      <td class="priority-cell" [title]="'Priority: ' + task.priority">
+        <span class="priority-badge">{{ task.priority }}</span>
       </td>
-      <td>{{ task.priority }}</td> <!-- Added Priority Cell -->      <td>
+      <td>
         <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
           {{ task.description | slice:0:300 }}...
           <a class="show-more-link" (click)="toggleDescription(task.id)">Show more</a>

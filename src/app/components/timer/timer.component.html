@@ -42,6 +42,15 @@
         {{ task.description.length > 200 ? (task.description | slice:0:200) + '...' : task.description }}
       </option>
     </select>
+    <!-- Add Complete button -->
+    <button
+      *ngIf="selectedTaskId"
+      class="complete-btn"
+      (click)="completeTask()"
+      [disabled]="!selectedTaskId || (getCurrentTask()?.completionStatus === 'Completed')"
+    >
+      Complete
+    </button>
   </div>
 
   <!-- Current task information -->

@@ -61,9 +61,8 @@ export class TaskService {
       this.tasksSubject.next([]);
       this.updateFilteredTaskLists([]); // Ensure filtered lists are also empty
     }
-  }
-
-  private updateFilteredTaskLists(tasks: Task[]): void {
+  }  private updateFilteredTaskLists(tasks: Task[]): void {
+    // Filter and sort active tasks by priority
     const activeTasks = tasks
       .filter(
         (t: Task) =>
@@ -73,9 +72,13 @@ export class TaskService {
       )
       .sort((a: Task, b: Task) => a.priority - b.priority);
 
+    // Filter and sort pending tasks by priority
     const pendingTasks = tasks
       .filter((t: Task) => t.completionStatus === TaskStatus.Pending)
-      .sort((a: Task, b: Task) => a.priority - b.priority);    const completedTasks = tasks
+      .sort((a: Task, b: Task) => a.priority - b.priority);
+
+    // Filter and sort completed tasks
+    const completedTasks = tasks
       .filter((t: Task) => t.completionStatus === TaskStatus.Completed)
       .sort((a: Task, b: Task) =>
         // Sort completed tasks by completion date (newest first)

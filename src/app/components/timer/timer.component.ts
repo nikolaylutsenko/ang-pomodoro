@@ -499,4 +499,23 @@ export class TimerComponent implements OnInit, OnDestroy {
   isSpecialIntervalValue(value: string | number | undefined): boolean {
     return value === '∞' || value === '?' || value === undefined;
   }
+
+  // Method to mark the current task as completed
+  completeTask(): void {
+    if (this.selectedTaskId) {
+      const allTasks = this.taskService.getAllTasks();
+      const taskIndex = allTasks.findIndex(t => t.id === this.selectedTaskId);
+
+      if (taskIndex > -1) {
+        const updatedTask = {
+          ...allTasks[taskIndex],
+          completionStatus: TaskStatus.Completed,
+          dateCompleted: new Date()
+        };
+
+        allTasks[taskIndex] = updatedTask;
+        this.taskService.saveTasks(allTasks);
+      }
+    }
+  }
 }

@@ -31,14 +31,16 @@ export class TaskListComponent implements OnChanges, OnInit, AfterViewInit {  @I
   filteredAndSortedTasks: Task[] = [];
   expandedDescriptions: { [taskId: string]: boolean } = {};
   selectedTaskIds: Set<string> = new Set(); // New property to track selections
+  showDragHelp: boolean = true; // Property to control drag help tooltip visibility
 
   showCreateTaskModal: boolean = false;
   taskToEditInModal: Task | null = null;
 
   constructor() {}
-
-  ngOnInit(): void { // ADDED ngOnInit stub
-    // Initialization logic can go here if needed in the future
+  ngOnInit(): void {
+    // Check if the drag help tooltip has been dismissed before
+    const dragHelpDismissed = localStorage.getItem('dragHelpDismissed');
+    this.showDragHelp = dragHelpDismissed !== 'true';
   }
 
   ngAfterViewInit(): void { // ADDED ngAfterViewInit stub
@@ -213,16 +215,26 @@ export class TaskListComponent implements OnChanges, OnInit, AfterViewInit {  @I
         changed = true;
       }
     });
-  }
-  // Method to handle drag and drop operations
+  }  // Method to handle drag and drop operations
   drop(event: CdkDragDrop<Task[], Task[]>): void {
     // Make sure we have the correct data for the drag event
     event.item.data = event.item.data || this.filteredAndSortedTasks[event.previousIndex];
+
+    // When tasks are reordered, switch to priority sort mode to ensure
+    // visual representation matches the actual priority values
+    this.sortMode = 'priority';
+
     // Emit the drop event to the parent component
     this.listDropped.emit(event);
   }
 
   trackById(index: number, task: Task): string { // ADDED trackById method
     return task.id;
+  }
+
+  // Method to dismiss the drag help tooltip and remember the user's preference
+  dismissDragHelp(): void {
+    this.showDragHelp = false;
+    localStorage.setItem('dragHelpDismissed', 'true');
   }
 }
