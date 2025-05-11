@@ -7,6 +7,12 @@
   display: flex;
   margin-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--color-border);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tab-buttons-container {
+  display: flex;
 }
 
 .sub-tab-button {
@@ -145,4 +151,27 @@
 /* Style for selected rows in both tables */
 .tasks-table tbody tr.selected td {
   background-color: var(--color-background-selected); /* Define this color in your variables */
+}
+
+/* Add Task Button Styles */
+.add-task-btn {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: 5%;
+  width: 150px;
+  height: 36px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--color-shadow);
+  transition: background-color 0.3s ease;
+  line-height: 0;
+  padding: 0;
+}
+
+.add-task-btn:hover {
+  background-color: var(--color-success-dark);
 }

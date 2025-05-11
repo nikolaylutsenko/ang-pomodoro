@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskStatus } from '../../../models/task.model';
-import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { CreateTaskComponent } from '../create-task/create-task.component'; // Import CreateTaskComponent
 
 @Component({
@@ -12,15 +12,18 @@ import { CreateTaskComponent } from '../create-task/create-task.component'; // I
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
-export class TaskListComponent implements OnChanges {
-  @Input() tasks: Task[] = [];
-  // @Output() editTask = new EventEmitter<Task>(); // Comment out or remove this line
+export class TaskListComponent implements OnChanges, OnInit, AfterViewInit {  @Input() tasks: Task[] = [];
+  @Input() listType: 'active' | 'pending' | 'completed' = 'active'; // ADDED: listType input with completed
+  @Input() cdkDropListId: string = ''; // ADDED
+  @Input() cdkDropListConnectedTo: string[] = []; // ADDED
+
   @Output() deleteTask = new EventEmitter<string>();
   @Output() taskCompleted = new EventEmitter<Task>();
-  @Output() filterChanged = new EventEmitter<string>();
-  @Output() taskOrderChanged = new EventEmitter<Task[]>();
   @Output() taskCreated = new EventEmitter<Partial<Task>>(); // For tasks created via modal
   @Output() taskSelectionChanged = new EventEmitter<{taskId: string, selected: boolean}>(); // New Output
+  @Output() moveToActive = new EventEmitter<string>(); // ADDED: Event for moving task to active list
+  @Output() moveToBacklog = new EventEmitter<string>(); // ADDED: Event for moving task to backlog list
+  @Output() listDropped = new EventEmitter<CdkDragDrop<Task[], Task[]>>(); // ADDED
 
   filterText: string = '';
   sortDesc: boolean = true;
@@ -34,6 +37,14 @@ export class TaskListComponent implements OnChanges {
 
   constructor() {}
 
+  ngOnInit(): void { // ADDED ngOnInit stub
+    // Initialization logic can go here if needed in the future
+  }
+
+  ngAfterViewInit(): void { // ADDED ngAfterViewInit stub
+    // After view initialization logic can go here if needed in the future
+  }
+
   // Make TaskStatus available in the template
   public get TaskStatus(): typeof TaskStatus {
     return TaskStatus;
@@ -44,7 +55,6 @@ export class TaskListComponent implements OnChanges {
       this.applyFiltersAndSorting();
     }
   }
-
   applyFiltersAndSorting(): void {
     let filtered = this.tasks.filter(t =>
       t.description.toLowerCase().includes(this.filterText.toLowerCase())
@@ -55,18 +65,30 @@ export class TaskListComponent implements OnChanges {
       [...this.selectedTaskIds].filter(id => currentFilteredIds.has(id))
     );
 
-    if (this.sortMode === 'date') {
-      // Only sort by date if sortMode is 'date'
+    // For completed tasks list, default sort by date completed (newest first)
+    if (this.listType === 'completed' && this.sortMode === 'priority') {
+      this.sortMode = 'date';
+      this.sortDesc = true;
+    }    if (this.sortMode === 'date') {
+      // Sort by date based on the listType
       this.filteredAndSortedTasks = filtered.sort((a, b) => {
-        // Sort by completion status first (completed tasks at the bottom)
-        if (a.completionStatus === TaskStatus.Completed && b.completionStatus !== TaskStatus.Completed) {
-          return 1;
+        if (this.listType === 'completed') {
+          // For completed tasks tab, sort by completion date
+          const dateA = a.dateCompleted?.getTime() || 0;
+          const dateB = b.dateCompleted?.getTime() || 0;
+          return this.sortDesc ? dateB - dateA : dateA - dateB;
+        } else {
+          // For other tabs, sort by creation date and completion status
+          // Sort by completion status first (completed tasks at the bottom)
+          if (a.completionStatus === TaskStatus.Completed && b.completionStatus !== TaskStatus.Completed) {
+            return 1;
+          }
+          if (a.completionStatus !== TaskStatus.Completed && b.completionStatus === TaskStatus.Completed) {
+            return -1;
+          }
+          // Then sort by creation date
+          return this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime();
         }
-        if (a.completionStatus !== TaskStatus.Completed && b.completionStatus === TaskStatus.Completed) {
-          return -1;
-        }
-        // Then sort by date
-        return this.sortDesc ? b.dateCreated.getTime() - a.dateCreated.getTime() : a.dateCreated.getTime() - b.dateCreated.getTime();
       });
     } else if (this.sortMode === 'priority') {
       // Sort by priority if sortMode is 'priority'
@@ -122,27 +144,14 @@ export class TaskListComponent implements OnChanges {
     this.taskCompleted.emit(task);
   }
 
-  drop(event: CdkDragDrop<Task[]>) {
-    // Create a new array from the current view model to reorder
-    const newOrderedTasks = [...this.filteredAndSortedTasks];
-    moveItemInArray(newOrderedTasks, event.previousIndex, event.currentIndex);
+  // ADDED: Method to emit event to move task to active
+  moveToActiveClicked(taskId: string): void {
+    this.moveToActive.emit(taskId);
+  }
 
-    // Update priorities based on the new order in the reordered list
-    const updatedTasksWithNewPriorities = newOrderedTasks.map((task, index) => ({
-      ...task,
-      priority: index + 1 // Priority is the new index + 1 in this specific view
-    }));
-
-    // Set sort mode to priority so that when ngOnChanges triggers applyFiltersAndSorting,
-    // it uses the new priorities.
-    this.sortMode = 'priority';
-
-    // Emit the tasks with their newly assigned priorities.
-    // The parent component (TasksComponent) will update these tasks in `allTasks`.
-    // Then, the @Input() tasks of this component will be updated,
-    // triggering ngOnChanges, which calls applyFiltersAndSorting.
-    // applyFiltersAndSorting will then use the new priorities because sortMode is 'priority'.
-    this.taskOrderChanged.emit(updatedTasksWithNewPriorities);
+  // ADDED: Method to emit event to move task to backlog
+  moveToBacklogClicked(taskId: string): void {
+    this.moveToBacklog.emit(taskId);
   }
 
   // Methods for the modal
@@ -204,8 +213,16 @@ export class TaskListComponent implements OnChanges {
         changed = true;
       }
     });
-    // if (changed) { // Optionally, inform parent about cleared selections if necessary
-    //   // This might be complex if parent needs to know which ones were cleared from this component
-    // }
+  }
+  // Method to handle drag and drop operations
+  drop(event: CdkDragDrop<Task[], Task[]>): void {
+    // Make sure we have the correct data for the drag event
+    event.item.data = event.item.data || this.filteredAndSortedTasks[event.previousIndex];
+    // Emit the drop event to the parent component
+    this.listDropped.emit(event);
+  }
+
+  trackById(index: number, task: Task): string { // ADDED trackById method
+    return task.id;
   }
 }

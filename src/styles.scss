@@ -18,6 +18,8 @@
   --color-success-dark: #388e3c; /* Added */
   --color-error: #e57373; /* Added */
   --color-error-dark: #b71c1c; /* Added */
+  --color-warning: #ff9800; /* Added */
+  --color-warning-dark: #f57c00; /* Added */
   --color-link: #1976d2; /* Added */
   --color-link-dark: #115293; /* Added */
   --color-text: #222222;
@@ -53,9 +55,13 @@ body {
   font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 button {
@@ -103,6 +109,8 @@ button {
   --color-success-dark: #4cae4c; /* Adjusted for dark */
   --color-error: #d9534f; /* Adjusted for dark */
   --color-error-dark: #c9302c; /* Adjusted for dark */
+  --color-warning: #f0ad4e; /* Adjusted for dark */
+  --color-warning-dark: #ec971f; /* Adjusted for dark */
   --color-link: #5bc0de; /* Adjusted for dark */
   --color-link-dark: #46b8da; /* Adjusted for dark */
   --color-text: #f8f9fa;

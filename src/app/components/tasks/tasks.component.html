@@ -1,19 +1,31 @@
 <div class="sub-tab-nav">
-  <button
-    (click)="selectSubTab('taskList')"
-    [class.active]="activeSubTab === 'taskList'"
-    class="sub-tab-button">
-    Task List ({{ tasksForList.length }})
-  </button>
-  <button
-    (click)="selectSubTab('backlog')"
-    [class.active]="activeSubTab === 'backlog'"
-    class="sub-tab-button">
-    Backlog ({{ backlogTasks.length }})
+  <div class="tab-buttons-container">
+    <button
+      (click)="selectSubTab('taskList')"
+      [class.active]="activeSubTab === 'taskList'"
+      class="sub-tab-button">
+      Task List ({{ activeTasks.length }})
+    </button>
+    <button
+      (click)="selectSubTab('backlog')"
+      [class.active]="activeSubTab === 'backlog'"
+      class="sub-tab-button">
+      Backlog ({{ pendingTasks.length }})
+    </button>
+    <button
+      (click)="selectSubTab('completed')"
+      [class.active]="activeSubTab === 'completed'"
+      class="sub-tab-button">
+      Completed ({{ completedTasks.length }})
+    </button>
+  </div>
+  <!-- Add Task Button -->
+  <button *ngIf="activeSubTab === 'taskList'" class="add-task-btn" (click)="openCreateTask()" title="Create new task">
+    <span>Create Task</span>
   </button>
 </div>
 
-<div class="transfer-controls-container">
+<div class="transfer-controls-container" *ngIf="activeSubTab !== 'completed'">
   <button (click)="moveSelectedTasksToActive()" [disabled]="selectedBacklogTaskIds.size === 0" title="Move selected to Task List">⬅️ To Task List </button>
   <button (click)="moveSelectedTasksToBacklog()" [disabled]="selectedActiveTaskIds.size === 0" title="Move selected to Backlog">To Backlog ➡️</button>
 </div>
@@ -21,41 +33,46 @@
 <div class="sub-tab-content">
   <div *ngIf="activeSubTab === 'taskList'">
     <app-task-list
-      [tasks]="tasksForList"
+      [tasks]="activeTasks"
+      listType="active"
+      [cdkDropListId]="activeTasksListId"
+      [cdkDropListConnectedTo]="[pendingTasksListId]"
+      (listDropped)="drop($event)"
       (deleteTask)="handleDeleteTask($event)"
       (taskCompleted)="handleTaskCompleted($event)"
       (taskCreated)="handleTaskSaved($event)"
-      (taskOrderChanged)="handleTaskOrderChanged($event)"
-      (taskSelectionChanged)="onActiveTaskSelectionChange($event)">
+      (taskSelectionChanged)="onActiveTaskSelectionChange($event)"
+      (moveToBacklog)="handleMoveToBacklog($event)">
     </app-task-list>
   </div>
 
   <div *ngIf="activeSubTab === 'backlog'">
     <h2>Backlog</h2>
-    <table class="tasks-table backlog-table-specific" *ngIf="backlogTasks.length > 0">
-      <thead>
-        <tr>
-          <th><input type="checkbox" (change)="toggleSelectAllBacklog($event)" [checked]="selectedBacklogTaskIds.size === backlogTasks.length && backlogTasks.length > 0 && backlogTasks.length > 0"></th>
-          <th>Description</th>
-          <th>Urgency</th> <!-- Added Urgency header -->
-        </tr>
-      </thead>
-      <tbody cdkDropList [cdkDropListData]="backlogTasks" (cdkDropListDropped)="dropBacklog($event)"> <!-- Added cdkDropList and event -->
-        <tr *ngFor="let task of backlogTasks" cdkDrag [ngClass]="{
-          'urgency-low': task.urgency === 'Low',
-          'urgency-mid': task.urgency === 'Mid',
-          'urgency-high': task.urgency === 'High',
-          'selected': selectedBacklogTaskIds.has(task.id)
-        }">
-          <td><input type="checkbox" [checked]="selectedBacklogTaskIds.has(task.id)" (change)="onBacklogSelectionChange(task.id, $event)"></td>
-          <td>
-            {{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}
-          </td>
-          <td>{{ task.urgency }}</td> <!-- Added Urgency data cell -->
-        </tr>
-      </tbody>
-    </table>
-    <p *ngIf="backlogTasks.length === 0">No tasks in backlog.</p>
+    <app-task-list
+      [tasks]="pendingTasks"
+      listType="pending"
+      [cdkDropListId]="pendingTasksListId"
+      [cdkDropListConnectedTo]="[activeTasksListId]"
+      (listDropped)="drop($event)"
+      (deleteTask)="handleDeleteTask($event)"
+      (taskSelectionChanged)="onBacklogSelectionChange($event)"
+      (moveToActive)="handleMoveToActive($event)">
+    </app-task-list>
+    <p *ngIf="pendingTasks.length === 0 && activeSubTab === 'backlog'">No tasks in backlog.</p>
+  </div>
+
+  <div *ngIf="activeSubTab === 'completed'">
+    <h2>Completed Tasks</h2>
+    <app-task-list
+      [tasks]="completedTasks"
+      listType="completed"
+      [cdkDropListId]="completedTasksListId"
+      [cdkDropListConnectedTo]="[]"
+      (listDropped)="drop($event)"
+      (deleteTask)="handleDeleteTask($event)"
+      (taskSelectionChanged)="onCompletedTaskSelectionChange($event)">
+    </app-task-list>
+    <p *ngIf="completedTasks.length === 0 && activeSubTab === 'completed'">No completed tasks.</p>
   </div>
 </div>
 

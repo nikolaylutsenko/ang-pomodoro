@@ -100,6 +100,40 @@
       }
     }
   }
+
+  tr[cdkDrag] {
+    cursor: grab;
+    position: relative;
+    transition: background-color 0.2s ease;
+
+    &:hover:not(.cdk-drag-disabled) {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &.cdk-drag-disabled {
+      cursor: default;
+    }
+  }
+
+  tbody tr[cdkDrag]:not(.cdk-drag-disabled)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.2));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  tbody tr[cdkDrag]:not(.cdk-drag-disabled):hover::after {
+    opacity: 1;
+  }
 }
 
 .show-more-link {
@@ -123,58 +157,79 @@
   border-left: 10px solid var(--color-error);
 }
 
+.dragging-preview-container {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+  &.urgency-low {
+    border-left: 10px solid var(--color-success);
+  }
+  &.urgency-mid {
+    border-left: 10px solid var(--color-primary-yellow);
+  }
+  &.urgency-high {
+    border-left: 10px solid var(--color-error);
+  }
+}
+
 .dragging-preview {
-  background-color: lightblue; // Example background color
+  width: auto;
+  background-color: var(--color-bg-card);
+  border-collapse: collapse;
+
+  td {
+    padding: 12px;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+
+    &:nth-child(3) {
+      min-width: 200px; // Wider column for description
+    }
+  }
+}
+
+.dragging-preview {
+  background-color: var(--color-bg-card);
   opacity: 0.8;
-  border: 1px dashed gray;
+  border: 1px dashed var(--color-border);
   // Ensure the cells in the preview have a similar width to the original table
   td {
     padding: 8px; // Match your original table padding
-    border: 1px solid #ddd; // Match your original table border
+    border: 1px solid var(--color-border);
     white-space: nowrap; // Prevent text wrapping in preview if desired
+  }
+  background-color: var(--color-bg-card) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 10px;
+  opacity: 0.8;
+
+  td {
+    padding: 10px;
+    color: var(--color-text);
+    white-space: nowrap;
   }
 }
 
 // Optional: Style for the placeholder (where the item will be dropped)
 .cdk-drop-list-dragging .cdk-drag-placeholder {
   opacity: 0.3;
-  background-color: lightgray;
-  border: 1px dashed darkgray;
+  background-color: var(--color-secondary);
+  border: 1px dashed var(--color-border);
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  opacity: 0.3;
+  background-color: var(--color-secondary-light);
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 // Optional: Style for the item being dragged (the original item that is now hidden)
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Add New Task Button Styles */
-.add-task-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px; /* Adjust size as needed */
-  height: 60px; /* Adjust size as needed */
-  border-radius: 50%; /* Makes it round */
-  background-color: #4CAF50; /* Green background */
-  color: white; /* White plus symbol */
-  font-size: 30px; /* Adjust plus icon size */
-  border: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.3s ease;
-}
-
-.add-task-btn:hover {
-  background-color: #45a049; /* Darker green on hover */
-}
-
-.add-task-btn span {
-  line-height: 1; /* Centers the plus icon vertically */
-}
+/* Add Task Button styles moved to tasks.component.scss */
 
 /* Modal Styles */
 .modal-overlay {
@@ -183,7 +238,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background-color: var(--color-shadow); /* Use theme variable for modal overlay */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -198,4 +253,33 @@
   z-index: 1001;
   width: 90%;
   max-width: 1000px; /* Increased maximum width of the modal */
+}
+
+/* While list is being dragged over */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.drag-handle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    color: var(--color-primary);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
 }

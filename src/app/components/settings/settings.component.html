@@ -1,52 +1,67 @@
-<div class="settings-container card">
-  <h2>Settings</h2>
-  <div class="settings-form">
-    <div class="form-group">
-      <label for="workDuration">Work Duration (minutes)</label>
-      <input 
-        type="number" 
-        id="workDuration" 
-        [(ngModel)]="settings.workDuration" 
-        (change)="updateSettings()"
-        min="1"
-        max="60"
-      >
-    </div>
+<!-- Settings Form -->
+<div class="settings-form">
+  <h2 class="settings-title">Timer Settings</h2>
+  <p class="settings-info">All changes are saved automatically</p>  <div class="input-group">
+    <label for="workDuration">
+      Work Duration (minutes)
+      <span class="input-range">(1-60)</span>
+    </label>
+    <input
+      id="workDuration"
+      type="number"
+      [(ngModel)]="settings.workDuration"
+      (ngModelChange)="saveSettings()"
+      min="1"
+      max="60"
+      step="1"
+    >
+  </div>
 
-    <div class="form-group">
-      <label for="shortBreak">Short Break (minutes)</label>
-      <input 
-        type="number" 
-        id="shortBreak" 
-        [(ngModel)]="settings.shortBreakDuration" 
-        (change)="updateSettings()"
-        min="1"
-        max="30"
-      >
-    </div>
+  <div class="input-group">
+    <label for="shortBreak">
+      Short Break Duration (minutes)
+      <span class="input-range">(1-30)</span>
+    </label>
+    <input
+      id="shortBreak"
+      type="number"
+      [(ngModel)]="settings.shortBreakDuration"
+      (ngModelChange)="saveSettings()"
+      min="1"
+      max="30"
+      step="1"
+    >
+  </div>
 
-    <div class="form-group">
-      <label for="longBreak">Long Break (minutes)</label>
-      <input 
-        type="number" 
-        id="longBreak" 
-        [(ngModel)]="settings.longBreakDuration" 
-        (change)="updateSettings()"
-        min="5"
-        max="45"
-      >
-    </div>
+  <div class="input-group">
+    <label for="longBreak">
+      Long Break Duration (minutes)
+      <span class="input-range">(1-60)</span>
+    </label>
+    <input
+      id="longBreak"
+      type="number"
+      [(ngModel)]="settings.longBreakDuration"
+      (ngModelChange)="saveSettings()"
+      min="1"
+      max="60"
+      step="1"
+    >
+  </div>
 
-    <div class="form-group">
-      <label for="longBreakInterval">Long Break Interval (sessions)</label>
-      <input 
-        type="number" 
-        id="longBreakInterval" 
-        [(ngModel)]="settings.longBreakInterval" 
-        (change)="updateSettings()"
-        min="2"
-        max="8"
-      >
-    </div>
+  <div class="input-group">
+    <label for="longBreakInterval">
+      Long Break Interval (sessions)
+      <span class="input-range">(1-10)</span>
+    </label>
+    <input
+      id="longBreakInterval"
+      type="number"
+      [(ngModel)]="settings.longBreakInterval"
+      (ngModelChange)="saveSettings()"
+      min="1"
+      max="10"
+      step="1"
+    >
   </div>
 </div>

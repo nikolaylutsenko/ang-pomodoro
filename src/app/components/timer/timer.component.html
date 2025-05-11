@@ -1,41 +1,41 @@
-<div class="timer-container card">
-  <div class="mode-selector">
-    <button 
-      class="mode-btn" 
-      [class.active]="currentMode === TimerMode.WORK"
-      (click)="setTimeForMode(TimerMode.WORK)" 
+<div class="timer-container">
+  <!-- Mode selector buttons -->
+  <div class="mode-buttons">
+    <button
+      [class.active]="currentMode === 'work'"
+      (click)="setMode('work')"
       [disabled]="isRunning"
-    >
+      class="mode-btn">
       Work
     </button>
-    <button 
-      class="mode-btn" 
-      [class.active]="currentMode === TimerMode.SHORT_BREAK"
-      (click)="setTimeForMode(TimerMode.SHORT_BREAK)" 
+    <button
+      [class.active]="currentMode === 'shortBreak'"
+      (click)="setMode('shortBreak')"
       [disabled]="isRunning"
-    >
+      class="mode-btn">
       Short Break
     </button>
-    <button 
-      class="mode-btn" 
-      [class.active]="currentMode === TimerMode.LONG_BREAK"
-      (click)="setTimeForMode(TimerMode.LONG_BREAK)" 
+    <button
+      [class.active]="currentMode === 'longBreak'"
+      (click)="setMode('longBreak')"
       [disabled]="isRunning"
-    >
+      class="mode-btn">
       Long Break
     </button>
   </div>
 
-  <div class="timer-display">
-    <span class="time">{{ formatTime(minutes) }}:{{ formatTime(seconds) }}</span>
+  <!-- Timer display -->
+  <div class="timer">
+    <span class="time">{{ minutes }}:{{ seconds | number:'2.0' }}</span>
   </div>
 
-  <!-- Task input area -->
+  <!-- Task selection -->
   <div class="task-input">
     <select
       [(ngModel)]="selectedTaskId"
       (ngModelChange)="onTaskChange($event)"
       [disabled]="tasks.length === 0"
+      class="task-dropdown"
     >
       <option value="">-- Select Task --</option>
       <option *ngFor="let task of tasks" [value]="task.id">
@@ -44,18 +44,46 @@
     </select>
   </div>
 
-  <div class="timer-controls">
-    <button class="btn start-btn" (click)="startTimer()" [disabled]="isRunning">
-      <i class="fas fa-play"></i>
+  <!-- Current task information -->
+  <div class="current-task-info" *ngIf="selectedTaskId && getCurrentTask()">
+    <div class="task-info-title">Current Task:</div>
+    <div class="task-info-description">{{ taskDescription }}</div>
+    <div class="task-info-progress">
+      <span class="progress-label">Progress: </span>
+      <span class="progress-value">
+        {{ getCurrentTask()?.completedIntervals || 0 }} /
+        <ng-container *ngIf="isSpecialIntervalValue(getCurrentTask()?.workIntervals)">
+          {{ getCurrentTask()?.workIntervals }}
+        </ng-container>
+        <ng-container *ngIf="!isSpecialIntervalValue(getCurrentTask()?.workIntervals)">
+          {{ getCurrentTask()?.workIntervals }}
+        </ng-container>
+        intervals
+      </span>
+    </div>
+  </div>
+
+  <!-- Timer controls -->
+  <div class="controls">
+    <button
+      class="control-btn"
+      [class.active]="isRunning"
+      (click)="toggleTimer()"
+      [attr.aria-label]="isRunning ? 'Pause timer' : 'Start timer'">
+      <i class="fas" [class.fa-pause]="isRunning" [class.fa-play]="!isRunning"></i>
     </button>
-    <button class="btn stop-btn" (click)="stopTimer()" [disabled]="!isRunning">
-      <i class="fas fa-square"></i>
+    <button
+      class="control-btn stop-btn"
+      (click)="stopTimer()"
+      aria-label="Stop timer">
+      <i class="fas fa-stop"></i>
     </button>
-    <button class="btn reset-btn" (click)="resetTimer()" [disabled]="isRunning">
+    <button
+      class="control-btn reset-btn"
+      (click)="resetTimer()"
+      [disabled]="isRunning"
+      aria-label="Reset timer">
       <i class="fas fa-redo-alt"></i>
     </button>
   </div>
 </div>
-
-<!-- Add the timer history component below the timer -->
-<app-timer-history></app-timer-history>
