@@ -44,6 +44,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   private audioContextUnlocked = false; // Flag for audio unlock
   private notificationAudio: HTMLAudioElement | null = null; // Audio object
   private tasksSubscription: Subscription = new Subscription();
+  private hasRestoredInitialTaskSelection: boolean = false;
 
   constructor(
     private timerSettingsService: TimerSettingsService,
@@ -66,18 +67,38 @@ export class TimerComponent implements OnInit, OnDestroy {
       if (!this.restoreState()) {
         this.resetTimer();
       }
-    });
-
-    // Subscribe to active tasks from TaskService instead of using localStorage directly
+    });    // Subscribe to active tasks from TaskService instead of using localStorage directly
     this.tasksSubscription = this.taskService.activeTasks$.subscribe(activeTasks => {
       this.tasks = activeTasks;
 
-      // Restore selected task ID if not already restored by timer state
-      if (!this.selectedTaskId && this.isBrowser) {
+      if (!this.hasRestoredInitialTaskSelection && this.isBrowser) {
+        this.hasRestoredInitialTaskSelection = true; // Prevent re-entry for this specific logic path
+
         const savedId = localStorage.getItem('currentTaskId');
-        if (savedId && this.tasks.some(t => t.id === savedId)) {
-          this.selectedTaskId = savedId;
-          this.taskDescription = this.tasks.find(t => t.id === savedId)!.description;
+        const currentTaskIsValidAndExists = savedId && savedId !== '' && this.tasks.some(t => t.id === savedId);
+
+        if (currentTaskIsValidAndExists) {
+          // A task was previously selected and exists in the current task list.
+          // Ensure the component's state reflects this.
+          if (this.selectedTaskId !== savedId) {
+            this.selectedTaskId = savedId;
+            const task = this.tasks.find(t => t.id === savedId);
+            if (task) this.taskDescription = task.description;
+          }
+          // Ensure the task service knows this task is in progress.
+          this.taskService.setTaskInProgress(savedId!); // savedId is checked to be non-null by currentTaskIsValidAndExists
+        } else {
+          // No valid task found in localStorage to restore, or it doesn't exist anymore.
+          // If a task is somehow selected in the component's model, clear it.
+          if (this.selectedTaskId !== '') {
+            this.selectedTaskId = '';
+            this.taskDescription = '';
+            this.taskService.setTaskInProgress(null);
+          }
+          // Ensure localStorage is also cleared if it had an invalid/stale ID
+          if (savedId) { // If there was a savedId but it was invalid or task doesn't exist
+              localStorage.removeItem('currentTaskId');
+          }
         }
       }
     });
@@ -104,7 +125,6 @@ export class TimerComponent implements OnInit, OnDestroy {
       clearInterval(this.timer); // Still clear interval on destroy
     }
   }
-
   private saveState() {
     if (!this.isBrowser) return; // Don't save state on server
 
@@ -113,16 +133,17 @@ export class TimerComponent implements OnInit, OnDestroy {
       remainingSeconds: this.currentTimeInSeconds,
       mode: this.currentMode,
       isRunning: this.isRunning,
-      selectedTaskId: this.selectedTaskId,
+      selectedTaskId: this.selectedTaskId, // May be empty string
       workIntervalCount: this.workIntervalCount,
       startTimeTimestamp: this.timerStartTime?.getTime() || null // Save timestamp
     };
     localStorage.setItem('timerState', JSON.stringify(state));
-    // Keep currentTaskId separate for task component use? Or rely on timerState?
-    // Let's keep it separate for now for simplicity elsewhere.
+
+    // Handle currentTaskId separately for task component use
     if (this.selectedTaskId) {
         localStorage.setItem('currentTaskId', this.selectedTaskId);
     } else {
+        // If no task is selected, make sure to remove it from localStorage
         localStorage.removeItem('currentTaskId');
     }
   }
@@ -133,11 +154,24 @@ export class TimerComponent implements OnInit, OnDestroy {
     const savedState = localStorage.getItem('timerState');
     if (savedState) {
       try {
-        const state: TimerState = JSON.parse(savedState);
-        this.currentMode = state.mode;
-        this.selectedTaskId = state.selectedTaskId;
+        const state: TimerState = JSON.parse(savedState);        this.currentMode = state.mode;
+
+        // Only restore task if it's valid and exists
+        if (state.selectedTaskId && state.selectedTaskId !== '' &&
+            this.tasks.some(t => t.id === state.selectedTaskId)) {
+          this.selectedTaskId = state.selectedTaskId;
+          this.taskDescription = this.tasks.find(t => t.id === state.selectedTaskId)?.description || '';
+
+          // Set the task to InProgress
+          this.taskService.setTaskInProgress(state.selectedTaskId);
+        } else {
+          // If no valid task or if "--Select Task--" was selected
+          this.selectedTaskId = '';
+          this.taskDescription = '';
+          this.taskService.setTaskInProgress(null);
+        }
+
         this.workIntervalCount = state.workIntervalCount || 0;
-        this.taskDescription = this.tasks.find(t => t.id === state.selectedTaskId)?.description || '';
         // Restore timerStartTime if it was saved
         this.timerStartTime = state.startTimeTimestamp ? new Date(state.startTimeTimestamp) : null;
 
@@ -282,7 +316,6 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.updateDisplay(); // Ensure display updates on pause
     this.saveState(); // Save paused state (including timerStartTime)
   }
-
   stopTimer() {
     // Only add history if it was actually running for a bit
     if (this.isRunning && this.timerStartTime) {
@@ -296,6 +329,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.timerStartTime = null; // Explicitly clear start time on stop
     this.resetTimer(); // Reset time based on current mode
     this.clearState(); // Clear saved state from localStorage
+
+    // Ensure the task remains in progress if selected
+    if (this.selectedTaskId) {
+      this.taskService.setTaskInProgress(this.selectedTaskId);
+    }
+
     // Save the reset state (stopped, default time for mode, null start time)
     this.saveState();
   }
@@ -324,20 +363,33 @@ export class TimerComponent implements OnInit, OnDestroy {
     const seconds = this.currentTimeInSeconds % 60;
     this.minutes = minutes.toString();
     this.seconds = seconds < 10 ? `0${seconds}` : seconds.toString();
-  }
-
-  // Handle selection of a task
+  }  // Handle selection of a task
   onTaskChange(taskId: string) {
-    this.selectedTaskId = taskId;
+    // this.selectedTaskId = taskId; // This line is redundant because [(ngModel)] already updated selectedTaskId.
+    console.log('Task changed to:', taskId); // Debug log
+
     if (taskId) {
-      const task = this.tasks.find(t => t.id === taskId)!;
-      this.taskDescription = task.description;
-      // localStorage.setItem('currentTaskId', taskId); // Managed by saveState now
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) {
+        this.taskDescription = task.description;
+        // Set the selected task to InProgress and all others to Queued
+        this.taskService.setTaskInProgress(taskId);
+      } else {
+        console.warn('Selected task not found in tasks array:', taskId);
+      }
     } else {
+      // Clear task information and ensure all tasks are set to Queued when "-- Select Task --" is chosen
       this.taskDescription = '';
-      // localStorage.removeItem('currentTaskId'); // Managed by saveState now
+      this.taskService.setTaskInProgress(null);
+
+      // Remove from localStorage to prevent it from being restored
+      localStorage.removeItem('currentTaskId');
     }
     this.saveState(); // Save state when task changes
+  }
+
+  trackTaskById(index: number, task: Task): string {
+    return task.id;
   }
 
   private addHistoryEntry(isSuccessful: boolean, explicitStartTime?: Date) {
@@ -499,7 +551,6 @@ export class TimerComponent implements OnInit, OnDestroy {
   isSpecialIntervalValue(value: string | number | undefined): boolean {
     return value === '∞' || value === '?' || value === undefined;
   }
-
   // Method to mark the current task as completed
   completeTask(): void {
     if (this.selectedTaskId) {
@@ -515,6 +566,11 @@ export class TimerComponent implements OnInit, OnDestroy {
 
         allTasks[taskIndex] = updatedTask;
         this.taskService.saveTasks(allTasks);
+
+        // Clear the selected task since it's now completed
+        this.selectedTaskId = '';
+        this.taskDescription = '';
+        this.saveState(); // Save the updated state
       }
     }
   }

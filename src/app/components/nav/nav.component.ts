@@ -14,8 +14,8 @@ export class NavComponent {
 
   tabs = [
     { path: '/timer', label: 'Timer', icon: 'fa-clock' },
-    { path: '/statistics', label: 'Statistics', icon: 'fa-chart-bar' },
     { path: '/tasks', label: 'Tasks', icon: 'fa-tasks' },
+    { path: '/statistics', label: 'Statistics', icon: 'fa-chart-bar' },
     { path: '/settings', label: 'Settings', icon: 'fa-cog' }
   ];
 }

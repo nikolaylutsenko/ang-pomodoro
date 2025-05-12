@@ -38,7 +38,7 @@
       class="task-dropdown"
     >
       <option value="">-- Select Task --</option>
-      <option *ngFor="let task of tasks" [value]="task.id">
+      <option *ngFor="let task of tasks; trackBy: trackTaskById" [value]="task.id">
         {{ task.description.length > 200 ? (task.description | slice:0:200) + '...' : task.description }}
       </option>
     </select>
@@ -52,9 +52,8 @@
       Complete
     </button>
   </div>
-
   <!-- Current task information -->
-  <div class="current-task-info" *ngIf="selectedTaskId && getCurrentTask()">
+  <div class="current-task-info" *ngIf="selectedTaskId && selectedTaskId !== '' && getCurrentTask()">
     <div class="task-info-title">Current Task:</div>
     <div class="task-info-description">{{ taskDescription }}</div>
     <div class="task-info-progress">
@@ -86,13 +85,6 @@
       (click)="stopTimer()"
       aria-label="Stop timer">
       <i class="fas fa-stop"></i>
-    </button>
-    <button
-      class="control-btn reset-btn"
-      (click)="resetTimer()"
-      [disabled]="isRunning"
-      aria-label="Reset timer">
-      <i class="fas fa-redo-alt"></i>
     </button>
   </div>
 </div>

@@ -47,7 +47,6 @@
   </div>
 
   <div *ngIf="activeSubTab === 'backlog'">
-    <h2>Backlog</h2>
     <app-task-list
       [tasks]="pendingTasks"
       listType="pending"
@@ -62,7 +61,6 @@
   </div>
 
   <div *ngIf="activeSubTab === 'completed'">
-    <h2>Completed Tasks</h2>
     <app-task-list
       [tasks]="completedTasks"
       listType="completed"
