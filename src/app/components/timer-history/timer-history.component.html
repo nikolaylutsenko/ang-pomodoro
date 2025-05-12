@@ -1,10 +1,9 @@
-<div class="history-section">
-  <!-- Header and buttons section (always visible) -->
+<div class="history-section">  <!-- Header and buttons section (always visible) -->
   <div class="history-header-container">
     <div class="history-header">
-      <h3>History</h3>
+      <h3 class="history-title">Timer History</h3>
       <button class="clear-btn" (click)="clearHistory()" *ngIf="history.length > 0">
-        Clear History
+        <i class="fas fa-trash-alt"></i> Clear History
       </button>
     </div>
 
@@ -27,7 +26,7 @@
           {{ entry.taskDescription || '—' }}
         </div>
         <div class="entry-type type-width" [class]="entry.type">
-          {{ entry.type === 'shortBreak' ? 'Short Break' : 
+          {{ entry.type === 'shortBreak' ? 'Short Break' :
              entry.type === 'longBreak' ? 'Long Break' : 'Work' }}
         </div>
         <div class="entry-status status-width" [class.successful]="entry.isSuccessful">
@@ -38,23 +37,24 @@
 
     <!-- History pagination controls -->
     <div class="history-controls">
-      <button 
-        class="show-more-btn" 
+      <button
+        class="show-more-btn"
         *ngIf="!showAll && sortedHistory.length > 3"
         (click)="toggleShowAll()">
         Show all today's history ({{ sortedHistory.length - 3 }} more)
       </button>
-      <button 
-        class="show-more-btn" 
+      <button
+        class="show-more-btn"
         *ngIf="showAll && sortedHistory.length > 3"
         (click)="toggleShowAll()">
         Show less
       </button>
     </div>
-  </div>
-  <ng-template #noHistory>
+  </div>  <ng-template #noHistory>
     <div class="no-history">
-      No history yet
+      <i class="fas fa-history"></i>
+      <p>No timer history recorded yet.</p>
+      <p class="no-history-subtitle">Complete a timer interval to see it here.</p>
     </div>
   </ng-template>
 </div>

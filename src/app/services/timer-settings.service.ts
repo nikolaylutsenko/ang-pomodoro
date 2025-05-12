@@ -32,6 +32,10 @@ export class TimerSettingsService {
     return this.settings.asObservable();
   }
 
+  getCurrentSettings(): TimerSettings { // ADDED: New method to get current settings value
+    return this.settings.getValue();
+  }
+
   updateSettings(newSettings: TimerSettings): void {
     this.settings.next(newSettings);
   }

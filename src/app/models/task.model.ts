@@ -7,10 +7,12 @@ export enum TaskUrgency {
 
 // Add TaskStatus Enum
 export enum TaskStatus {
-  Pending = 'Pending',
+  Created = 'Created', // Newly added task
+  Pending = 'Pending', // Task in backlog
+  Queued = 'Queued',   // Task in daily list, ready to be worked on
   InProgress = 'InProgress',
-  Completed = 'Completed',
-  Failed = 'Failed'
+  Completed = 'Completed'
+  // Failed status is removed
 }
 
 // Task Entity Interface
@@ -19,10 +21,12 @@ export interface Task {
   description: string; // max 1000 symbols
   dateCreated: Date;
   urgency: TaskUrgency;
+  priority: number; // Lower number means higher priority
 
   // New fields
   estimatedHours: number;
   workIntervals: number | string; // Changed from number
   completedIntervals: number;
   completionStatus: TaskStatus;
+  dateCompleted: Date | null; // Storing date and time when task was completed
 }

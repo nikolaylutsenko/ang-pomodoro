@@ -4,17 +4,32 @@
     type="text"
     placeholder="Filter by description"
     [(ngModel)]="filterText"
-    (ngModelChange)="filterChanged.emit(filterText)"
+    (input)="applyFiltersAndSorting()"
   />
   <button (click)="toggleSort()">
     Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
   </button>
 </div>
 
+<!-- Help tooltip for drag and drop -->
+<div *ngIf="showDragHelp && filteredAndSortedTasks.length > 1 && listType !== 'completed'" class="drag-help-tooltip">
+  <div class="tooltip-content">
+    <span class="tooltip-title">💡 Tip: Reorder tasks by dragging</span>
+    <p>You can change the priority of tasks by dragging them up or down.</p>
+    <button (click)="dismissDragHelp()">Got it!</button>
+  </div>
+</div>
+
 <!-- Tasks Table -->
-<table class="tasks-table">
-  <thead>
+<table class="tasks-table">  <thead>
     <tr>
+      <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
+      <th class="priority-header" title="Drag & drop tasks to change priority">
+        <div class="priority-header-content">
+          <span>Priority</span>
+          <small *ngIf="listType !== 'completed'">(Drag to reorder)</small>
+        </div>
+      </th>
       <th>Description</th>
       <th>Urgency</th> <!-- Changed from Priority -->
       <th>Date Created</th>
@@ -24,30 +39,48 @@
       <th>Status</th>
       <th>Actions</th>
     </tr>
-  </thead>
-  <tbody cdkDropList [cdkDropListData]="filteredAndSortedTasks" (cdkDropListDropped)="drop($event)">
-    <tr *ngFor="let task of filteredAndSortedTasks" cdkDrag [cdkDragDisabled]="task.completionStatus === TaskStatus.Completed" [ngClass]="{
+  </thead>  <tbody cdkDropList [cdkDropListData]="filteredAndSortedTasks" (cdkDropListDropped)="drop($event)" [id]="cdkDropListId">
+    <tr *ngFor="let task of filteredAndSortedTasks; trackBy: trackById" cdkDrag [cdkDragDisabled]="task.completionStatus === TaskStatus.Completed" [cdkDragData]="task" [ngClass]="{
       'urgency-low': task.urgency === 'Low',
       'urgency-mid': task.urgency === 'Mid',
-      'urgency-high': task.urgency === 'High'
-    }" [class.completed]="task.completionStatus === TaskStatus.Completed">
-      <ng-template cdkDragPreview>
-        <tr [ngClass]="{
+      'urgency-high': task.urgency === 'High',
+      'selected': selectedTaskIds.has(task.id),
+      'draggable-row': task.completionStatus !== TaskStatus.Completed
+    }" [class.completed]="task.completionStatus === TaskStatus.Completed"><ng-template cdkDragPreview>
+        <div class="dragging-preview-container" [ngClass]="{
           'urgency-low': task.urgency === 'Low',
           'urgency-mid': task.urgency === 'Mid',
-          'urgency-high': task.urgency === 'High',
-          'dragging-preview': true
+          'urgency-high': task.urgency === 'High'
         }">
-          <td>{{ task.description | slice:0:300 }}{{ task.description.length > 300 ? '...' : '' }}</td>
-          <td>{{ task.urgency }}</td>
-          <td>{{ task.dateCreated | date:'short' }}</td>
-          <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
-          <td>{{ task.workIntervals }}</td>
-          <td>{{ task.completedIntervals }}</td>
-          <td>{{ task.completionStatus }}</td>
-          <td>Actions</td>
-        </tr>
-      </ng-template>
+          <table class="dragging-preview">
+            <tr>
+              <td>
+                <div class="drag-handle-container">
+                  <span class="drag-handle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="currentColor" d="M8 18h8v-2H8v2zm0-4h8v-2H8v2zm0-4h8V8H8v2zm-4 8h2V8H4v10z"/>
+                    </svg>
+                  </span>
+                </div>
+              </td>
+              <td>{{ task.priority }}</td>
+              <td>{{ task.description | slice:0:50 }}{{ task.description.length > 50 ? '...' : '' }}</td>
+              <td>{{ task.urgency }}</td>
+            </tr>
+          </table>
+        </div>
+      </ng-template><td>
+        <div class="drag-handle-container">
+          <input type="checkbox" [checked]="selectedTaskIds.has(task.id)" (change)="onTaskSelectionChange(task.id, $event)">
+          <span class="drag-handle" *ngIf="task.completionStatus !== TaskStatus.Completed" title="Drag to reorder">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" d="M8 18h8v-2H8v2zm0-4h8v-2H8v2zm0-4h8V8H8v2zm-4 8h2V8H4v10z"/>
+            </svg>
+          </span>
+        </div>
+      </td>      <td class="priority-cell" [title]="'Priority: ' + task.priority">
+        <span class="priority-badge">{{ task.priority }}</span>
+      </td>
       <td>
         <span *ngIf="!expandedDescriptions[task.id] && task.description.length > 300">
           {{ task.description | slice:0:300 }}...
@@ -62,19 +95,43 @@
         </span>
       </td>
       <td>{{ task.urgency }}</td>
-      <td>{{ task.dateCreated | date:'short' }}</td>
+      <td>
+        <ng-container *ngIf="listType === 'completed' && task.dateCompleted">
+          <span title="Date Completed">{{ task.dateCompleted | date:'short' }}</span>
+          <br>
+          <small title="Date Created">(Created: {{ task.dateCreated | date:'short' }})</small>
+        </ng-container>
+        <ng-container *ngIf="listType !== 'completed' || !task.dateCompleted">
+          {{ task.dateCreated | date:'short' }}
+        </ng-container>
+      </td>
       <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>
       <td>{{ task.completedIntervals }}</td>
       <td>{{ task.completionStatus }}</td>
       <td>
-        <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">✔️</span>
+        <span *ngIf="task.completionStatus !== TaskStatus.Completed && listType === 'active'" class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">✔️</span>
         <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
         <span class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">🗑️</span>
+        <span *ngIf="listType === 'pending'" class="icon-btn" title="Move to Active List" (click)="moveToActiveClicked(task.id)">⬆️</span>
+        <span *ngIf="listType === 'active' && task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Move to Backlog" (click)="moveToBacklogClicked(task.id)">⬇️</span>
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
-      <td colspan="8">No tasks found.</td>
+      <td colspan="10">No tasks found.</td> <!-- Adjusted colspan -->
     </tr>
   </tbody>
 </table>
+
+<!-- Create Task Modal -->
+<div *ngIf="showCreateTaskModal" class="modal-overlay" (click)="closeCreateTaskModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-create-task
+      [taskToEdit]="taskToEditInModal"
+      (taskSaved)="handleTaskSavedFromModal($event)"
+      (cancelEdit)="closeCreateTaskModal()">
+    </app-create-task>
+  </div>
+</div>
+
+<!-- Removed duplicate task list display that was causing extra bullet points -->

@@ -100,6 +100,40 @@
       }
     }
   }
+
+  tr[cdkDrag] {
+    cursor: grab;
+    position: relative;
+    transition: background-color 0.2s ease;
+
+    &:hover:not(.cdk-drag-disabled) {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &.cdk-drag-disabled {
+      cursor: default;
+    }
+  }
+
+  tbody tr[cdkDrag]:not(.cdk-drag-disabled)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.2));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  tbody tr[cdkDrag]:not(.cdk-drag-disabled):hover::after {
+    opacity: 1;
+  }
 }
 
 .show-more-link {
@@ -123,27 +157,293 @@
   border-left: 10px solid var(--color-error);
 }
 
+.dragging-preview-container {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+  &.urgency-low {
+    border-left: 10px solid var(--color-success);
+  }
+  &.urgency-mid {
+    border-left: 10px solid var(--color-primary-yellow);
+  }
+  &.urgency-high {
+    border-left: 10px solid var(--color-error);
+  }
+}
+
 .dragging-preview {
-  background-color: lightblue; // Example background color
+  width: auto;
+  background-color: var(--color-bg-card);
+  border-collapse: collapse;
+
+  td {
+    padding: 12px;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+
+    &:nth-child(3) {
+      min-width: 200px; // Wider column for description
+    }
+  }
+}
+
+.dragging-preview {
+  background-color: var(--color-bg-card);
   opacity: 0.8;
-  border: 1px dashed gray;
+  border: 1px dashed var(--color-border);
   // Ensure the cells in the preview have a similar width to the original table
   td {
     padding: 8px; // Match your original table padding
-    border: 1px solid #ddd; // Match your original table border
+    border: 1px solid var(--color-border);
     white-space: nowrap; // Prevent text wrapping in preview if desired
+  }
+  background-color: var(--color-bg-card) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 10px;
+  opacity: 0.8;
+
+  td {
+    padding: 10px;
+    color: var(--color-text);
+    white-space: nowrap;
   }
 }
 
 // Optional: Style for the placeholder (where the item will be dropped)
 .cdk-drop-list-dragging .cdk-drag-placeholder {
   opacity: 0.3;
-  background-color: lightgray;
-  border: 1px dashed darkgray;
+  background-color: var(--color-secondary);
+  border: 1px dashed var(--color-border);
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  opacity: 0.3;
+  background-color: var(--color-secondary-light);
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 // Optional: Style for the item being dragged (the original item that is now hidden)
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Add Task Button styles moved to tasks.component.scss */
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-shadow); /* Use theme variable for modal overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure modal is on top */
+}
+
+.modal-content {
+  background-color: var(--color-bg-card);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  width: 90%;
+  max-width: 1000px; /* Increased maximum width of the modal */
+}
+
+/* While list is being dragged over */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.drag-handle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    color: var(--color-primary);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// Add drag and drop styling
+.cdk-drag-preview {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  opacity: 0.9;
+  border-radius: var(--radius-md);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  background: var(--color-accent-light) !important;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging tr:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-text-muted);
+  opacity: 0.7;
+  transition: color 0.2s, opacity 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--color-primary);
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragging-preview-container {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  &.urgency-low {
+    border-left: 4px solid var(--color-urgency-low);
+  }
+
+  &.urgency-mid {
+    border-left: 4px solid var(--color-urgency-mid);
+  }
+
+  &.urgency-high {
+    border-left: 4px solid var(--color-urgency-high);
+  }
+
+  .dragging-preview {
+    border-collapse: collapse;
+
+    td {
+      padding: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+  }
+}
+
+.priority-cell {
+  width: 60px;
+  text-align: center;
+}
+
+.priority-badge {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.priority-header {
+  width: 80px;
+  cursor: help;
+}
+
+.priority-header-content {
+  display: flex;
+  flex-direction: column;
+
+  small {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 2px;
+    font-weight: normal;
+  }
+}
+
+.drag-help-tooltip {
+  position: relative;
+  margin-bottom: 15px;
+
+  .tooltip-content {
+    background-color: var(--color-accent-light);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--color-primary);
+
+    .tooltip-title {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0 0 12px 0;
+      font-size: 0.9rem;
+    }
+
+    button {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 4px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--color-primary-dark);
+      }
+    }
+  }
+}
+
+.draggable-row {
+  transition: background-color 0.2s, transform 0.2s;
+
+  &:hover {
+    background-color: var(--color-hover);
+
+    .drag-handle {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  // Add subtle animation when the row is being dragged
+  &.cdk-drag-preview {
+    transform: scale(1.02);
+  }
 }

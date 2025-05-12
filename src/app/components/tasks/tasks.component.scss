@@ -1,14 +1,177 @@
-/* Styles moved to create-task.component.scss and task-list.component.scss */
-
-/* Keep only styles relevant to the tasks component container itself, if any */
-/* Example: Add padding or margin to the overall component */
 :host {
-    display: block; /* Ensure the component takes up block space */
-    padding: var(--spacing-md); /* Add some padding around the whole tasks view */
+  display: block;
+  padding: var(--spacing-md);
+}
+
+.sub-tab-nav {
+  display: flex;
+  margin-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--color-border);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tab-buttons-container {
+  display: flex;
+}
+
+.sub-tab-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; /* For active indicator */
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-right: var(--spacing-sm);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.sub-tab-button:hover {
+  color: var(--color-text);
+}
+
+.sub-tab-button.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: bold;
+}
+
+.transfer-controls-container {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.transfer-controls-container button {
+  background-color: var(--color-button-secondary);
+  color: var(--color-text-on-secondary);
+  border: 1px solid var(--color-border-button);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem; /* Adjusted font size */
+  line-height: 1.2;
+}
+
+.transfer-controls-container button:disabled {
+  background-color: var(--color-button-disabled);
+  color: var(--color-text-on-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.transfer-controls-container button:not(:disabled):hover {
+  background-color: var(--color-button-secondary-hover);
+}
+
+.sub-tab-content {
+  /* Styles for the content area below tabs */
+  padding-top: var(--spacing-md);
+}
+
+/* Table styles remain the same */
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-bg-card);
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* Ensure border radius applies to table content */
+}
+
+.tasks-table th,
+.tasks-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tasks-table th {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.tasks-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tasks-table td {
+  vertical-align: middle;
+}
+
+/* Urgency row styling - applied to <tr> in both tables */
+.urgency-low {
+  border-left: 10px solid var(--color-success);
+}
+.urgency-mid {
+  border-left: 10px solid var(--color-primary-yellow);
+}
+.urgency-high {
+  border-left: 10px solid var(--color-error);
+}
+/* End of copied styles */
+
+/* Specific styles for backlog if needed, or to override .tasks-table */
+.backlog-table-specific {
+  margin-top: var(--spacing-md); /* Keep or adjust as needed */
+  /* Add any backlog-specific styles here */
+  /* For example, if you want a different background or font size for backlog */
+}
+
+/* Ensure buttons in the backlog table are styled appropriately */
+.button-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.8rem; /* Adjust as needed */
+  margin-right: var(--spacing-xs); /* Ensure spacing between buttons */
+}
+
+.button-small:last-child {
+    margin-right: 0;
+}
+
+.button-danger {
+  background-color: var(--color-danger-muted); /* Example danger color */
+  color: var(--color-text-on-danger);
+}
+
+.button-danger:hover {
+  background-color: var(--color-danger); /* Darker on hover */
 }
 
 /* Separator style remains here as it's between the two child components */
 .tasks-separator {
   border-top: 1px solid var(--color-border);
   margin: var(--spacing-lg) 0; /* Use global spacing */
+}
+
+/* Style for selected rows in both tables */
+.tasks-table tbody tr.selected td {
+  background-color: var(--color-background-selected); /* Define this color in your variables */
+}
+
+/* Add Task Button Styles */
+.add-task-btn {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: 5%;
+  width: 150px;
+  height: 36px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--color-shadow);
+  transition: background-color 0.3s ease;
+  line-height: 0;
+  padding: 0;
+}
+
+.add-task-btn:hover {
+  background-color: var(--color-success-dark);
 }
