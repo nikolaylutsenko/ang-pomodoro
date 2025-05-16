@@ -1,13 +1,15 @@
 <mat-card class="timer-container">
-  <!-- Mode selector buttons -->
-  <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentMode" (ngModelChange)="onModeChange($event)" aria-label="Timer Mode" class="mode-buttons" [disabled]="isRunning">
+  <!-- Mode selector buttons -->  <mat-button-toggle-group appearance="legacy" #group="matButtonToggleGroup" [(ngModel)]="currentMode" (ngModelChange)="onModeChange($event)" aria-label="Timer Mode" class="mode-buttons" [disabled]="isRunning">
     <mat-button-toggle value="work" aria-label="Work Mode" class="mode-btn work">
+      <mat-icon class="mode-icon">work</mat-icon>
       Work
     </mat-button-toggle>
     <mat-button-toggle value="shortBreak" aria-label="Short Break Mode" class="mode-btn short-break">
+      <mat-icon class="mode-icon">coffee</mat-icon>
       Short Break
     </mat-button-toggle>
     <mat-button-toggle value="longBreak" aria-label="Long Break Mode" class="mode-btn long-break">
+      <mat-icon class="mode-icon">weekend</mat-icon>
       Long Break
     </mat-button-toggle>
   </mat-button-toggle-group>

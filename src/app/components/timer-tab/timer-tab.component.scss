@@ -1,9 +1,10 @@
 .timer-tab-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem; /* Reduced gap between timer and history */
   max-width: 100%;
   animation: fadeIn 0.3s ease;
+  padding-top: 0; /* Ensure no extra padding at top */
 }
 
 @keyframes fadeIn {

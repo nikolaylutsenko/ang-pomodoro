@@ -1,21 +1,23 @@
 <div class="sub-tab-nav">
-  <div class="tab-buttons-container">
-    <button
+  <div class="tab-buttons-container">    <button
       (click)="selectSubTab('taskList')"
       [class.active]="activeSubTab === 'taskList'"
       class="sub-tab-button">
+      <mat-icon class="tab-icon">list</mat-icon>
       Task List ({{ activeTasks.length }})
     </button>
     <button
       (click)="selectSubTab('backlog')"
       [class.active]="activeSubTab === 'backlog'"
       class="sub-tab-button">
+      <mat-icon class="tab-icon">inbox</mat-icon>
       Backlog ({{ pendingTasks.length }})
     </button>
     <button
       (click)="selectSubTab('completed')"
       [class.active]="activeSubTab === 'completed'"
       class="sub-tab-button">
+      <mat-icon class="tab-icon">check_circle</mat-icon>
       Completed ({{ completedTasks.length }})
     </button>
   </div>

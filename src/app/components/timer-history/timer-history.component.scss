@@ -13,8 +13,8 @@
 
 .history-header-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 16px; // Standard mat-card-header padding
   border-bottom: 1px solid rgba(0,0,0,0.12); // Separator for header
 
@@ -25,9 +25,18 @@
   }
 
   .clear-btn {
+    padding: 0 8px; // Reduce padding for smaller button
+    font-size: 0.8rem;
+
     mat-icon {
-      margin-right: 8px;
+      margin-right: 4px;
     }
+  }
+
+  .history-header-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    color: var(--color-primary);
   }
 }
 
@@ -146,8 +155,7 @@ mat-card-content {
 
   .no-history-icon {
     font-size: 3rem;
-    width: 3rem;
-    height: 3rem;
+    color: var(--color-text-secondary);
     margin-bottom: 1rem;
   }
 

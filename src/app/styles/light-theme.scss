@@ -1,10 +1,15 @@
-@use '@angular/material' as mat;
+/* This file can be imported by components that need specific light theme styling */
+/* The main theming is now handled in material-theme.scss */
 
-@include mat.core();
-
-$light-primary: mat.define-palette(mat.$indigo-palette, 500);
-$light-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-$light-warn: mat.define-palette(mat.$red-palette);
+/* Light theme specific variables */
+:root .light-theme {
+  --color-bg: #f8f9fa;
+  --color-bg-card: #ffffff;
+  --color-text: #222222;
+  --color-text-secondary: #555555;
+  --color-border: #e0e0e0;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+}
 
 $light-theme: mat.define-light-theme((
   color: (

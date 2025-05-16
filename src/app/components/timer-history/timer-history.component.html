@@ -1,5 +1,5 @@
-<mat-card class="history-section">
-  <mat-card-header class="history-header-container">
+<mat-card class="history-section">  <mat-card-header class="history-header-container">
+    <mat-icon class="history-header-icon">history</mat-icon>
     <mat-card-title class="history-title">Timer History</mat-card-title>
     <button mat-stroked-button color="warn" (click)="clearHistory()" *ngIf="history.length > 0" class="clear-btn">
       <mat-icon>delete_sweep</mat-icon> Clear History
@@ -40,9 +40,7 @@
           {{ !showAll ? 'Show all today\'s history (' + (sortedHistory.length - 3) + ' more)' : 'Show less' }}
         </button>
       </div>
-    </div>
-
-    <ng-template #noHistory>
+    </div>    <ng-template #noHistory>
       <div class="no-history">
         <mat-icon class="no-history-icon">history</mat-icon>
         <p>No timer history recorded yet.</p>

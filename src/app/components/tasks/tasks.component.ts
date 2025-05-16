@@ -7,16 +7,17 @@ import { TaskService } from '../../services/task.service';
 import { TaskListComponent } from './task-list/task-list.component';
 import { CdkDragDrop, moveItemInArray, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subscription } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-tasks',
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     // CreateTaskComponent, // Removed from imports
     TaskListComponent,
-    DragDropModule // Added DragDropModule here
+    DragDropModule, // Added DragDropModule here
+    MatIconModule // Add MatIconModule
   ],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']

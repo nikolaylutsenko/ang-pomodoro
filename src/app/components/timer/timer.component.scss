@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   width: 60%; // Consider making this responsive or theme-based
-  margin: 1.5rem auto 0;
+  margin: 0 auto; /* Removed top margin */
   min-width: 320px; // Adjusted for better mobile view
   padding: 1.5rem 2rem 2rem;
   // background will be inherited from mat-card or can be themed
@@ -31,17 +31,19 @@
 }
 
 .timer {
-  margin: 1rem 0;
+  margin: 2.5rem 0; /* Increased vertical margin from 1rem to 2.5rem */
   text-align: center;
   width: 100%;
 }
 
 .time {
-  font-size: 7.8rem; // Increased from 6rem by 30%
+  font-size: 10.14rem; /* Increased size by 30% from 7.8rem */
   font-weight: bold;
   font-family: 'Roboto Mono', monospace;
   // Color will be inherited or themed
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); // Softer shadow
+  display: block;
+  padding: 1rem 0; /* Added vertical padding inside the timer */
 }
 
 .task-controls {
@@ -105,7 +107,79 @@
   }
 }
 
+.mode-icon {
+  margin-right: 0.5rem;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 // Responsive adjustments
+@media (max-width: 1200px) {
+  .time {
+    font-size: 8rem; /* Slightly smaller on medium screens */
+  }
+}
+
+@media (max-width: 992px) {
+  .timer-container {
+    width: 75%;
+  }
+
+  .time {
+    font-size: 7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .timer-container {
+    width: 90%;
+    padding: 1.25rem 1.5rem 1.75rem;
+  }
+
+  .time {
+    font-size: 6rem;
+  }
+
+  .timer {
+    margin: 1.75rem 0; /* Slightly reduced margin on mobile */
+  }
+
+  .mode-icon {
+    margin-right: 0.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-container {
+    width: 95%;
+    min-width: unset;
+    padding: 1rem;
+  }
+
+  .time {
+    font-size: 5rem;
+    padding: 0.5rem 0;
+  }
+
+  .timer {
+    margin: 1.5rem 0;
+  }
+
+  .mode-btn {
+    flex-direction: column;
+
+    .mode-icon {
+      margin-right: 0;
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .timer-container {
     width: 90%;

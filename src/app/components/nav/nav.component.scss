@@ -1,11 +1,19 @@
+/* We'll use the breakpoints from material-theme.scss */
+
 :host {
-  flex-grow: 1; /* Allow the nav to take up available space */
+  flex-grow: 1; /* Allow app-nav to take available space in the mat-toolbar */
+  display: flex;
+  justify-content: center; /* Center the child (mat-tab-nav-bar) within app-nav */
+  align-items: center;
+  width: 100%; /* Ensure it takes full width */
 }
 
-mat-tab-nav-bar {
-  width: 100%;
+mat-tab-nav-bar.desktop-tabs { // Applied to the <nav> element
+  width: auto; /* Let the tab bar be only as wide as its content */
   // Remove the default bottom border from the tab bar if it interferes with card look
   border-bottom: none !important;
+  display: flex; /* Ensure it's a flex container for tab links */
+  justify-content: center; /* Center the actual tab links (<a>) within the tab bar */
 }
 
 a.mat-tab-link {
@@ -20,6 +28,10 @@ a.mat-tab-link {
   color: #333; /* Default text color for tabs */
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); /* Refined shadow for card effect */
   transition: all 0.3s cubic-bezier(.25,.8,.25,1); /* Material-like transition */
+
+  i {
+    margin-right: 8px;
+  }
 
   // Remove the default Material tab indicator line
   &::after {
@@ -39,17 +51,60 @@ a.mat-tab-link:not(.mat-tab-label-active):hover {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-/* Hide labels on smaller screens */
-@media (max-width: 768px) {
-  a.mat-tab-link .mat-icon {
+/* Hide labels on medium screens (icons only), tabs remain centered due to above rules */
+@media screen and (min-width: 600px) and (max-width: 959px) {
+  nav.desktop-tabs a.mat-tab-link i { /* Increased specificity */
     margin-right: 0; /* Remove margin when label is hidden */
   }
-  a.mat-tab-link span {
+  nav.desktop-tabs a.mat-tab-link span { /* Increased specificity */
     display: none;
   }
-  // Adjust padding for icon-only tabs on mobile to make them more square-like if desired
-  a.mat-tab-link {
+  nav.desktop-tabs a.mat-tab-link { /* Increased specificity */
     padding: 8px;
-    min-width: auto; // Allow shrinking to icon size
+    min-width: auto; /* Allow shrinking to icon size */
+  }
+}
+
+.mobile-menu-button-container {
+  display: none; /* Hidden by default on larger screens */
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0;
+
+  button {
+    width: 80%;
+    max-width: 200px;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+
+    .mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.active-mobile-link {
+  background-color: rgba(0, 0, 0, 0.1); // Style for active mobile menu items
+}
+
+.menu-icon {
+  margin-right: 8px;
+  width: 24px; /* Fixed width for icons */
+  text-align: center;
+}
+
+/* Mobile responsive design - Use Material Design breakpoint */
+@media screen and (max-width: 599px) {
+  nav.desktop-tabs {
+    display: none !important; /* Hide desktop tabs on small screens */
+  }
+
+  .mobile-menu-button-container {
+    display: flex !important; /* Show mobile menu button */
+  }
+
+  mat-tab-nav-panel {
+    margin-top: 8px; /* Add space below mobile menu button */
   }
 }

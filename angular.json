@@ -42,12 +42,9 @@
                 "output": "/assets"
               }
 
-            ],
-            "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss",
-              "src/app/styles/light-theme.scss",
-              "src/app/styles/dark-theme.scss"
+            ],            "styles": [
+              "@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
