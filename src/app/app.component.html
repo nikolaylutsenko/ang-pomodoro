@@ -205,18 +205,16 @@
 
 <!-- Main container -->
 <div class="app-container">
-  <header>
-    <div class="header-content">      <!-- Replaced SVG with yapt-icon.png -->
-      <div class="logo-container">
-        <img src="assets/yapt-icon.png" alt="YAPT Icon" class="app-logo" />
-        <span class="version-badge">{{ version }}</span>
-      </div>
-      <app-nav></app-nav>
-      <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
-        <i class="fas" [class.fa-sun]="isDarkModeActive" [class.fa-moon]="!isDarkModeActive"></i> <!-- REVISED to use isDarkModeActive -->
-      </button>
+  <mat-toolbar color="primary">
+    <div class="logo-container">
+      <img src="assets/yapt-icon.png" alt="YAPT Icon" class="app-logo" />
+      <span class="version-badge">{{ version }}</span>
     </div>
-  </header>
+    <app-nav></app-nav>
+    <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
+      <i class="fas" [class.fa-sun]="isDarkModeActive" [class.fa-moon]="!isDarkModeActive"></i> <!-- REVISED to use isDarkModeActive -->
+    </button>
+  </mat-toolbar>
 
   <main class="main-content">
     <router-outlet></router-outlet>

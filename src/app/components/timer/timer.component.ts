@@ -3,6 +3,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common'; // Added isPl
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { TimerSettingsService } from '../../services/timer-settings.service';
+// -- IMPORT ANGULAR MATERIAL MODULES --
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+// -- END IMPORT ANGULAR MATERIAL MODULES --
 import { TimerHistoryService } from '../../services/timer-history.service';
 import { NotificationService } from '../../services/notification.service';
 import { TaskService } from '../../services/task.service';
@@ -21,7 +29,18 @@ interface TimerState {
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    // -- ADD ANGULAR MATERIAL MODULES --
+    MatCardModule,
+    MatButtonToggleModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule
+    // -- END ADD ANGULAR MATERIAL MODULES --
+  ],
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss']
 })
@@ -64,8 +83,17 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.settingsSubscription = this.timerSettingsService.getSettings().subscribe(settings => {
       this.settings = settings;
       // Only reset if no state is restored
-      if (!this.restoreState()) {
-        this.resetTimer();
+      // if (!this.restoreState()) { // Temporarily disable restoreState to avoid conflicts during refactor
+      //   this.resetTimer();
+      // }
+      // Ensure resetTimer is called if restoreState isn't or doesn't set things up.
+      // For now, let's assume resetTimer should be called if not restoring.
+      if (!this.isBrowser || !localStorage.getItem('timerState')) {
+        this.resetTimer(); // Initial setup if no saved state
+      } else {
+        if (!this.restoreState()) { // Attempt to restore, if it fails (e.g. returns false), then reset.
+            this.resetTimer();
+        }
       }
     });    // Subscribe to active tasks from TaskService instead of using localStorage directly
     this.tasksSubscription = this.taskService.activeTasks$.subscribe(activeTasks => {
@@ -572,6 +600,13 @@ export class TimerComponent implements OnInit, OnDestroy {
         this.taskDescription = '';
         this.saveState(); // Save the updated state
       }
+    }
+  }
+
+  // Add this method to handle mode changes from mat-button-toggle-group
+  onModeChange(newMode: 'work' | 'shortBreak' | 'longBreak'): void {
+    if (!this.isRunning) { // Only allow mode change if timer is not running
+      this.setMode(newMode);
     }
   }
 }

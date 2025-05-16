@@ -1,77 +1,55 @@
-.main-nav {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  flex: 1;
-  justify-content: center; // Center the nav element
-  overflow: hidden; // Add this to prevent overflow
+:host {
+  flex-grow: 1; /* Allow the nav to take up available space */
 }
 
-.nav-tabs {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 60px; // Set to exact header height of 60px
-  border-radius: 0;
-  overflow: hidden;
-  background: transparent;
-  justify-content: center; // Center the tabs
-}
-
-.nav-item {
-  display: flex;
-  height: 100%; // This will now be 60px based on parent
-  max-width: 180px; // Increased from 150px
-  min-width: 120px; // Increased from 100px
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0 1.25rem; // Increased horizontal padding from 1rem
-  height: 100%;
+mat-tab-nav-bar {
   width: 100%;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border-bottom: 3px solid transparent;
-  text-align: center; // Center text
+  // Remove the default bottom border from the tab bar if it interferes with card look
+  border-bottom: none !important;
+}
 
-  i {
-    font-size: 1rem;
-  }
+a.mat-tab-link {
+  padding: 8px 16px; /* Adjust padding for card content */
+  opacity: 1; /* Make fully opaque to see background */
+  justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  border-radius: 2px; /* Rounded corners for cards - Reduced for flatter look */
+  margin: 4px 2px; /* Spacing between cards, reduced horizontal margin slightly */
+  background-color: #f0f0f0; /* Solid light grey fallback for default card background */
+  color: #333; /* Default text color for tabs */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); /* Refined shadow for card effect */
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1); /* Material-like transition */
 
-  span {
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap; // Prevent text wrapping
-  }
-  &.active {
-    color: var(--color-text);
-    border-bottom-color: var(--color-primary);
-    background: var(--color-secondary);
-  }
-
-  &:hover:not(.active) {
-    background: var(--color-secondary);
-    color: var(--color-text);
+  // Remove the default Material tab indicator line
+  &::after {
+    display: none !important;
   }
 }
 
+a.mat-tab-link.mat-tab-label-active {
+  background-color: #007bff; /* Solid blue fallback for active card background */
+  color: white; /* White text for active card */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); /* More pronounced shadow for active card */
+}
+
+a.mat-tab-link:not(.mat-tab-label-active):hover {
+  background-color: #e9ecef; /* Solid light grey hover background */
+  color: #212529; /* Darker text on hover */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+/* Hide labels on smaller screens */
 @media (max-width: 768px) {
-  .nav-link {
-    padding: 0 0.5rem; // Further reduce padding on mobile
-
-    span {
-      display: none;
-    }
-
-    i {
-      margin: 0;
-      font-size: 1.1rem;
-    }
+  a.mat-tab-link .mat-icon {
+    margin-right: 0; /* Remove margin when label is hidden */
+  }
+  a.mat-tab-link span {
+    display: none;
+  }
+  // Adjust padding for icon-only tabs on mobile to make them more square-like if desired
+  a.mat-tab-link {
+    padding: 8px;
+    min-width: auto; // Allow shrinking to icon size
   }
 }

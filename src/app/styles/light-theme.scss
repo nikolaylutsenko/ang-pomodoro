@@ -1,0 +1,104 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$light-primary: mat.define-palette(mat.$indigo-palette, 500);
+$light-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$light-warn: mat.define-palette(mat.$red-palette);
+
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: $light-primary,
+    accent: $light-accent,
+    warn: $light-warn,
+  )
+));
+
+.light-theme {
+  @include mat.core-theme($light-theme);
+  @include mat.button-theme($light-theme);
+  @include mat.toolbar-theme($light-theme);
+  @include mat.tabs-theme($light-theme);
+  // -- ADD COMPONENT THEMES --
+  @include mat.card-theme($light-theme);
+  @include mat.button-toggle-theme($light-theme);
+  @include mat.form-field-theme($light-theme);
+  @include mat.select-theme($light-theme);
+  @include mat.icon-theme($light-theme);
+  // -- END COMPONENT THEMES --
+  // Include other component themes here
+  @include mat.list-theme($light-theme);
+  @include mat.divider-theme($light-theme);
+
+  // Custom styles for timer component in light theme
+  .timer-container {
+    background-color: mat.get-color-from-palette(mat.$grey-palette, 100);
+    color: mat.get-color-from-palette(mat.$grey-palette, 800);
+
+    .mode-btn.work.mat-button-toggle-checked {
+      background-color: mat.get-color-from-palette($light-primary, 200);
+      color: mat.get-color-from-palette($light-primary, 800);
+    }
+    .mode-btn.short-break.mat-button-toggle-checked {
+      background-color: mat.get-color-from-palette($light-accent, 200);
+      color: mat.get-color-from-palette($light-accent, 800);
+    }
+    .mode-btn.long-break.mat-button-toggle-checked {
+      background-color: mat.get-color-from-palette(mat.$orange-palette, 200); // Example: using orange for long break
+      color: mat.get-color-from-palette(mat.$orange-palette, 800);
+    }
+
+    .time {
+      color: mat.get-color-from-palette($light-primary, 700);
+    }
+
+    .current-task-info {
+      background-color: mat.get-color-from-palette(mat.$grey-palette, 200);
+      border: 1px solid mat.get-color-from-palette(mat.$grey-palette, 300);
+    }
+  }
+
+  // Custom styles for timer-history component in light theme
+  .history-section.mat-mdc-card {
+    background-color: mat.get-color-from-palette(mat.$grey-palette, 50);
+    color: mat.get-color-from-palette(mat.$grey-palette, 900);
+
+    .history-header-container {
+      border-bottom-color: mat.get-color-from-palette(mat.$grey-palette, 300);
+    }
+
+    .history-legend {
+      color: mat.get-color-from-palette(mat.$grey-palette, 600);
+      border-bottom-color: mat.get-color-from-palette(mat.$grey-palette, 300);
+    }
+
+    .history-item {
+      .entry-type.work {
+        color: mat.get-color-from-palette($light-primary, 700);
+      }
+      .entry-type.shortBreak {
+        color: mat.get-color-from-palette($light-accent, 700);
+      }
+      .entry-type.longBreak {
+        color: mat.get-color-from-palette(mat.$orange-palette, 700);
+      }
+
+      .entry-status.successful mat-icon {
+        color: mat.get-color-from-palette(mat.$green-palette, 600);
+      }
+      .entry-status:not(.successful) mat-icon {
+        color: mat.get-color-from-palette($light-warn, 500);
+      }
+    }
+
+    .no-history {
+      color: mat.get-color-from-palette(mat.$grey-palette, 700);
+      .no-history-icon {
+        color: mat.get-color-from-palette(mat.$grey-palette, 400);
+      }
+      .no-history-subtitle {
+        color: mat.get-color-from-palette(mat.$grey-palette, 500);
+      }
+    }
+  }
+}

@@ -1,370 +1,107 @@
+@use '@angular/material' as mat;
+
 .timer-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60%;
+  width: 60%; // Consider making this responsive or theme-based
   margin: 1.5rem auto 0;
-  min-width: 700px;
-  padding: 1.5rem 2rem 2rem 2rem;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  min-width: 320px; // Adjusted for better mobile view
+  padding: 1.5rem 2rem 2rem;
+  // background will be inherited from mat-card or can be themed
+  border-radius: 12px; // Or use Material's elevation/theming for cards
 }
 
 .mode-buttons {
   display: flex;
-  gap: 5px;
-  margin-bottom: 5px;
   width: 100%;
-}
+  margin-bottom: 1rem;
 
-.mode-btn {
-  flex: 1;
-  padding: 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.2rem;
-  color: white;
-
-  &:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    opacity: 0.7;
-
-    &:hover {
-      background-color: #cccccc;
-    }
-  }
-
-  &:nth-child(1) {
-    background: rgba(129, 199, 132, 0.2);
-    &:hover { background: rgba(129, 199, 132, 0.3); }
-    &.active { background: rgba(129, 199, 132, 0.4); }
-  }
-
-  &:nth-child(2) {
-    background: rgba(100, 181, 246, 0.2);
-    &:hover { background: rgba(100, 181, 246, 0.3); }
-    &.active { background: rgba(100, 181, 246, 0.4); }
-  }
-
-  &:nth-child(3) {
-    background: rgba(186, 104, 200, 0.2);
-    &:hover { background: rgba(186, 104, 200, 0.3); }
-    &.active { background: rgba(186, 104, 200, 0.4); }
+  .mode-btn {
+    flex: 1;
+    padding: 0.75rem 1rem; // Standardized padding, adjust as needed
+    font-size: 1rem; // Standardized font size
+    // Theme-specific backgrounds will be applied via theme files
+    // For example, in light-theme.scss:
+    // .timer-container .mode-btn.work.mat-button-toggle-checked {
+    //   background-color: mat.get-color-from-palette($light-primary, 500);
+    // }
+    // Similar for short-break (accent) and long-break (warn or another color)
   }
 }
 
 .timer {
-  margin: 5px 0;
+  margin: 1rem 0;
   text-align: center;
   width: 100%;
 }
 
 .time {
-  font-size: 8rem;
+  font-size: 7.8rem; // Increased from 6rem by 30%
   font-weight: bold;
   font-family: 'Roboto Mono', monospace;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  // Color will be inherited or themed
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); // Softer shadow
 }
 
-.task-input {
+.task-controls {
+  display: flex;
+  align-items: center; // Align dropdown and button
+  gap: 1rem; // Space between dropdown and button
   margin-bottom: 1rem;
   width: 100%;
-}
 
-.task-dropdown {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) inset;
-
-  &:focus {
-    outline: none;
-    border-color: #64b5f6;
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1) inset;
-  }
-
-  &:hover:not(:focus):not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  &:disabled {
-    background-color: rgba(255, 255, 255, 0.05);
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-
-  option {
-    background-color: #2c3e50;
-    color: white;
+  .task-dropdown-container {
+    flex-grow: 1; // Allow dropdown to take available space
   }
 }
 
-.task-input {
-  display: flex;
-  margin-bottom: 20px;
-  align-items: center;
 
-  .task-dropdown {
-    flex: 1;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
-
-  .complete-btn {
-    margin-left: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #4caf50;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-
-    &:hover {
-      background-color: #388e3c;
-    }
-
-    &:disabled {
-      background-color: #cccccc;
-      color: #666666;
-      cursor: not-allowed;
-    }
-  }
-}
-
-// Current task information
 .current-task-info {
   width: 100%;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 1rem;
   border-radius: 8px;
-  margin-top: 0.5rem;
+  // Background and text color should be themed
+  // Example for light theme:
+  // background-color: rgba(0,0,0,0.03);
+  // color: mat.get-color-from-palette($light-foreground, text);
 
   .task-info-title {
-    font-weight: 500;
+    font-weight: bold;
     margin-bottom: 0.5rem;
-    color: rgba(255, 255, 255, 0.7);
   }
-
   .task-info-description {
-    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 0.5rem;
     word-break: break-word;
   }
-
   .task-info-progress {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-
-    .progress-label {
-      color: rgba(255, 255, 255, 0.6);
-    }
   }
 }
 
 .controls {
   display: flex;
-  gap: 1rem;
-  width: 100%;
-  max-width: 350px;
-  margin: 2rem auto 0;
-}
-
-.control-btn {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border-radius: 20px;
-  font-size: 1.2rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 42px;
-  display: flex;
+  gap: 1rem; // Space between control buttons
   align-items: center;
   justify-content: center;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  &.active {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &.start-btn:not(:disabled) {
-    background: rgba(77, 175, 124, 0.2);
-
-    &:hover {
-      background: rgba(77, 175, 124, 0.3);
-    }
-
-    &.active {
-      background: rgba(77, 175, 124, 0.4);
-    }
-  }
-
-  &.stop-btn:not(:disabled) {
-    background: rgba(229, 115, 115, 0.2);
-
-    &:hover {
-      background: rgba(229, 115, 115, 0.3);
-    }
-  }
-
-  i {
-    font-size: 1.5rem;
-  }
-}
-
-// Light theme styles
-:host-context(body:not([data-theme="dark"])) {
-  .timer-container {
-    background: rgba(0, 0, 0, 0.03);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-
-  .time {
-    color: rgba(0, 0, 0, 0.9);
-    text-shadow: none;
-  }
-
-  .mode-btn {
-    color: rgba(0, 0, 0, 0.9);
-
-    &:disabled {
-      background-color: #e0e0e0;
-      color: #888888;
-      cursor: not-allowed;
-      opacity: 0.7;
-
-      &:hover {
-        background-color: #e0e0e0;
-      }
-    }
-
-    &:nth-child(1) {
-      background: rgba(46, 125, 50, 0.1);
-      &:hover { background: rgba(46, 125, 50, 0.15); }
-      &.active { background: rgba(46, 125, 50, 0.2); }
-    }
-
-    &:nth-child(2) {
-      background: rgba(25, 118, 210, 0.1);
-      &:hover { background: rgba(25, 118, 210, 0.15); }
-      &.active { background: rgba(25, 118, 210, 0.2); }
-    }
-
-    &:nth-child(3) {
-      background: rgba(123, 31, 162, 0.1);
-      &:hover { background: rgba(123, 31, 162, 0.15); }
-      &.active { background: rgba(123, 31, 162, 0.2); }
-    }
-  }
-
-  .task-dropdown {
-    border-color: rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.8);
-    color: rgba(0, 0, 0, 0.8);
-
-    &:focus {
-      border-color: #1976d2;
-      background: #ffffff;
-      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
-    }
-
-    &:hover:not(:focus):not(:disabled) {
-      border-color: rgba(0, 0, 0, 0.2);
-    }
-
-    &:disabled {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    option {
-      background-color: white;
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .current-task-info {
-    background: rgba(0, 0, 0, 0.02);
-
-    .task-info-title {
-      color: rgba(0, 0, 0, 0.7);
-    }
-
-    .task-info-description {
-      color: rgba(0, 0, 0, 0.9);
-    }
-
-    .task-info-progress {
-      color: rgba(0, 0, 0, 0.7);
-
-      .progress-label {
-        color: rgba(0, 0, 0, 0.6);
-      }
-    }
-  }
+  width: 100%;
+  margin-top: 1rem; // Add some space above controls
 
   .control-btn {
-    background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.7);
-    border-color: rgba(0, 0, 0, 0.1);
+    flex: 1; // Make them take equal space like mode buttons
+    padding: 0.75rem 1rem; // Match mode-btn padding
+    font-size: 1rem; // Match mode-btn font-size
+    display: flex; // To align icon and text
+    align-items: center;
+    justify-content: center;
 
-    &:hover:not(:disabled) {
-      background: rgba(0, 0, 0, 0.1);
+    mat-icon {
+      margin-right: 8px; // Space between icon and text
     }
 
-    &.active {
-      background: rgba(0, 0, 0, 0.15);
-      border-color: rgba(0, 0, 0, 0.2);
-    }
-
-    &.start-btn:not(:disabled) {
-      background: rgba(46, 125, 50, 0.1);
-
-      &:hover {
-        background: rgba(46, 125, 50, 0.15);
-      }
-
-      &.active {
-        background: rgba(46, 125, 50, 0.2);
-      }
-    }
-
-    &.stop-btn:not(:disabled) {
-      background: rgba(211, 47, 47, 0.1);
-
-      &:hover {
-        background: rgba(211, 47, 47, 0.15);
-      }
-    }
+    // Ensure they don't shrink below content
+    min-height: 48px; // A common touch target size, adjust as needed
   }
 }
 
@@ -372,34 +109,49 @@
 @media (max-width: 768px) {
   .timer-container {
     width: 90%;
-    min-width: initial;
-    padding: 1.5rem 1rem 1.5rem 1rem;
+    min-width: unset;
+    padding: 1rem;
   }
 
   .time {
-    font-size: 6rem;
+    font-size: 5.85rem; // Adjusted from 4.5rem by 30%
+  }
+
+  .mode-buttons {
+    flex-direction: column; // Stack buttons on smaller screens
+    .mode-btn {
+      margin-bottom: 0.5rem;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .task-controls {
+    flex-direction: column;
+    align-items: stretch; // Make dropdown and button full width
+    .complete-btn {
+      margin-top: 0.5rem;
+    }
   }
 
   .controls {
-    max-width: 90%;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .control-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    min-height: 38px;
+    flex-direction: column; // Stack control buttons on smaller screens
+    align-items: stretch; // Make buttons full width
+    .control-btn {
+      margin-bottom: 0.5rem;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 
 @media (max-width: 480px) {
   .time {
-    font-size: 4rem;
+    font-size: 4.55rem; // Adjusted from 3.5rem by 30%
   }
-
-  .mode-btn {
-    font-size: 0.9rem;
-    padding: 0.75rem 0.5rem;
+  .current-task-info {
+    padding: 0.75rem;
   }
 }
