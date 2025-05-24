@@ -2,11 +2,22 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskUrgency } from '../../../models/task.model';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-create-task',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSliderModule,
+    MatButtonModule
+  ],
   templateUrl: './create-task.component.html',
   styleUrl: './create-task.component.scss'
 })
@@ -87,6 +98,13 @@ export class CreateTaskComponent implements OnChanges {
   // ADDED: Method to set urgency from label clicks
   setUrgency(value: number): void {
     this.currentUrgencyValue = value;
+  }
+
+  // ADDED: Method to set urgency from slider event
+  setUrgencyFromSlider(event: any): void {
+    // For MDC-based mat-slider, event.target.value is the number
+    const value = typeof event === 'number' ? event : (event?.target?.value ?? 1);
+    this.currentUrgencyValue = Number(value);
   }
 
   getUrgencyGradient() {

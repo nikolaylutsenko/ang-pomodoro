@@ -8,6 +8,7 @@ import { TaskListComponent } from './task-list/task-list.component';
 import { CdkDragDrop, moveItemInArray, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-tasks',
@@ -17,7 +18,8 @@ import { MatIconModule } from '@angular/material/icon';
     // CreateTaskComponent, // Removed from imports
     TaskListComponent,
     DragDropModule, // Added DragDropModule here
-    MatIconModule // Add MatIconModule
+    MatIconModule, // Add MatIconModule
+    MatTabsModule // <-- Add MatTabsModule for Material tabs
   ],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
@@ -404,6 +406,24 @@ export class TasksComponent implements OnInit, OnDestroy {
   openCreateTask(): void {
     if (this.taskListComponent && this.activeSubTab === 'taskList') {
       this.taskListComponent.openCreateTaskModal();
+    }
+  }
+
+  // Helper for Material tab index
+  getTabIndex(): number {
+    switch (this.activeSubTab) {
+      case 'taskList': return 0;
+      case 'backlog': return 1;
+      case 'completed': return 2;
+      default: return 0;
+    }
+  }
+
+  onTabChange(index: number): void {
+    switch (index) {
+      case 0: this.activeSubTab = 'taskList'; break;
+      case 1: this.activeSubTab = 'backlog'; break;
+      case 2: this.activeSubTab = 'completed'; break;
     }
   }
 }

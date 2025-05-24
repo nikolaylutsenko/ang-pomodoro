@@ -1,33 +1,32 @@
 <!-- Task Form -->
-<div class="task-form-container">
+<div class="task-form-container mat-card mat-elevation-z2">
   <form (ngSubmit)="addOrUpdateTask()" class="task-form">
     <div class="task-form-fields">
       <div class="description-and-urgency-wrapper">
-        <textarea
-          maxlength="1000"
-          placeholder="Task description (max 1000 symbols)"
-          [(ngModel)]="currentDescription"
-          name="description"
-          required
-          rows="6"
-          class="task-desc-textarea"
-        ></textarea>
-
+        <mat-form-field appearance="outline" class="full-width">
+          <textarea
+            matInput
+            maxlength="1000"
+            placeholder="Task description (max 1000 symbols)"
+            [(ngModel)]="currentDescription"
+            name="description"
+            required
+            rows="6"
+          ></textarea>
+        </mat-form-field>
         <div class="urgency-slider-container">
           <label for="urgency-slider">Urgency:</label>
           <div class="slider-and-labels-wrapper">
-            <input
+            <mat-slider
               id="urgency-slider"
-              type="range"
               min="0"
               max="2"
               step="1"
+              thumbLabel
+              tickInterval="1"
               [(ngModel)]="currentUrgencyValue"
               name="urgency"
-              [ngStyle]="{'background': getUrgencyGradient()}"
-              required
-              orient="vertical"
-            />
+            ></mat-slider>
             <div class="urgency-labels">
               <span class="urgency-high" (click)="setUrgency(2)">High</span>
               <span class="urgency-medium" (click)="setUrgency(1)">Medium</span>
@@ -36,26 +35,41 @@
           </div>
         </div>
       </div>
-
       <div class="time-and-actions-row">
         <div class="time-selector">
           <label>Time (hours):</label>
           <div class="time-buttons">
             <button
+              mat-stroked-button
+              color="accent"
               *ngFor="let time of timeOptions"
               type="button"
               [class.selected]="selectedTime === time"
               (click)="selectTime(time)"
               [disabled]="selectedTime === time"
-              class="time-button">
+              class="time-button"
+            >
               {{ time }}
             </button>
           </div>
         </div>
-
         <div class="task-form-actions">
-          <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
-          <button type="button" *ngIf="editingTaskId" (click)="cancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="add-task-btn"
+          >
+            {{ editingTaskId ? 'Update' : 'Add' }} Task
+          </button>
+          <button
+            mat-button
+            type="button"
+            *ngIf="editingTaskId"
+            (click)="cancel()"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
