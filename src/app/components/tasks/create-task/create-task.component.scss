@@ -49,26 +49,57 @@
   width: 100%;
 }
 
-/* NEW STYLES for description and urgency side-by-side */
-.description-and-urgency-wrapper {
+/* NEW STYLES for urgency section below description */
+.urgency-section {
   display: flex;
-  flex-direction: row;
-  gap: 1.5rem; /* Space between textarea and urgency slider */
-  align-items: flex-start; /* Align items to the top */
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+
+  label {
+    font-weight: 500;
+    color: var(--color-text);
+    font-size: 1rem;
+  }
 }
 
-.task-desc-textarea {
-  background: var(--color-bg-card); /* ADDED: Ensure theme background is used */
-  color: var(--color-text);         /* ADDED: Ensure theme text color is used */
-  border: 1px solid var(--color-border); /* ADDED: Consistent border with other inputs */
-  border-radius: 4px; /* ADDED: Consistent border-radius */
-  padding: 0.8rem 1rem; /* ADDED: Consistent padding */
-  font-size: 1.1rem; /* ADDED: Consistent font-size */
-  resize: vertical; /* ADDED: Allow vertical resize */
-  box-sizing: border-box; /* ADDED: Consistent box-sizing */
-  flex-grow: 1;
-  height: 150px; /* MODIFIED: Set height to match slider-and-labels-wrapper */
+.urgency-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
+
+.urgency-btn {
+  flex: 1;
+  min-width: 100px;
+  transition: all 0.2s ease;
+
+  &.selected {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  mat-icon {
+    margin-right: 0.25rem;
+  }
+
+  &.urgency-low.selected {
+    background-color: var(--color-success) !important;
+    color: white !important;
+  }
+
+  &.urgency-medium.selected {
+    background-color: #FFA726 !important; /* Changed to yellow/orange */
+    color: white !important;
+  }
+
+  &.urgency-high.selected {
+    background-color: var(--color-error) !important;
+    color: white !important;
+  }
+}
+
+
 
 .estimated-hours-field {
     display: flex;
@@ -92,94 +123,7 @@
     color: var(--color-text);
 }
 
-.urgency-slider-container {
-  display: flex;
-  flex-direction: column; /* Label on top of slider+labels */
-  align-items: center; /* Center the 'Urgency:' label */
-  gap: 0.3rem; /* Gap between label and slider group */
-  width: auto; /* Adjust as needed, e.g., 60px for slider + labels */
-  // width: 700px; /* REMOVED - was for horizontal */
-  // max-width: 100%; /* REMOVED */
-}
 
-// .urgency-slider-container label is mostly existing, ensure it's fine
-
-/* NEW STYLES for the vertical slider and its immediate labels */
-.slider-and-labels-wrapper {
-  display: flex;
-  flex-direction: row; /* Slider | Labels */
-  align-items: center;
-  gap: 0.5rem; /* Space between slider and its text labels */
-  height: 150px; /* Define the height for the vertical slider and labels */
-}
-
-.urgency-slider-container input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent; /* ngStyle will set the actual track gradient */
-  outline: none;
-  margin: 0;
-  padding: 0;
-
-  /* Vertical styling */
-  writing-mode: bt-lr;
-  -webkit-appearance: slider-vertical;
-  width: 8px;  /* Thickness of the slider track */
-  height: 100%; /* Length of the slider, takes full height of wrapper (150px) */
-  border-radius: 5px;
-  // ... existing styles like :focus might need review ...
-}
-
-.urgency-slider-container input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-slider-thumb-bg);
-  border: 2px solid var(--color-slider-thumb-border);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: border 0.2s;
-  /* Adjust margins if needed to center thumb on vertical track */
-  margin-left: -7px; /* (Thumb width - Track width) / 2 roughly */
-}
-
-.urgency-slider-container input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-slider-thumb-bg, #fff); /* Use variable */
-  border: 2px solid var(--color-slider-thumb-border, #888); /* Use variable */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: border 0.2s;
-}
-
-.urgency-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%; /* Match the height of slider-and-labels-wrapper (150px) */
-  font-size: 0.95rem; /* Reverted from 0.9rem to original 0.95rem */
-  // width: 100%; /* REMOVED */
-  // margin-top: 0.1rem; /* REMOVED */
-}
-
-.urgency-labels .urgency-low {
-  color: var(--color-success);
-}
-.urgency-labels .urgency-medium {
-  color: var(--color-primary);
-}
-.urgency-labels .urgency-high {
-  color: var(--color-error);
-}
-
-.urgency-labels span {
-  cursor: pointer; /* Add pointer cursor to indicate clickable */
-  padding: 0.2em 0; /* Add some padding for easier clicking */
-}
 
 /* NEW STYLES for time and actions row */
 .time-and-actions-row {
@@ -242,27 +186,3 @@
   border-radius: var(--radius-md);
 }
 
-/* NEW: Vertical slider layout for urgency */
-.slider-vertical-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.vertical-slider {
-  /* Rotate horizontal slider to vertical */
-  transform: rotate(-90deg);
-  height: 150px;
-  width: 32px;
-  /* Centering adjustments */
-  margin: 0;
-}
-
-.vertical-tick-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 150px;
-  font-size: 0.9rem;
-  color: var(--color-text);
-}

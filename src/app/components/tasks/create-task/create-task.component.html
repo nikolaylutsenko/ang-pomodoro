@@ -1,39 +1,50 @@
 <!-- Task Form -->
 <div class="task-form-container mat-card mat-elevation-z2">
-  <form (ngSubmit)="addOrUpdateTask()" class="task-form">
-    <div class="task-form-fields">
-      <div class="description-and-urgency-wrapper">
-        <mat-form-field appearance="outline" class="full-width">
-          <textarea
-            matInput
-            maxlength="1000"
-            placeholder="Task description (max 1000 symbols)"
-            [(ngModel)]="currentDescription"
-            name="description"
-            required
-            rows="6"
-          ></textarea>
-        </mat-form-field>
-        <div class="urgency-section">
-          <label>Urgency</label>
-          <div class="slider-vertical-wrapper">
-            <mat-slider
-              class="vertical-slider"
-              min="0"
-              max="2"
-              step="1"
-              thumbLabel
-              tickInterval="1"
-              [(ngModel)]="currentUrgencyValue"
-              name="urgency"
-              aria-label="Task urgency">
-            </mat-slider>
-            <div class="vertical-tick-labels">
-              <span>High</span>
-              <span>Medium</span>
-              <span>Low</span>
-            </div>
-          </div>
+  <form (ngSubmit)="addOrUpdateTask()" class="task-form">    <div class="task-form-fields">
+      <!-- Task description field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea
+          matInput
+          maxlength="1000"
+          placeholder="Task description (max 1000 symbols)"
+          [(ngModel)]="currentDescription"
+          name="description"
+          required
+          rows="6"
+        ></textarea>
+      </mat-form-field>
+
+      <!-- Urgency selector below description -->
+      <div class="urgency-section">
+        <label>Urgency</label>
+        <div class="urgency-buttons">
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 0 ? 'primary' : ''"
+                  [class.selected]="currentUrgencyValue === 0"
+                  (click)="setUrgency(0)"
+                  class="urgency-btn urgency-low">
+            <mat-icon>low_priority</mat-icon>
+            <span>Low</span>
+          </button>
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 1 ? '' : ''"
+                  [class.selected]="currentUrgencyValue === 1"
+                  (click)="setUrgency(1)"
+                  class="urgency-btn urgency-medium">
+            <mat-icon>priority_high</mat-icon>
+            <span>Medium</span>
+          </button>
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 2 ? 'warn' : ''"
+                  [class.selected]="currentUrgencyValue === 2"
+                  (click)="setUrgency(2)"
+                  class="urgency-btn urgency-high">
+            <mat-icon>warning</mat-icon>
+            <span>High</span>
+          </button>
         </div>
       </div>
       <div class="time-and-actions-row">

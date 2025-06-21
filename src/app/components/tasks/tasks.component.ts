@@ -37,11 +37,9 @@ export class TasksComponent implements OnInit, OnDestroy {
   activeTasksListId = 'active-tasks-drop-list';
   pendingTasksListId = 'pending-tasks-drop-list';
   completedTasksListId = 'completed-tasks-drop-list';
-
   selectedBacklogTaskIds: Set<string> = new Set();
   selectedActiveTaskIds: Set<string> = new Set();
   selectedCompletedTaskIds: Set<string> = new Set();
-  activeSubTab: 'taskList' | 'backlog' | 'completed' = 'taskList';
 
   currentSettings!: TimerSettings;
   private activeTasksSubscription: Subscription = new Subscription();
@@ -82,11 +80,9 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.completedTasks = tasks;
     });
   }
-
   // Updated method to change sub-tab
   selectSubTab(tabName: 'taskList' | 'backlog' | 'completed'): void {
-    this.activeSubTab = tabName;
-    // Potentially clear selections in the non-visible tab if desired, or manage as is.
+    // No longer needed since we removed the create task button
   }
 
   private calculateWorkIntervals(taskData: Partial<Task>): number | string {
@@ -404,29 +400,17 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.selectedActiveTaskIds.add(taskId);
     }
   }
-
   // Method to open the create task modal in the task list component
   openCreateTask(): void {
-    if (this.taskListComponent && this.activeSubTab === 'taskList') {
-      this.taskListComponent.openCreateTaskModal();
-    }
+    // This method is no longer needed since create task moved to header
   }
 
   // Helper for Material tab index
   getTabIndex(): number {
-    switch (this.activeSubTab) {
-      case 'taskList': return 0;
-      case 'backlog': return 1;
-      case 'completed': return 2;
-      default: return 0;
-    }
+    return 0; // Always return 0 since we use mat-tab-group now
   }
 
   onTabChange(index: number): void {
-    switch (index) {
-      case 0: this.activeSubTab = 'taskList'; break;
-      case 1: this.activeSubTab = 'backlog'; break;
-      case 2: this.activeSubTab = 'completed'; break;
-    }
+    // Tab change handled by Material tab group
   }
 }
