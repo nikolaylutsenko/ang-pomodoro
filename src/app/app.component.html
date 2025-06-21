@@ -260,9 +260,8 @@
       <mat-icon>add</mat-icon>
       <span>New Task</span>
     </button>
-    <app-nav class="nav-flex-item"></app-nav>
-    <button class="theme-toggle" aria-label="Toggle theme" (click)="toggleTheme()" title="Toggle theme">
-      <i class="fas" [class.fa-sun]="isDarkModeActive" [class.fa-moon]="!isDarkModeActive"></i>
+    <app-nav class="nav-flex-item"></app-nav>    <button class="theme-toggle" aria-label="Toggle theme" (click)="toggleTheme()" title="Toggle theme">
+      <mat-icon>{{ isDarkModeActive ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
   </mat-toolbar>
 

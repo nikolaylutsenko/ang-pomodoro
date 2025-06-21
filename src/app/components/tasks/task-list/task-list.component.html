@@ -116,13 +116,22 @@
       <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>
       <td>{{ task.completedIntervals }}</td>
-      <td>{{ task.completionStatus }}</td>
-      <td>
-        <span *ngIf="task.completionStatus !== TaskStatus.Completed && listType === 'active'" class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">✔️</span>
-        <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
-        <span class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">🗑️</span>
-        <span *ngIf="listType === 'pending'" class="icon-btn" title="Move to Active List" (click)="moveToActiveClicked(task.id)">⬆️</span>
-        <span *ngIf="listType === 'active' && task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Move to Backlog" (click)="moveToBacklogClicked(task.id)">⬇️</span>
+      <td>{{ task.completionStatus }}</td>      <td>
+        <button *ngIf="task.completionStatus !== TaskStatus.Completed && listType === 'active'" mat-icon-button class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">
+          <mat-icon>check_circle</mat-icon>
+        </button>
+        <button *ngIf="task.completionStatus !== TaskStatus.Completed" mat-icon-button class="icon-btn" title="Edit" (click)="editTaskClicked(task)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button *ngIf="listType === 'pending'" mat-icon-button class="icon-btn" title="Move to Active List" (click)="moveToActiveClicked(task.id)">
+          <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="listType === 'active' && task.completionStatus !== TaskStatus.Completed" mat-icon-button class="icon-btn" title="Move to Backlog" (click)="moveToBacklogClicked(task.id)">
+          <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">
