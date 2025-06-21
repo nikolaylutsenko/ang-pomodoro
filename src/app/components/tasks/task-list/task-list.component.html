@@ -1,12 +1,14 @@
 <!-- Filter and Sort Controls -->
 <div class="task-controls">
-  <input
-    type="text"
-    placeholder="Filter by description"
-    [(ngModel)]="filterText"
-    (input)="applyFiltersAndSorting()"
-  />
-  <button (click)="toggleSort()">
+  <mat-form-field appearance="outline">
+    <mat-label>Filter by description</mat-label>
+    <input
+      matInput
+      [(ngModel)]="filterText"
+      (input)="applyFiltersAndSorting()"
+    />
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="toggleSort()">
     Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
   </button>
 </div>
@@ -23,7 +25,11 @@
 <!-- Tasks Table -->
 <table class="tasks-table">  <thead>
     <tr>
-      <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
+      <th>
+        <mat-checkbox (change)="toggleSelectAll($event.checked)"
+                      [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0">
+        </mat-checkbox>
+      </th> <!-- Added select-all checkbox -->
       <th class="priority-header" title="Drag & drop tasks to change priority">
         <div class="priority-header-content">
           <span>Priority</span>
@@ -71,7 +77,9 @@
         </div>
       </ng-template><td>
         <div class="drag-handle-container">
-          <input type="checkbox" [checked]="selectedTaskIds.has(task.id)" (change)="onTaskSelectionChange(task.id, $event)">
+          <mat-checkbox [checked]="selectedTaskIds.has(task.id)"
+                        (change)="onTaskSelectionChange(task.id, $event.checked)">
+          </mat-checkbox>
           <span class="drag-handle" *ngIf="task.completionStatus !== TaskStatus.Completed" title="Drag to reorder">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill="currentColor" d="M8 18h8v-2H8v2zm0-4h8v-2H8v2zm0-4h8V8H8v2zm-4 8h2V8H4v10z"/>

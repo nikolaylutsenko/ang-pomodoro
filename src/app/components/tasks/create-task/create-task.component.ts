@@ -6,6 +6,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-create-task',
@@ -16,7 +18,9 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatSliderModule,
-    MatButtonModule
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule
   ],
   templateUrl: './create-task.component.html',
   styleUrl: './create-task.component.scss'
@@ -31,6 +35,7 @@ export class CreateTaskComponent implements OnChanges {
 
   editingTaskId: string | null = null;
   urgencyMap = [TaskUrgency.Low, TaskUrgency.Mid, TaskUrgency.High];
+  urgencyColorMap = ['primary','accent','warn'] as const;
 
   timeOptions: (number | string)[] = [1, 2, 3, 5, 8, 13, 20, 40, 100, '∞', '?'];
   selectedTime: number | string = 1; // Default to 1 hour
@@ -105,6 +110,10 @@ export class CreateTaskComponent implements OnChanges {
     // For MDC-based mat-slider, event.target.value is the number
     const value = typeof event === 'number' ? event : (event?.target?.value ?? 1);
     this.currentUrgencyValue = Number(value);
+  }
+
+  getSliderColor(): 'primary' | 'accent' | 'warn' {
+    return this.urgencyColorMap[this.currentUrgencyValue];
   }
 
   getUrgencyGradient() {

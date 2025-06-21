@@ -14,11 +14,11 @@
             rows="6"
           ></textarea>
         </mat-form-field>
-        <div class="urgency-slider-container">
-          <label for="urgency-slider">Urgency:</label>
-          <div class="slider-and-labels-wrapper">
+        <div class="urgency-section">
+          <label>Urgency</label>
+          <div class="slider-vertical-wrapper">
             <mat-slider
-              id="urgency-slider"
+              class="vertical-slider"
               min="0"
               max="2"
               step="1"
@@ -26,32 +26,25 @@
               tickInterval="1"
               [(ngModel)]="currentUrgencyValue"
               name="urgency"
-            ></mat-slider>
-            <div class="urgency-labels">
-              <span class="urgency-high" (click)="setUrgency(2)">High</span>
-              <span class="urgency-medium" (click)="setUrgency(1)">Medium</span>
-              <span class="urgency-low" (click)="setUrgency(0)">Low</span>
+              aria-label="Task urgency">
+            </mat-slider>
+            <div class="vertical-tick-labels">
+              <span>High</span>
+              <span>Medium</span>
+              <span>Low</span>
             </div>
           </div>
         </div>
       </div>
       <div class="time-and-actions-row">
+        <!-- Time selection using Material button-toggle-group -->
         <div class="time-selector">
           <label>Time (hours):</label>
-          <div class="time-buttons">
-            <button
-              mat-stroked-button
-              color="accent"
-              *ngFor="let time of timeOptions"
-              type="button"
-              [class.selected]="selectedTime === time"
-              (click)="selectTime(time)"
-              [disabled]="selectedTime === time"
-              class="time-button"
-            >
+          <mat-button-toggle-group [(ngModel)]="selectedTime" name="workIntervals">
+            <mat-button-toggle *ngFor="let time of timeOptions" [value]="time">
               {{ time }}
-            </button>
-          </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
         <div class="task-form-actions">
           <button

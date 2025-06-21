@@ -241,3 +241,28 @@
   font-size: 1.25rem !important;
   border-radius: var(--radius-md);
 }
+
+/* NEW: Vertical slider layout for urgency */
+.slider-vertical-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vertical-slider {
+  /* Rotate horizontal slider to vertical */
+  transform: rotate(-90deg);
+  height: 150px;
+  width: 32px;
+  /* Centering adjustments */
+  margin: 0;
+}
+
+.vertical-tick-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 150px;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
