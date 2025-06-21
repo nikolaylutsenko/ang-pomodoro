@@ -1,5 +1,4 @@
 /* This file can be imported by components that need specific dark theme styling */
-/* The main theming is now handled in material-theme.scss */
 
 /* Dark theme specific variables */
 :root .dark-theme {
@@ -11,98 +10,95 @@
   --color-shadow: rgba(0, 0, 0, 0.5);
 }
 
-$dark-theme: mat.define-dark-theme((
-  color: (
-    primary: $dark-primary,
-    accent: $dark-accent,
-    warn: $dark-warn,
-  )
-));
-
 .dark-theme {
-  @include mat.core-theme($dark-theme);
-  @include mat.button-theme($dark-theme);
-  @include mat.toolbar-theme($dark-theme);
-  @include mat.tabs-theme($dark-theme);
-  // -- ADD COMPONENT THEMES --
-  @include mat.card-theme($dark-theme);
-  @include mat.button-toggle-theme($dark-theme);
-  @include mat.form-field-theme($dark-theme);
-  @include mat.select-theme($dark-theme);
-  @include mat.icon-theme($dark-theme);
-  // -- END COMPONENT THEMES --
-  // Include other component themes here
-  @include mat.list-theme($dark-theme);
-  @include mat.divider-theme($dark-theme);
-
   // Custom styles for timer component in dark theme
   .timer-container {
-    background-color: mat.get-color-from-palette(mat.$grey-palette, 800);
-    color: mat.get-color-from-palette(mat.$grey-palette, 200);
-
-    .mode-btn.work.mat-button-toggle-checked {
-      background-color: mat.get-color-from-palette($dark-primary, 600);
-      color: mat.get-color-from-palette(mat.$grey-palette, 50);
-    }
-    .mode-btn.short-break.mat-button-toggle-checked {
-      background-color: mat.get-color-from-palette($dark-accent, 600);
-      color: mat.get-color-from-palette(mat.$grey-palette, 900); // Darker text for amber bg
-    }
-    .mode-btn.long-break.mat-button-toggle-checked {
-      background-color: mat.get-color-from-palette(mat.$deep-orange-palette, 600);
-      color: mat.get-color-from-palette(mat.$grey-palette, 50);
-    }
+    background-color: #1e1e1e;
+    color: #e0e0e0;
 
     .time {
-      color: mat.get-color-from-palette($dark-primary, 300);
+      color: #64b5f6; /* Light blue for timer display */
     }
 
     .current-task-info {
-      background-color: mat.get-color-from-palette(mat.$grey-palette, 700);
-      border: 1px solid mat.get-color-from-palette(mat.$grey-palette, 600);
+      background-color: #2a2a2a;
+      border: 1px solid #444444;
+      color: #e0e0e0;
+
+      .task-info-title {
+        color: #ffffff;
+      }
+
+      .task-info-description {
+        color: #cccccc;
+      }
+
+      .task-info-progress {
+        color: #b0b0b0;
+      }
+    }
+
+    // Material button toggle styles for dark theme
+    .mat-button-toggle-group {
+      border: 1px solid #444444;
+    }
+
+    .mat-button-toggle {
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border-right: 1px solid #444444;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.mat-button-toggle-checked {
+        background-color: #1976d2;
+        color: #ffffff;
+      }
     }
   }
 
   // Custom styles for timer-history component in dark theme
   .history-section.mat-mdc-card {
-    background-color: mat.get-color-from-palette(mat.$grey-palette, 800);
-    color: mat.get-color-from-palette(mat.$grey-palette, 100);
+    background-color: #1e1e1e;
+    color: #e0e0e0;
 
     .history-header-container {
-      border-bottom-color: mat.get-color-from-palette(mat.$grey-palette, 700);
+      border-bottom-color: #444444;
     }
 
     .history-legend {
-      color: mat.get-color-from-palette(mat.$grey-palette, 400);
-      border-bottom-color: mat.get-color-from-palette(mat.$grey-palette, 700);
+      color: #a0a0a0;
+      border-bottom-color: #444444;
     }
 
     .history-item {
       .entry-type.work {
-        color: mat.get-color-from-palette($dark-primary, 300);
+        color: #64b5f6;
       }
       .entry-type.shortBreak {
-        color: mat.get-color-from-palette($dark-accent, 300);
+        color: #ffa726;
       }
       .entry-type.longBreak {
-        color: mat.get-color-from-palette(mat.$deep-orange-palette, 300);
+        color: #ff7043;
       }
 
       .entry-status.successful mat-icon {
-        color: mat.get-color-from-palette(mat.$green-palette, 400);
+        color: #66bb6a;
       }
       .entry-status:not(.successful) mat-icon {
-        color: mat.get-color-from-palette($dark-warn, 400);
+        color: #ef5350;
       }
     }
 
     .no-history {
-      color: mat.get-color-from-palette(mat.$grey-palette, 300);
+      color: #cccccc;
       .no-history-icon {
-        color: mat.get-color-from-palette(mat.$grey-palette, 500);
+        color: #666666;
       }
       .no-history-subtitle {
-        color: mat.get-color-from-palette(mat.$grey-palette, 400);
+        color: #a0a0a0;
       }
     }
   }
