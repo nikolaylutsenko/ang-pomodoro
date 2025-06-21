@@ -450,3 +450,76 @@ body.dark-theme .statistics-card .stat-value {
 body.dark-theme .statistics-card .stat-label {
   color: #b0b0b0 !important;
 }
+
+
+/* Dark theme specific overrides for tasks component tabs */
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-group {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-header {
+  background-color: #1e1e1e !important;
+  border-bottom: 1px solid #444444 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab.mdc-tab--active {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab:hover {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: inherit !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mdc-tab-indicator__content--underline {
+  border-color: #64b5f6 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body-content {
+  background-color: transparent !important;
+}
+
+/* Dark theme for tab content */
+body.dark-theme .tab-content-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .sub-tab-content.mat-mdc-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .sub-tab-content p {
+  color: #b0b0b0 !important;
+}
+
+/* Dark theme for tasks separator */
+body.dark-theme .tasks-separator {
+  border-color: #444444 !important;
+  background-color: #444444 !important;
+}
+
+/* Additional Material tab CSS custom properties for dark theme */
+body.dark-theme .adaptive-mat-tabs {
+  --mdc-tab-indicator-active-indicator-color: #64b5f6;
+  --mdc-tab-indicator-inactive-indicator-opacity: 0;
+  --mat-tab-header-label-text-color: #b0b0b0;
+  --mat-tab-header-active-label-text-color: #64b5f6;
+  --mat-tab-header-active-ripple-color: #64b5f6;
+  --mat-tab-header-inactive-ripple-color: #666666;
+}
