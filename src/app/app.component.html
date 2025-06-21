@@ -201,6 +201,47 @@
     border-radius: 3px;
     font-weight: bold;
   }
+
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 800px;
+    width: 90%;
+    min-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 95%;
+      min-width: unset;
+      max-width: 95vw;
+    }
+  }
+
+  .close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--gray-700);
+  }
 </style>
 
 <!-- Main container -->
@@ -209,7 +250,16 @@
     <div class="logo-container">
       <img src="assets/yapt-icon.png" alt="YAPT Icon" class="app-logo" />
       <span class="version-badge">{{ version }}</span>
-    </div>
+    </div>    <!-- Create Task Button -->
+    <button mat-raised-button
+            color="accent"
+            class="create-task-btn"
+            (click)="openCreateTaskModal()"
+            matTooltip="Create New Task"
+            aria-label="Create new task">
+      <mat-icon>add</mat-icon>
+      <span>New Task</span>
+    </button>
     <app-nav class="nav-flex-item"></app-nav>
     <button class="theme-toggle" aria-label="Toggle theme" (click)="toggleTheme()" title="Toggle theme">
       <i class="fas" [class.fa-sun]="isDarkModeActive" [class.fa-moon]="!isDarkModeActive"></i>
@@ -221,6 +271,17 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <!-- Create Task Modal -->
+  <div *ngIf="showCreateTaskModal" class="modal-overlay" (click)="closeCreateTaskModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-create-task
+        [taskToEdit]="taskToEdit"
+        (taskSaved)="handleTaskSaved($event)"
+        (cancelEdit)="closeCreateTaskModal()">
+      </app-create-task>
+    </div>
+  </div>
 </div>
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
