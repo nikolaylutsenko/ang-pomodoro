@@ -38,7 +38,23 @@
         <mat-form-field appearance="outline" class="setting-input">
           <input matInput type="number" [(ngModel)]="settings.longBreakInterval" (ngModelChange)="saveSettings()" name="longBreakInterval" min="1" max="10" step="1">
         </mat-form-field>
-      </div>
-    </form>
+      </div>    </form>
+    <div class="settings-actions">
+      <button class="settings-action-btn download" (click)="downloadTasks()">
+        <mat-icon>download</mat-icon>
+        Download Tasks
+      </button>
+      <input
+        type="file"
+        accept="application/json"
+        #fileInput
+        style="display: none"
+        (change)="uploadTasks($event)"
+      />
+      <button class="settings-action-btn upload" (click)="fileInput.click()">
+        <mat-icon>upload</mat-icon>
+        Upload Tasks
+      </button>
+    </div>
   </mat-card-content>
 </mat-card>

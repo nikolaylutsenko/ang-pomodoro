@@ -95,6 +95,18 @@ export class TaskService {
     return this.tasksSubject.getValue();
   }
 
+  setAllTasks(tasks: Task[]): void {
+    const currentTasks = this.getAllTasks();
+    const newTasks = tasks.filter(
+      incoming =>
+        !currentTasks.some(
+          existing => existing.id === incoming.id && existing.description === incoming.description
+        )
+    );
+    const updatedTasks = [...currentTasks, ...newTasks];
+    this.saveTasks(updatedTasks);
+  }
+
   public saveTasks(tasks: Task[]): void {
     const sortedTasksForStorage = [...tasks].sort((a, b) => a.priority - b.priority);
     localStorage.setItem('tasks', JSON.stringify(sortedTasksForStorage));

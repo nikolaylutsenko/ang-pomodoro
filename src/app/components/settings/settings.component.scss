@@ -126,3 +126,119 @@
     width: 100%;
   }
 }
+
+.settings-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0 1rem 0;
+}
+
+.settings-action-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border-radius: 2rem;
+  border: 2px solid;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s, transform 0.1s;
+  outline: none;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// Download (green)
+.settings-action-btn.download {
+  border-color: #43a047;
+  color: #43a047;
+
+  svg, .mat-icon { color: #43a047 !important; }
+
+  &:hover, &:focus {
+    background: #43a047;
+    color: #fff;
+
+    svg, .mat-icon { color: #fff !important; }
+  }
+}
+
+// Upload (orange)
+.settings-action-btn.upload {
+  border-color: #fb8c00;
+  color: #fb8c00;
+
+  svg, .mat-icon { color: #fb8c00 !important; }
+
+  &:hover, &:focus {
+    background: #fb8c00;
+    color: #fff;
+
+    svg, .mat-icon { color: #fff !important; }
+  }
+}
+
+// Dark theme support
+.dark-theme .settings-action-btn {
+  background: #181818;
+}
+
+.dark-theme .settings-action-btn.download {
+  border-color: #66bb6a;
+  color: #66bb6a;
+  background: #181818;
+
+  svg, .mat-icon { color: #66bb6a !important; }
+
+  &:hover, &:focus {
+    background: #388e3c;
+    color: #fff;
+
+    svg, .mat-icon { color: #fff !important; }
+  }
+}
+
+.dark-theme .settings-action-btn.upload {
+  border-color: #ffb300;
+  color: #ffb300;
+  background: #181818;
+
+  svg, .mat-icon { color: #ffb300 !important; }
+
+  &:hover, &:focus {
+    background: #ef6c00;
+    color: #fff;
+
+    svg, .mat-icon { color: #fff !important; }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-action-btn.download {
+    background: linear-gradient(90deg, #388e3c 60%, #1b5e20 100%);
+    color: #fff;
+    border-color: #66bb6a;
+    &:hover, &:focus {
+      background: linear-gradient(90deg, #66bb6a 60%, #388e3c 100%);
+      color: #fff;
+    }
+  }
+  .settings-action-btn.upload {
+    background: linear-gradient(90deg, #ef6c00 60%, #e65100 100%);
+    color: #fff;
+    border-color: #ffb300;
+    &:hover, &:focus {
+      background: linear-gradient(90deg, #ffb300 60%, #ef6c00 100%);
+      color: #fff;
+    }
+  }
+}
+
+/* Optional: style the file input to be hidden */
+input[type="file"].settings-upload-input {
+  display: none;
+}
