@@ -668,7 +668,8 @@ body.dark-theme .cdk-overlay-pane {
 body.dark-theme .cdk-overlay-pane,
 body.dark-theme .cdk-global-overlay-wrapper,
 body.dark-theme .mat-dialog-container,
-body.dark-theme .task-form-container {
+body.dark-theme .task-form-container,
+body.dark-theme .modal-content {
   box-shadow: 0 2px 16px 2px rgba(0,0,0,0.85) !important;
   border: 1px solid #222 !important;
   background: #181a1b !important;
