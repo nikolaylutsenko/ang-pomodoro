@@ -41,9 +41,9 @@
                 "input": "src/assets",
                 "output": "/assets"
               }
-              
-            ],
-            "styles": [
+
+            ],            "styles": [
+              "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -104,6 +104,7 @@
               "src/service-worker.js"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ],
             "scripts": []

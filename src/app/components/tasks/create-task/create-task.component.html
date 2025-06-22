@@ -1,61 +1,79 @@
 <!-- Task Form -->
-<div class="task-form-container">
-  <form (ngSubmit)="addOrUpdateTask()" class="task-form">
-    <div class="task-form-fields">
-      <div class="description-and-urgency-wrapper">
+<div class="task-form-container mat-card mat-elevation-z2">
+  <form (ngSubmit)="addOrUpdateTask()" class="task-form">    <div class="task-form-fields">
+      <!-- Task description field -->
+      <mat-form-field appearance="outline" class="full-width">
         <textarea
+          matInput
           maxlength="1000"
           placeholder="Task description (max 1000 symbols)"
           [(ngModel)]="currentDescription"
           name="description"
           required
           rows="6"
-          class="task-desc-textarea"
         ></textarea>
+      </mat-form-field>
 
-        <div class="urgency-slider-container">
-          <label for="urgency-slider">Urgency:</label>
-          <div class="slider-and-labels-wrapper">
-            <input
-              id="urgency-slider"
-              type="range"
-              min="0"
-              max="2"
-              step="1"
-              [(ngModel)]="currentUrgencyValue"
-              name="urgency"
-              [ngStyle]="{'background': getUrgencyGradient()}"
-              required
-              orient="vertical"
-            />
-            <div class="urgency-labels">
-              <span class="urgency-high" (click)="setUrgency(2)">High</span>
-              <span class="urgency-medium" (click)="setUrgency(1)">Medium</span>
-              <span class="urgency-low" (click)="setUrgency(0)">Low</span>
-            </div>
-          </div>
+      <!-- Urgency selector below description -->
+      <div class="urgency-section">
+        <label>Urgency</label>
+        <div class="urgency-buttons">
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 0 ? 'primary' : ''"
+                  [class.selected]="currentUrgencyValue === 0"
+                  (click)="setUrgency(0)"
+                  class="urgency-btn urgency-low">
+            <mat-icon>low_priority</mat-icon>
+            <span>Low</span>
+          </button>
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 1 ? '' : ''"
+                  [class.selected]="currentUrgencyValue === 1"
+                  (click)="setUrgency(1)"
+                  class="urgency-btn urgency-medium">
+            <mat-icon>priority_high</mat-icon>
+            <span>Medium</span>
+          </button>
+          <button type="button"
+                  mat-raised-button
+                  [color]="currentUrgencyValue === 2 ? 'warn' : ''"
+                  [class.selected]="currentUrgencyValue === 2"
+                  (click)="setUrgency(2)"
+                  class="urgency-btn urgency-high">
+            <mat-icon>warning</mat-icon>
+            <span>High</span>
+          </button>
         </div>
       </div>
-
       <div class="time-and-actions-row">
+        <!-- Time selection using Material button-toggle-group -->
         <div class="time-selector">
           <label>Time (hours):</label>
-          <div class="time-buttons">
-            <button
-              *ngFor="let time of timeOptions"
-              type="button"
-              [class.selected]="selectedTime === time"
-              (click)="selectTime(time)"
-              [disabled]="selectedTime === time"
-              class="time-button">
+          <mat-button-toggle-group [(ngModel)]="selectedTime" name="workIntervals">
+            <mat-button-toggle *ngFor="let time of timeOptions" [value]="time">
               {{ time }}
-            </button>
-          </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
-
         <div class="task-form-actions">
-          <button type="submit" class="add-task-btn">{{ editingTaskId ? 'Update' : 'Add' }} Task</button>
-          <button type="button" *ngIf="editingTaskId" (click)="cancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="add-task-btn"
+          >
+            {{ editingTaskId ? 'Update' : 'Add' }} Task
+          </button>
+          <button
+            mat-button
+            type="button"
+            *ngIf="editingTaskId"
+            (click)="cancel()"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>

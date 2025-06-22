@@ -1,67 +1,44 @@
-<!-- Settings Form -->
-<div class="settings-form">
-  <h2 class="settings-title">Timer Settings</h2>
-  <p class="settings-info">All changes are saved automatically</p>  <div class="input-group">
-    <label for="workDuration">
-      Work Duration (minutes)
-      <span class="input-range">(1-60)</span>
-    </label>
-    <input
-      id="workDuration"
-      type="number"
-      [(ngModel)]="settings.workDuration"
-      (ngModelChange)="saveSettings()"
-      min="1"
-      max="60"
-      step="1"
-    >
-  </div>
-
-  <div class="input-group">
-    <label for="shortBreak">
-      Short Break Duration (minutes)
-      <span class="input-range">(1-30)</span>
-    </label>
-    <input
-      id="shortBreak"
-      type="number"
-      [(ngModel)]="settings.shortBreakDuration"
-      (ngModelChange)="saveSettings()"
-      min="1"
-      max="30"
-      step="1"
-    >
-  </div>
-
-  <div class="input-group">
-    <label for="longBreak">
-      Long Break Duration (minutes)
-      <span class="input-range">(1-60)</span>
-    </label>
-    <input
-      id="longBreak"
-      type="number"
-      [(ngModel)]="settings.longBreakDuration"
-      (ngModelChange)="saveSettings()"
-      min="1"
-      max="60"
-      step="1"
-    >
-  </div>
-
-  <div class="input-group">
-    <label for="longBreakInterval">
-      Long Break Interval (sessions)
-      <span class="input-range">(1-10)</span>
-    </label>
-    <input
-      id="longBreakInterval"
-      type="number"
-      [(ngModel)]="settings.longBreakInterval"
-      (ngModelChange)="saveSettings()"
-      min="1"
-      max="10"
-      step="1"
-    >
-  </div>
-</div>
+<mat-card class="settings-card">  <mat-card-header>
+    <mat-icon class="header-icon">settings</mat-icon>
+    <div class="mat-card-header-text">
+      <mat-card-title class="settings-title">Timer Settings</mat-card-title>
+      <mat-card-subtitle class="settings-info">Changes are saved automatically</mat-card-subtitle>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <form class="settings-form">      <div class="setting-item">
+        <div class="setting-label-container">
+          <mat-icon class="setting-icon">work</mat-icon>
+          <mat-label class="setting-label">Work Duration (minutes)</mat-label>
+        </div>
+        <mat-form-field appearance="outline" class="setting-input">
+          <input matInput type="number" [(ngModel)]="settings.workDuration" (ngModelChange)="saveSettings()" name="workDuration" min="1" max="60" step="1">
+        </mat-form-field>
+      </div>      <div class="setting-item">
+        <div class="setting-label-container">
+          <mat-icon class="setting-icon">coffee</mat-icon>
+          <mat-label class="setting-label">Short Break Duration (minutes)</mat-label>
+        </div>
+        <mat-form-field appearance="outline" class="setting-input">
+          <input matInput type="number" [(ngModel)]="settings.shortBreakDuration" (ngModelChange)="saveSettings()" name="shortBreakDuration" min="1" max="30" step="1">
+        </mat-form-field>
+      </div>      <div class="setting-item">
+        <div class="setting-label-container">
+          <mat-icon class="setting-icon">weekend</mat-icon>
+          <mat-label class="setting-label">Long Break Duration (minutes)</mat-label>
+        </div>
+        <mat-form-field appearance="outline" class="setting-input">
+          <input matInput type="number" [(ngModel)]="settings.longBreakDuration" (ngModelChange)="saveSettings()" name="longBreakDuration" min="1" max="60" step="1">
+        </mat-form-field>
+      </div>      <div class="setting-item">
+        <div class="setting-label-container">
+          <mat-icon class="setting-icon">loop</mat-icon>
+          <mat-label class="setting-label">Long Break Interval (sessions)</mat-label>
+        </div>
+        <mat-form-field appearance="outline" class="setting-input">
+          <input matInput type="number" [(ngModel)]="settings.longBreakInterval" (ngModelChange)="saveSettings()" name="longBreakInterval" min="1" max="10" step="1">
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

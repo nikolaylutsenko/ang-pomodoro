@@ -1,28 +1,18 @@
-<div class="timer-container">
-  <!-- Mode selector buttons -->
-  <div class="mode-buttons">
-    <button
-      [class.active]="currentMode === 'work'"
-      (click)="setMode('work')"
-      [disabled]="isRunning"
-      class="mode-btn">
+<mat-card class="timer-container">
+  <!-- Mode selector buttons -->  <mat-button-toggle-group appearance="legacy" #group="matButtonToggleGroup" [(ngModel)]="currentMode" (ngModelChange)="onModeChange($event)" aria-label="Timer Mode" class="mode-buttons" [disabled]="isRunning">
+    <mat-button-toggle value="work" aria-label="Work Mode" class="mode-btn work">
+      <mat-icon class="mode-icon">work</mat-icon>
       Work
-    </button>
-    <button
-      [class.active]="currentMode === 'shortBreak'"
-      (click)="setMode('shortBreak')"
-      [disabled]="isRunning"
-      class="mode-btn">
+    </mat-button-toggle>
+    <mat-button-toggle value="shortBreak" aria-label="Short Break Mode" class="mode-btn short-break">
+      <mat-icon class="mode-icon">coffee</mat-icon>
       Short Break
-    </button>
-    <button
-      [class.active]="currentMode === 'longBreak'"
-      (click)="setMode('longBreak')"
-      [disabled]="isRunning"
-      class="mode-btn">
+    </mat-button-toggle>
+    <mat-button-toggle value="longBreak" aria-label="Long Break Mode" class="mode-btn long-break">
+      <mat-icon class="mode-icon">weekend</mat-icon>
       Long Break
-    </button>
-  </div>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
 
   <!-- Timer display -->
   <div class="timer">
@@ -30,28 +20,28 @@
   </div>
 
   <!-- Task selection -->
-  <div class="task-input">
-    <select
-      [(ngModel)]="selectedTaskId"
-      (ngModelChange)="onTaskChange($event)"
-      [disabled]="tasks.length === 0"
-      class="task-dropdown"
-    >
-      <option value="">-- Select Task --</option>
-      <option *ngFor="let task of tasks; trackBy: trackTaskById" [value]="task.id">
-        {{ task.description.length > 200 ? (task.description | slice:0:200) + '...' : task.description }}
-      </option>
-    </select>
+  <div class="task-controls">
+    <mat-form-field appearance="fill" class="task-dropdown-container">
+      <mat-label>Select Task</mat-label>
+      <mat-select [(ngModel)]="selectedTaskId" (ngModelChange)="onTaskChange($event)" [disabled]="tasks.length === 0">
+        <mat-option value="">-- Select Task --</mat-option>
+        <mat-option *ngFor="let task of tasks; trackBy: trackTaskById" [value]="task.id">
+          {{ task.description.length > 200 ? (task.description | slice:0:200) + '...' : task.description }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <!-- Add Complete button -->
-    <button
+    <button mat-stroked-button
       *ngIf="selectedTaskId"
       class="complete-btn"
       (click)="completeTask()"
       [disabled]="!selectedTaskId || (getCurrentTask()?.completionStatus === 'Completed')"
-    >
-      Complete
+      color="primary">
+      Complete Task
     </button>
   </div>
+
   <!-- Current task information -->
   <div class="current-task-info" *ngIf="selectedTaskId && selectedTaskId !== '' && getCurrentTask()">
     <div class="task-info-title">Current Task:</div>
@@ -73,18 +63,19 @@
 
   <!-- Timer controls -->
   <div class="controls">
-    <button
-      class="control-btn"
-      [class.active]="isRunning"
+    <button mat-flat-button [color]="isRunning ? 'warn' : 'primary'"
       (click)="toggleTimer()"
-      [attr.aria-label]="isRunning ? 'Pause timer' : 'Start timer'">
-      <i class="fas" [class.fa-pause]="isRunning" [class.fa-play]="!isRunning"></i>
+      [attr.aria-label]="isRunning ? 'Pause timer' : 'Start timer'"
+      class="control-btn play-pause-btn">
+      <mat-icon>{{ isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
+      <span>{{ isRunning ? 'Pause' : 'Start' }}</span>
     </button>
-    <button
-      class="control-btn stop-btn"
+    <button mat-flat-button color="accent"
       (click)="stopTimer()"
-      aria-label="Stop timer">
-      <i class="fas fa-stop"></i>
+      aria-label="Stop timer"
+      class="control-btn stop-btn">
+      <mat-icon>stop</mat-icon>
+      <span>Stop</span>
     </button>
   </div>
-</div>
+</mat-card>

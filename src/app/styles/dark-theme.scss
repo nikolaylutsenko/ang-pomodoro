@@ -1,0 +1,105 @@
+/* This file can be imported by components that need specific dark theme styling */
+
+/* Dark theme specific variables */
+:root .dark-theme {
+  --color-bg: #121212;
+  --color-bg-card: #1e1e1e;
+  --color-text: #e0e0e0;
+  --color-text-secondary: #a0a0a0;
+  --color-border: #333333;
+  --color-shadow: rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme {
+  // Custom styles for timer component in dark theme
+  .timer-container {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+
+    .time {
+      color: #64b5f6; /* Light blue for timer display */
+    }
+
+    .current-task-info {
+      background-color: #2a2a2a;
+      border: 1px solid #444444;
+      color: #e0e0e0;
+
+      .task-info-title {
+        color: #ffffff;
+      }
+
+      .task-info-description {
+        color: #cccccc;
+      }
+
+      .task-info-progress {
+        color: #b0b0b0;
+      }
+    }
+
+    // Material button toggle styles for dark theme
+    .mat-button-toggle-group {
+      border: 1px solid #444444;
+    }
+
+    .mat-button-toggle {
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border-right: 1px solid #444444;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.mat-button-toggle-checked {
+        background-color: #1976d2;
+        color: #ffffff;
+      }
+    }
+  }
+
+  // Custom styles for timer-history component in dark theme
+  .history-section.mat-mdc-card {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+
+    .history-header-container {
+      border-bottom-color: #444444;
+    }
+
+    .history-legend {
+      color: #a0a0a0;
+      border-bottom-color: #444444;
+    }
+
+    .history-item {
+      .entry-type.work {
+        color: #64b5f6;
+      }
+      .entry-type.shortBreak {
+        color: #ffa726;
+      }
+      .entry-type.longBreak {
+        color: #ff7043;
+      }
+
+      .entry-status.successful mat-icon {
+        color: #66bb6a;
+      }
+      .entry-status:not(.successful) mat-icon {
+        color: #ef5350;
+      }
+    }
+
+    .no-history {
+      color: #cccccc;
+      .no-history-icon {
+        color: #666666;
+      }
+      .no-history-subtitle {
+        color: #a0a0a0;
+      }
+    }
+  }
+}

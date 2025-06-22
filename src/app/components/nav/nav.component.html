@@ -1,10 +1,23 @@
-<nav class="main-nav">
-  <ul class="nav-tabs">
-    <li *ngFor="let tab of tabs" class="nav-item">
-      <a [routerLink]="tab.path" routerLinkActive="active" class="nav-link">
-        <i class="fas {{ tab.icon }}"></i>
-        <span>{{ tab.label }}</span>
-      </a>
-    </li>
-  </ul>
+<div class="mobile-menu-button-container">  <button mat-raised-button [matMenuTriggerFor]="mobileMenu" aria-label="Toggle mobile menu">
+    <mat-icon>menu</mat-icon>
+    <span>Menu</span>
+  </button>
+</div>
+
+<mat-menu #mobileMenu="matMenu">
+  <a mat-menu-item *ngFor="let tab of tabs" [routerLink]="tab.path" routerLinkActive #rlaM="routerLinkActive" [class.active-mobile-link]="rlaM.isActive">
+    <mat-icon class="menu-icon">{{tab.icon}}</mat-icon>
+    <span>{{tab.label}}</span>
+  </a>
+</mat-menu>
+
+<nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel" (keydown)="handleKeyDown($event)" tabindex="0" class="desktop-tabs">  <a mat-tab-link
+     *ngFor="let tab of tabs"
+     [routerLink]="tab.path"
+     routerLinkActive #rla="routerLinkActive"
+     [active]="rla.isActive">
+    <mat-icon class="mr-2">{{tab.icon}}</mat-icon>
+    <span>{{tab.label}}</span>
+  </a>
 </nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>

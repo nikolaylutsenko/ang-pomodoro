@@ -1,71 +1,64 @@
+@use '@angular/material' as mat;
+
 .history-section {
   width: 60%;
-  min-width: 700px;
+  min-width: 320px; // Adjusted for better mobile view
   display: flex;
   flex-direction: column;
-  align-items: center;
   margin: 1.5rem auto 0;
-  padding: 1.5rem 2rem 2rem;
+  padding: 0; // Mat-card provides its own padding for content
   max-height: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  // Background and shadow are handled by mat-card
 }
 
 .history-header-container {
-  width: 100%;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: transparent;
-  padding-bottom: 0.5rem;
-}
-
-.history-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  width: 100%;
+  justify-content: space-between;
+  padding: 16px; // Standard mat-card-header padding
+  border-bottom: 1px solid rgba(0,0,0,0.12); // Separator for header
 
-  h3 {
+  .history-title {
     margin: 0;
     font-weight: 500;
-    font-size: 1.5rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.25rem; // Adjusted for Material Design consistency
+  }
 
-    &.history-title {
-      position: relative;
-      display: inline-block;
+  .clear-btn {
+    padding: 0 8px; // Reduce padding for smaller button
+    font-size: 0.8rem;
 
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -5px;
-        width: 40px;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 2px;
-      }
+    mat-icon {
+      margin-right: 4px;
     }
   }
+
+  .history-header-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    color: var(--color-primary);
+  }
+}
+
+mat-card-content {
+  padding: 0 16px 16px; // Padding for content area, no top padding as header has bottom border
 }
 
 .history-legend {
   display: flex;
   width: 100%;
-  padding: 0.5rem 1.5rem;
-  margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
+  padding: 0.75rem 0; // Reduced padding, as items will have their own
+  font-size: 0.8rem;
   font-weight: 500;
-}
-
-.legend-item {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  // Color will be themed (e.g., secondary text)
+  border-bottom: 1px solid rgba(0,0,0,0.12); // Separator for legend
+  margin-bottom: 0.5rem;
+}
+
+.legend-item, .history-item > span {
+  box-sizing: border-box; // Ensure padding/border are included in width
 }
 
 .time-width {
@@ -75,327 +68,156 @@
 
 .task-width {
   flex: 1;
-  min-width: 200px;
+  min-width: 150px; // Adjusted min-width
   padding-right: 1rem;
-}
-
-.type-width {
-  width: 120px;
-  flex-shrink: 0;
-  text-align: center;
-}
-
-.status-width {
-  width: 60px;
-  flex-shrink: 0;
-  text-align: center;
-}
-
-.clear-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-
-  &:hover {
-    color: rgba(255, 255, 255, 1);
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-}
-
-.history-list-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  max-height: 400px;
-  overflow: hidden;
-  margin-top: 0.5rem;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  width: 100%;
-  overflow-y: auto;
-  max-height: calc(100% - 50px);
-  padding-right: 5px; /* Prevent content from touching scrollbar */
-}
-
-.history-item {
-  display: flex;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  font-size: 1.1rem;
-  width: 100%;
-  transition: all 0.2s ease;
-  animation: slideIn 0.3s ease-out;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.entry-time {
-  font-family: 'Roboto Mono', monospace;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.entry-task {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.entry-type {
-  font-weight: 500;
+.type-width {
+  width: 100px; // Adjusted width
+  flex-shrink: 0;
   text-align: center;
-
-  &.work { color: var(--color-success); } /* Use variable */
-  &.shortBreak { color: var(--color-link); } /* Use variable */
-  &.longBreak { color: var(--color-primary); } /* Use variable */
 }
 
-.entry-status {
+.status-width {
+  width: 50px; // Adjusted width
+  flex-shrink: 0;
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e57373;
-  font-size: 1.2rem;
-
-  &.successful { color: var(--color-success); } /* Use variable */
-  &.interrupted { color: var(--color-error); } /* Use variable */
 }
 
-.history-controls {
+.history-list-container {
   width: 100%;
-  padding: 0.75rem 0 0;
-  position: relative;
-  bottom: auto;
-  z-index: 5;
-  background: transparent;
-  margin-top: 1rem;
+  // overflow-y: auto; // Removed to prevent scrollbar
+  // max-height: 400px; // Removed to prevent scrollbar
 }
 
-.show-more-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  font-size: 0.95rem;
-  padding: 0.75rem;
-  width: 100%;
-  text-align: center;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
-  font-weight: 500;
+.history-list {
+  padding-top: 0; // Remove default mat-list padding if legend provides separation
+}
 
-  &:hover {
-    color: rgba(255, 255, 255, 1);
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
+.history-item {
+  // mat-list-item provides base styling
+  // We use a wrapper div with matListItemLine for content projection
+
+  .history-item-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center; // Vertically center content in the row
+    width: 100%; // Ensure the wrapper spans the full width
+    padding: 8px 0; // Add some vertical padding to the row content
+  }
+
+  // Custom classes for width are applied to the spans within the wrapper
+  .entry-time, .entry-task, .entry-type, .entry-status {
+    // These will inherit flex properties from their parent (.history-item-content-wrapper)
+    // and their specific width classes (.time-width, etc.) will define their horizontal space.
+    display: flex; // Ensure icons within status are centered if needed
+    align-items: center;
+  }
+
+  .entry-type {
+    font-weight: 500;
+    // Colors should be set in theme files for better maintainability
+  }
+
+  .entry-status {
+    mat-icon {
+      font-size: 1.25rem;
+    }
+    &.successful mat-icon {
+      color: green; // Or use theme variable
+    }
+    &:not(.successful) mat-icon {
+      color: red; // Or use theme variable
+    }
   }
 }
 
+.history-controls {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
 .no-history {
-  text-align: center;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 2rem;
-  font-size: 1.3rem;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  // color: mat.get-color-from-palette(mat.$grey-palette, 500); // Themed color
 
-  i {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.7;
+  .no-history-icon {
+    font-size: 3rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
   }
 
   p {
-    margin: 0;
+    margin: 0.25rem 0;
+  }
 
-    &.no-history-subtitle {
-      font-size: 1rem;
-      opacity: 0.7;
-    }
+  .no-history-subtitle {
+    font-size: 0.9rem;
+    // color: mat.get-color-from-palette(mat.$grey-palette, 400); // Themed color
   }
 }
 
-:host-context(body:not([data-theme="dark"])) {
+// Responsive adjustments
+@media (max-width: 768px) {
   .history-section {
-    background: rgba(0, 0, 0, 0.03);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-
-  .history-header-container {
-    background: transparent;
-  }
-
-  .history-controls {
-    background: transparent;
+    width: 90%;
   }
 
   .history-legend {
-    color: rgba(0, 0, 0, 0.4);
+    font-size: 0.7rem;
   }
-  .history-header h3 {
-    color: rgba(0, 0, 0, 0.9);
 
-    &.history-title::after {
-      background: rgba(0, 0, 0, 0.2);
-    }
-  }
-  .clear-btn {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 0.6);
-
-    &:hover {
-      color: rgba(0, 0, 0, 0.8);
-      background: rgba(0, 0, 0, 0.08);
-      border-color: rgba(0, 0, 0, 0.15);
-    }
-  }
+  .time-width { width: 60px; }
+  .task-width { min-width: 120px; padding-right: 0.5rem; }
+  .type-width { width: 80px; }
+  .status-width { width: 40px; }
 
   .history-item {
-    background: rgba(0, 0, 0, 0.02);
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.04);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    .history-item-content-wrapper {
+      padding: 6px 0;
     }
-  }
-
-  .entry-time {
-    color: rgba(0, 0, 0, 0.9);
-  }
-
-  .entry-task {
-    color: rgba(0, 0, 0, 0.9);
-  }
-
-  .entry-type {
-    &.work {
-      color: #2e7d32;
-    }
-
-    &.shortBreak {
-      color: #1976d2;
-    }
-
-    &.longBreak {
-      color: #7b1fa2;
-    }
-  }
-
-  .entry-status {
-    color: #d32f2f;
-
-    &.successful {
-      color: #2e7d32;
-    }
-  }
-  .show-more-btn {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 0.6);
-
-    &:hover {
-      color: rgba(0, 0, 0, 0.8);
-      background: rgba(0, 0, 0, 0.08);
-      border-color: rgba(0, 0, 0, 0.15);
-    }
-  }
-  .no-history {
-    color: rgba(0, 0, 0, 0.5);
-
-    i {
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    p.no-history-subtitle {
-      color: rgba(0, 0, 0, 0.4);
+    // Adjust font sizes within items if needed for smaller screens
+    .entry-time, .entry-task, .entry-type, .entry-status {
+        font-size: 0.85rem;
     }
   }
 }
 
-@media (max-width: 768px) {
-  .history-section {
-    width: 95%;
-    min-width: unset;
-    padding: 1rem;
-    margin: 1rem auto;
+@media (max-width: 480px) {
+  .history-header-container {
+    padding: 12px;
+    .history-title {
+      font-size: 1.1rem;
+    }
+    .clear-btn {
+      padding: 0 8px; // Reduce padding for smaller button
+      font-size: 0.8rem;
+      mat-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+  mat-card-content {
+    padding: 0 12px 12px;
+  }
+
+  .history-legend {
+    display: none; // Optionally hide legend on very small screens
   }
 
   .task-width {
-    min-width: 120px;
-  }
-
-  .history-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-
-    h3 {
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .history-legend {
-    padding: 0.5rem 1rem;
-  }
-
-  .history-item {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .type-width {
-    width: 100px;
-  }
-}
-
-/* Component transition animations */
-:host {
-  display: block;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+    min-width: 100px;
   }
 }

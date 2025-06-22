@@ -7,16 +7,22 @@ import { TaskService } from '../../services/task.service';
 import { TaskListComponent } from './task-list/task-list.component';
 import { CdkDragDrop, moveItemInArray, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subscription } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-tasks',
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     // CreateTaskComponent, // Removed from imports
     TaskListComponent,
-    DragDropModule // Added DragDropModule here
+    DragDropModule, // Added DragDropModule here
+    MatIconModule, // Add MatIconModule
+    MatTabsModule // <-- Add MatTabsModule for Material tabs
   ],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
@@ -31,11 +37,9 @@ export class TasksComponent implements OnInit, OnDestroy {
   activeTasksListId = 'active-tasks-drop-list';
   pendingTasksListId = 'pending-tasks-drop-list';
   completedTasksListId = 'completed-tasks-drop-list';
-
   selectedBacklogTaskIds: Set<string> = new Set();
   selectedActiveTaskIds: Set<string> = new Set();
   selectedCompletedTaskIds: Set<string> = new Set();
-  activeSubTab: 'taskList' | 'backlog' | 'completed' = 'taskList';
 
   currentSettings!: TimerSettings;
   private activeTasksSubscription: Subscription = new Subscription();
@@ -76,11 +80,9 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.completedTasks = tasks;
     });
   }
-
   // Updated method to change sub-tab
   selectSubTab(tabName: 'taskList' | 'backlog' | 'completed'): void {
-    this.activeSubTab = tabName;
-    // Potentially clear selections in the non-visible tab if desired, or manage as is.
+    // No longer needed since we removed the create task button
   }
 
   private calculateWorkIntervals(taskData: Partial<Task>): number | string {
@@ -398,11 +400,17 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.selectedActiveTaskIds.add(taskId);
     }
   }
-
   // Method to open the create task modal in the task list component
   openCreateTask(): void {
-    if (this.taskListComponent && this.activeSubTab === 'taskList') {
-      this.taskListComponent.openCreateTaskModal();
-    }
+    // This method is no longer needed since create task moved to header
+  }
+
+  // Helper for Material tab index
+  getTabIndex(): number {
+    return 0; // Always return 0 since we use mat-tab-group now
+  }
+
+  onTabChange(index: number): void {
+    // Tab change handled by Material tab group
   }
 }

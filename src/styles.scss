@@ -1,7 +1,20 @@
+@use './app/styles/material-theme.scss' as mat-theme;
+@use './app/styles/dark-theme.scss' as dark-theme;
+
+/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap');
 
-/* You can add global styles to this file, and also import other style files */
+/* Base styles */
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--color-bg, #f8f9fa);
+  color: var(--color-text, #222222);
+}
+
+/* Apply theme classes programmatically in the app.component.ts */
 
 /* Global Theme Variables */
 :root {
@@ -139,4 +152,538 @@ button {
     outline: none;
     border-color: var(--primary-color, #007bff); // Use theme variable or fallback
   }
+}
+
+/* Dark theme specific overrides for timer component */
+body.dark-theme .timer-container.mat-mdc-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .timer-container .time {
+  color: #64b5f6 !important; /* Light blue for timer display */
+}
+
+body.dark-theme .timer-container .current-task-info {
+  background-color: #2a2a2a !important;
+  border: 1px solid #444444 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .timer-container .task-info-title {
+  color: #ffffff !important;
+}
+
+body.dark-theme .timer-container .task-info-description {
+  color: #cccccc !important;
+}
+
+body.dark-theme .timer-container .task-info-progress {
+  color: #b0b0b0 !important;
+}
+
+/* Dark theme for Material form fields in timer */
+body.dark-theme .timer-container .mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: #2a2a2a;
+  --mdc-filled-text-field-label-text-color: #b0b0b0;
+  --mdc-filled-text-field-input-text-color: #e0e0e0;
+}
+
+body.dark-theme .timer-container .mat-mdc-select {
+  --mdc-filled-text-field-container-color: #2a2a2a;
+  --mdc-filled-text-field-input-text-color: #e0e0e0;
+}
+
+body.dark-theme .timer-container .mat-mdc-select-value {
+  color: #e0e0e0 !important;
+}
+
+/* Dark theme for Material buttons in timer */
+body.dark-theme .timer-container .mat-mdc-button.mat-mdc-button-base {
+  --mdc-text-button-label-text-color: #e0e0e0;
+}
+
+body.dark-theme .timer-container .mat-mdc-raised-button.mat-mdc-button-base {
+  --mdc-protected-button-container-color: #333333;
+  --mdc-protected-button-label-text-color: #e0e0e0;
+}
+
+body.dark-theme .timer-container .mat-mdc-flat-button.mat-primary {
+  --mdc-filled-button-container-color: #1976d2;
+  --mdc-filled-button-label-text-color: #ffffff;
+}
+
+body.dark-theme .timer-container .mat-mdc-flat-button.mat-warn {
+  --mdc-filled-button-container-color: #d32f2f;
+  --mdc-filled-button-label-text-color: #ffffff;
+}
+
+body.dark-theme .timer-container .mat-mdc-flat-button.mat-accent {
+  --mdc-filled-button-container-color: #ffa726;
+  --mdc-filled-button-label-text-color: #000000;
+}
+
+/* Dark theme for button toggle group in timer */
+body.dark-theme .timer-container .mat-button-toggle-group {
+  border: 1px solid #444444;
+}
+
+body.dark-theme .timer-container .mat-button-toggle {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border-right: 1px solid #444444;
+}
+
+body.dark-theme .timer-container .mat-button-toggle.mat-button-toggle-checked {
+  background-color: #1976d2;
+  color: #ffffff;
+}
+
+body.dark-theme .timer-container .mat-button-toggle:last-child {
+  border-right: none;
+}
+
+/* Dark theme specific overrides for Material select dropdown in timer */
+body.dark-theme .timer-container .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-text-field-wrapper {
+  background-color: #2a2a2a !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-text-field-wrapper .mat-mdc-form-field-flex {
+  background-color: #2a2a2a !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-text-field-wrapper .mat-mdc-form-field-infix {
+  background-color: transparent !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field .mat-mdc-form-field-input-control {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field .mat-mdc-floating-label {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-select-value {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-select-arrow {
+  color: #b0b0b0 !important;
+}
+
+/* Dark theme for Material select overlay/panel */
+body.dark-theme .mat-mdc-select-panel {
+  background-color: #2a2a2a !important;
+  border: 1px solid #444444 !important;
+}
+
+body.dark-theme .mat-mdc-option {
+  color: #e0e0e0 !important;
+  background-color: transparent !important;
+}
+
+body.dark-theme .mat-mdc-option:hover {
+  background-color: #333333 !important;
+}
+
+body.dark-theme .mat-mdc-option.mdc-list-item--selected {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+}
+
+body.dark-theme .mat-mdc-option.mat-mdc-option-active {
+  background-color: #333333 !important;
+}
+
+/* Dark theme for form field underline and borders */
+body.dark-theme .timer-container .mat-mdc-form-field-bottom-align::before {
+  border-bottom-color: #444444 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field.mat-focused .mat-mdc-form-field-bottom-align::before {
+  border-bottom-color: #64b5f6 !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-text-field-wrapper.mdc-text-field--filled {
+  background-color: #2a2a2a !important;
+}
+
+body.dark-theme .timer-container .mat-mdc-text-field-wrapper.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: #2a2a2a !important;
+}
+
+/* Additional dark theme overrides for Material 3 select components */
+body.dark-theme .cdk-overlay-pane .mat-mdc-select-panel {
+  background: #2a2a2a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .mat-mdc-select-panel .mat-mdc-option {
+  --mdc-list-list-item-label-text-color: #e0e0e0;
+  --mdc-list-list-item-supporting-text-color: #b0b0b0;
+}
+
+body.dark-theme .mat-mdc-select-panel .mat-mdc-option:hover {
+  --mdc-list-list-item-hover-state-layer-color: #333333;
+  --mdc-list-list-item-hover-label-text-color: #ffffff;
+}
+
+body.dark-theme .timer-container .mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: #2a2a2a;
+  --mdc-filled-text-field-label-text-color: #b0b0b0;
+  --mdc-filled-text-field-input-text-color: #e0e0e0;
+  --mdc-filled-text-field-active-indicator-color: #64b5f6;
+  --mdc-filled-text-field-hover-state-layer-color: #333333;
+  --mdc-filled-text-field-focus-label-text-color: #64b5f6;
+}
+
+/* Dark theme specific overrides for settings component */
+body.dark-theme .settings-card.mat-mdc-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-card-header {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-card-title {
+  color: #ffffff !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-card-subtitle {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-card-content {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .settings-card .setting-label {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .settings-card .header-icon {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .settings-card .setting-icon {
+  color: #64b5f6 !important;
+}
+
+/* Dark theme for Material form fields in settings */
+body.dark-theme .settings-card .mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-text-field-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline {
+  border-color: #444444 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline {
+  border-color: #64b5f6 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field .mat-mdc-form-field-input-control {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field .mat-mdc-floating-label {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .settings-card .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #444444;
+  --mdc-outlined-text-field-focus-outline-color: #64b5f6;
+  --mdc-outlined-text-field-input-text-color: #e0e0e0;
+  --mdc-outlined-text-field-label-text-color: #b0b0b0;
+  --mdc-outlined-text-field-focus-label-text-color: #64b5f6;
+}
+
+/* Dark theme specific overrides for statistics component */
+body.dark-theme .statistics-card.mat-mdc-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .statistics-card .mat-mdc-card-header {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .statistics-card .mat-mdc-card-title {
+  color: #ffffff !important;
+}
+
+body.dark-theme .statistics-card .mat-mdc-card-subtitle {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .statistics-card .mat-mdc-card-content {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .statistics-card p {
+  color: #e0e0e0 !important;
+}
+
+/* Dark theme for any additional statistics content */
+body.dark-theme .statistics-card .stat-item {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .statistics-card .stat-value {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .statistics-card .stat-label {
+  color: #b0b0b0 !important;
+}
+
+
+/* Dark theme specific overrides for tasks component tabs */
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-group {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-header {
+  background-color: #1e1e1e !important;
+  border-bottom: 1px solid #444444 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab.mdc-tab--active {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab:hover {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: inherit !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mdc-tab-indicator__content--underline {
+  border-color: #64b5f6 !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body {
+  background-color: transparent !important;
+}
+
+body.dark-theme .adaptive-mat-tabs .mat-mdc-tab-body-content {
+  background-color: transparent !important;
+}
+
+/* Dark theme for tab content */
+body.dark-theme .tab-content-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .sub-tab-content.mat-mdc-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .sub-tab-content p {
+  color: #b0b0b0 !important;
+}
+
+/* Dark theme for tasks separator */
+body.dark-theme .tasks-separator {
+  border-color: #444444 !important;
+  background-color: #444444 !important;
+}
+
+/* Additional Material tab CSS custom properties for dark theme */
+body.dark-theme .adaptive-mat-tabs {
+  --mdc-tab-indicator-active-indicator-color: #64b5f6;
+  --mdc-tab-indicator-inactive-indicator-opacity: 0;
+  --mat-tab-header-label-text-color: #b0b0b0;
+  --mat-tab-header-active-label-text-color: #64b5f6;
+  --mat-tab-header-active-ripple-color: #64b5f6;
+  --mat-tab-header-inactive-ripple-color: #666666;
+}
+
+/* Dark theme specific overrides for create-task component */
+body.dark-theme .task-form-container.mat-card {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #444444 !important;
+}
+
+body.dark-theme .task-form-container {
+  background: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .urgency-section label {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .time-selector label {
+  color: #e0e0e0 !important;
+}
+
+/* Dark theme for Material form fields in create-task */
+body.dark-theme .task-form-container .mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-text-field-wrapper {
+  background-color: transparent !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline {
+  border-color: #444444 !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline {
+  border-color: #64b5f6 !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field .mat-mdc-form-field-input-control {
+  color: #e0e0e0 !important;
+  background-color: transparent !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field .mat-mdc-floating-label {
+  color: #b0b0b0 !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #64b5f6 !important;
+}
+
+body.dark-theme .task-form-container .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #444444;
+  --mdc-outlined-text-field-focus-outline-color: #64b5f6;
+  --mdc-outlined-text-field-input-text-color: #e0e0e0;
+  --mdc-outlined-text-field-label-text-color: #b0b0b0;
+  --mdc-outlined-text-field-focus-label-text-color: #64b5f6;
+}
+
+/* Dark theme for input and textarea in create-task */
+body.dark-theme .task-form-container input,
+body.dark-theme .task-form-container textarea {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .task-form-container input::placeholder,
+body.dark-theme .task-form-container textarea::placeholder {
+  color: #b0b0b0 !important;
+  opacity: 1; /* Firefox applies a lower opacity by default */
+}
+
+/* Dark theme for Material button toggle group in create-task */
+body.dark-theme .task-form-container .mat-button-toggle-group {
+  background-color: #2a2a2a !important;
+  border: 1px solid #444444 !important;
+}
+
+body.dark-theme .task-form-container .mat-button-toggle {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+  border-right: 1px solid #444444 !important;
+}
+
+body.dark-theme .task-form-container .mat-button-toggle.mat-button-toggle-checked {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+}
+
+body.dark-theme .task-form-container .mat-button-toggle:last-child {
+  border-right: none !important;
+}
+
+/* Dark theme for Material buttons in create-task */
+body.dark-theme .task-form-container .mat-mdc-raised-button.mat-mdc-button-base {
+  --mdc-protected-button-container-color: #333333;
+  --mdc-protected-button-label-text-color: #e0e0e0;
+}
+
+body.dark-theme .task-form-container .mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: #1976d2;
+  --mdc-protected-button-label-text-color: #ffffff;
+}
+
+body.dark-theme .task-form-container .mat-mdc-raised-button.mat-warn {
+  --mdc-protected-button-container-color: #d32f2f;
+  --mdc-protected-button-label-text-color: #ffffff;
+}
+
+
+/* Remove darkening overlay on hold for Add Task button in dark theme */
+body.dark-theme .mat-mdc-raised-button.mat-mdc-button-base:active,
+body.dark-theme .mat-mdc-raised-button.mat-mdc-button-base.mat-mdc-button-active,
+body.dark-theme .mat-mdc-raised-button.mat-mdc-button-base .mdc-button__ripple,
+body.dark-theme .mat-mdc-raised-button.mat-mdc-button-base .mat-mdc-button-ripple {
+  background-color: transparent !important;
+  box-shadow: 0 2px 16px 2px rgba(0,0,0,0.85) !important;
+}
+
+/* Remove darkening overlay on hold for header Add Task button in dark theme */
+body.dark-theme header .mat-mdc-raised-button.mat-mdc-button-base:active,
+body.dark-theme header .mat-mdc-raised-button.mat-mdc-button-base.mat-mdc-button-active,
+body.dark-theme header .mat-mdc-raised-button.mat-mdc-button-base .mdc-button__ripple,
+body.dark-theme header .mat-mdc-raised-button.mat-mdc-button-base .mat-mdc-button-ripple,
+body.dark-theme header .mat-mdc-fab:active,
+body.dark-theme header .mat-mdc-fab .mdc-fab__ripple {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .mat-toolbar .mat-mdc-raised-button.mat-mdc-button-base:active,
+body.dark-theme .mat-toolbar .mat-mdc-raised-button.mat-mdc-button-base.mat-mdc-button-active,
+body.dark-theme .mat-toolbar .mat-mdc-raised-button.mat-mdc-button-base .mdc-button__ripple,
+body.dark-theme .mat-toolbar .mat-mdc-raised-button.mat-mdc-button-base .mat-mdc-button-ripple {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Remove/override dark ripple and shadow on header/toolbar raised buttons in dark theme */
+body.dark-theme header .mat-mdc-raised-button.mat-mdc-button-base,
+body.dark-theme .mat-toolbar .mat-mdc-raised-button.mat-mdc-button-base {
+  --mat-mdc-button-persistent-ripple-color: transparent !important;
+  --mat-mdc-button-ripple-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+}
+
+/* Dark theme for CDK overlay (modal backdrop) */
+body.dark-theme .cdk-overlay-backdrop {
+  background-color: transparent !important;
+}
+
+body.dark-theme .cdk-overlay-pane {
+  background-color: transparent !important;
+}
+
+/* Fix white border/shadow around modal in dark theme */
+body.dark-theme .cdk-overlay-pane,
+body.dark-theme .cdk-global-overlay-wrapper,
+body.dark-theme .mat-dialog-container,
+body.dark-theme .task-form-container,
+body.dark-theme .modal-content {
+  box-shadow: 0 2px 16px 2px rgba(0,0,0,0.85) !important;
+  border: 1px solid #222 !important;
+  background: #181a1b !important;
+}
+
+body.dark-theme .mat-mdc-dialog-container {
+  background: #181a1b !important;
+  box-shadow: 0 2px 16px 2px rgba(0,0,0,0.85) !important;
+  border: 1px solid #222 !important;
 }

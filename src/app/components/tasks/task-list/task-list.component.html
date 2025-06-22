@@ -1,12 +1,14 @@
 <!-- Filter and Sort Controls -->
 <div class="task-controls">
-  <input
-    type="text"
-    placeholder="Filter by description"
-    [(ngModel)]="filterText"
-    (input)="applyFiltersAndSorting()"
-  />
-  <button (click)="toggleSort()">
+  <mat-form-field appearance="outline">
+    <mat-label>Filter by description</mat-label>
+    <input
+      matInput
+      [(ngModel)]="filterText"
+      (input)="applyFiltersAndSorting()"
+    />
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="toggleSort()">
     Sort by Date: {{ sortDesc ? 'Newest' : 'Oldest' }}
   </button>
 </div>
@@ -23,7 +25,11 @@
 <!-- Tasks Table -->
 <table class="tasks-table">  <thead>
     <tr>
-      <th><input type="checkbox" (change)="toggleSelectAll($event)" [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0"></th> <!-- Added select-all checkbox -->
+      <th>
+        <mat-checkbox (change)="toggleSelectAll($event.checked)"
+                      [checked]="areAllTasksSelected() && filteredAndSortedTasks.length > 0">
+        </mat-checkbox>
+      </th> <!-- Added select-all checkbox -->
       <th class="priority-header" title="Drag & drop tasks to change priority">
         <div class="priority-header-content">
           <span>Priority</span>
@@ -71,7 +77,9 @@
         </div>
       </ng-template><td>
         <div class="drag-handle-container">
-          <input type="checkbox" [checked]="selectedTaskIds.has(task.id)" (change)="onTaskSelectionChange(task.id, $event)">
+          <mat-checkbox [checked]="selectedTaskIds.has(task.id)"
+                        (change)="onTaskSelectionChange(task.id, $event.checked)">
+          </mat-checkbox>
           <span class="drag-handle" *ngIf="task.completionStatus !== TaskStatus.Completed" title="Drag to reorder">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill="currentColor" d="M8 18h8v-2H8v2zm0-4h8v-2H8v2zm0-4h8V8H8v2zm-4 8h2V8H4v10z"/>
@@ -108,13 +116,22 @@
       <td>{{ (task.workIntervals === '∞' || task.workIntervals === '?') ? task.workIntervals : task.estimatedHours }}</td>
       <td>{{ task.workIntervals }}</td>
       <td>{{ task.completedIntervals }}</td>
-      <td>{{ task.completionStatus }}</td>
-      <td>
-        <span *ngIf="task.completionStatus !== TaskStatus.Completed && listType === 'active'" class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">✔️</span>
-        <span *ngIf="task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Edit" (click)="editTaskClicked(task)">✏️</span>
-        <span class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">🗑️</span>
-        <span *ngIf="listType === 'pending'" class="icon-btn" title="Move to Active List" (click)="moveToActiveClicked(task.id)">⬆️</span>
-        <span *ngIf="listType === 'active' && task.completionStatus !== TaskStatus.Completed" class="icon-btn" title="Move to Backlog" (click)="moveToBacklogClicked(task.id)">⬇️</span>
+      <td>{{ task.completionStatus }}</td>      <td>
+        <button *ngIf="task.completionStatus !== TaskStatus.Completed && listType === 'active'" mat-icon-button class="icon-btn" title="Complete Task" (click)="completeTaskClicked(task)">
+          <mat-icon>check_circle</mat-icon>
+        </button>
+        <button *ngIf="task.completionStatus !== TaskStatus.Completed" mat-icon-button class="icon-btn" title="Edit" (click)="editTaskClicked(task)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="icon-btn" title="Delete" (click)="deleteTaskClicked(task.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button *ngIf="listType === 'pending'" mat-icon-button class="icon-btn" title="Move to Active List" (click)="moveToActiveClicked(task.id)">
+          <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="listType === 'active' && task.completionStatus !== TaskStatus.Completed" mat-icon-button class="icon-btn" title="Move to Backlog" (click)="moveToBacklogClicked(task.id)">
+          <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
       </td>
     </tr>
     <tr *ngIf="filteredAndSortedTasks.length === 0">

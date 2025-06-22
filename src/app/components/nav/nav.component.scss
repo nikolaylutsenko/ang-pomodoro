@@ -1,77 +1,110 @@
-.main-nav {
+/* We'll use the breakpoints from material-theme.scss */
+
+:host {
+  flex-grow: 1; /* Allow app-nav to take available space in the mat-toolbar */
   display: flex;
+  justify-content: center; /* Center the child (mat-tab-nav-bar) within app-nav */
   align-items: center;
-  height: 100%;
-  flex: 1;
-  justify-content: center; // Center the nav element
-  overflow: hidden; // Add this to prevent overflow
+  width: 100%; /* Ensure it takes full width */
 }
 
-.nav-tabs {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 60px; // Set to exact header height of 60px
-  border-radius: 0;
-  overflow: hidden;
-  background: transparent;
-  justify-content: center; // Center the tabs
+mat-tab-nav-bar.desktop-tabs { // Applied to the <nav> element
+  width: auto; /* Let the tab bar be only as wide as its content */
+  // Remove the default bottom border from the tab bar if it interferes with card look
+  border-bottom: none !important;
+  display: flex; /* Ensure it's a flex container for tab links */
+  justify-content: center; /* Center the actual tab links (<a>) within the tab bar */
 }
 
-.nav-item {
-  display: flex;
-  height: 100%; // This will now be 60px based on parent
-  max-width: 180px; // Increased from 150px
-  min-width: 120px; // Increased from 100px
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
+a.mat-tab-link {
+  padding: 8px 16px; /* Adjust padding for card content */
+  opacity: 1; /* Make fully opaque to see background */
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0 1.25rem; // Increased horizontal padding from 1rem
-  height: 100%;
-  width: 100%;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border-bottom: 3px solid transparent;
-  text-align: center; // Center text
+  flex-grow: 0;
+  flex-shrink: 0;
+  border-radius: 2px; /* Rounded corners for cards - Reduced for flatter look */
+  margin: 4px 2px; /* Spacing between cards, reduced horizontal margin slightly */
+  background-color: #f0f0f0; /* Solid light grey fallback for default card background */
+  color: #333; /* Default text color for tabs */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); /* Refined shadow for card effect */
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1); /* Material-like transition */
 
   i {
-    font-size: 1rem;
+    margin-right: 8px;
   }
 
-  span {
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap; // Prevent text wrapping
-  }
-  &.active {
-    color: var(--color-text);
-    border-bottom-color: var(--color-primary);
-    background: var(--color-secondary);
-  }
-
-  &:hover:not(.active) {
-    background: var(--color-secondary);
-    color: var(--color-text);
+  // Remove the default Material tab indicator line
+  &::after {
+    display: none !important;
   }
 }
 
-@media (max-width: 768px) {
-  .nav-link {
-    padding: 0 0.5rem; // Further reduce padding on mobile
+a.mat-tab-link.mat-tab-label-active {
+  background-color: #007bff; /* Solid blue fallback for active card background */
+  color: white; /* White text for active card */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); /* More pronounced shadow for active card */
+}
 
-    span {
-      display: none;
-    }
+a.mat-tab-link:not(.mat-tab-label-active):hover {
+  background-color: #e9ecef; /* Solid light grey hover background */
+  color: #212529; /* Darker text on hover */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
 
-    i {
-      margin: 0;
-      font-size: 1.1rem;
+/* Hide labels on medium screens (icons only), tabs remain centered due to above rules */
+@media screen and (min-width: 600px) and (max-width: 959px) {
+  nav.desktop-tabs a.mat-tab-link i { /* Increased specificity */
+    margin-right: 0; /* Remove margin when label is hidden */
+  }
+  nav.desktop-tabs a.mat-tab-link span { /* Increased specificity */
+    display: none;
+  }
+  nav.desktop-tabs a.mat-tab-link { /* Increased specificity */
+    padding: 8px;
+    min-width: auto; /* Allow shrinking to icon size */
+  }
+}
+
+.mobile-menu-button-container {
+  display: none; /* Hidden by default on larger screens */
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0;
+
+  button {
+    width: 80%;
+    max-width: 200px;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+
+    .mat-icon {
+      margin-right: 8px;
     }
+  }
+}
+
+.active-mobile-link {
+  background-color: rgba(0, 0, 0, 0.1); // Style for active mobile menu items
+}
+
+.menu-icon {
+  margin-right: 8px;
+  width: 24px; /* Fixed width for icons */
+  text-align: center;
+}
+
+/* Mobile responsive design - Use Material Design breakpoint */
+@media screen and (max-width: 599px) {
+  nav.desktop-tabs {
+    display: none !important; /* Hide desktop tabs on small screens */
+  }
+
+  .mobile-menu-button-container {
+    display: flex !important; /* Show mobile menu button */
+  }
+
+  mat-tab-nav-panel {
+    margin-top: 8px; /* Add space below mobile menu button */
   }
 }

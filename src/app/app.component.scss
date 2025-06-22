@@ -37,24 +37,64 @@ header {
   }
 }
 
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem; // Adjust padding as needed
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo {
+  height: 40px;
+  width: auto;
+  transition: height 0.3s ease;
+
+  @media (max-width: 599px) {
+    height: 32px;
+  }
+}
+
+.version-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 9px;
+  padding: 1px 3px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 2px;
+
+  @media (max-width: 599px) {
+    font-size: 8px;
+    padding: 0 2px;
+  }
+}
+
 .theme-toggle {
   background: none;
   border: none;
   color: inherit;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
+  padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s;
+  width: 40px;
+  height: 40px;
+
   &:hover {
-    background-color: var(--color-secondary-dark);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   i {
-    font-size: 1.2rem;
+    font-size: 20px;
   }
 }
 
@@ -64,13 +104,45 @@ header {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1.5rem 1.5rem 1rem; /* Changed from 1.5rem to remove top padding */
+  // padding: 24px 16px;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: hidden; /* Prevent scrollbars by default */
-  background: transparent; /* Remove any background color */
-  box-shadow: none; /* Remove any shadow that might be creating the visual effect */
+  overflow-y: hidden;
+  box-sizing: border-box;
+  transition: padding 0.3s ease;
+
+  @media (max-width: 599px) {
+    padding: 16px 12px;
+  }
+
+  @media (min-width: 600px) and (max-width: 959px) {
+    padding: 20px 20px;
+  }
+}
+
+/* Responsive design adjustments */
+@media (max-width: 599px) {
+  mat-toolbar {
+    padding: 0 8px;
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+  }
+
+  .main-content {
+    padding: 8px;
+  }
+
+  .logo-container {
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .main-content {
+    padding: 20px;
+  }
 }
 
 /* Components rendered in router-outlet should handle their own scrolling if needed */
@@ -118,7 +190,6 @@ header {
   }
 }
 
-
 .app-title {
   text-align: center;
   padding: 10px 0;
@@ -131,4 +202,110 @@ header {
     margin-left: 5px;
     color: var(--secondary-text-color); /* Or a lighter color */
   }
+}
+
+.responsive-toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  padding: 0 16px;
+  transition: padding 0.3s ease;
+  .logo-container {
+    flex: 0 0 auto;
+    margin-right: 16px;
+  }
+
+  .create-task-btn {
+    flex: 0 0 auto;
+    margin-right: 16px;
+  }
+
+  .nav-flex-item {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .theme-toggle {
+    flex: 0 0 auto;
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 599px) {
+  .responsive-toolbar {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+
+    .logo-container {
+      flex: 1 0 auto;
+      order: 0;
+      margin-bottom: 0;
+      margin-right: 8px;
+    }
+
+    .nav-flex-item {
+      flex: 0 0 100%;
+      order: 2;
+      margin-top: 8px;
+    }
+
+    .theme-toggle {
+      flex: 0 0 auto;
+      order: 1;
+    }
+  }
+}
+
+.content-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-out;
+
+  @media (max-width: 599px) {
+    padding-bottom: 16px; /* Add some bottom padding on small screens */
+  }
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.create-task-btn {
+  margin: 0 1rem 0 0;
+  color: white !important;
+  font-weight: 500;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  transition: all 0.2s ease;
 }

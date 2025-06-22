@@ -3,12 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskStatus } from '../../../models/task.model';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
-import { CreateTaskComponent } from '../create-task/create-task.component'; // Import CreateTaskComponent
+import { CreateTaskComponent } from '../create-task/create-task.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, CreateTaskComponent], // Add CreateTaskComponent
+  imports: [
+    CommonModule,
+    FormsModule,
+    DragDropModule,
+    CreateTaskComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule
+  ],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -173,30 +188,25 @@ export class TaskListComponent implements OnChanges, OnInit, AfterViewInit {  @I
   }
 
   // Method to handle individual task selection
-  onTaskSelectionChange(taskId: string, event: Event): void {
-    const checkbox = event.target as HTMLInputElement;
-    if (checkbox.checked) {
+  onTaskSelectionChange(taskId: string, checked: boolean): void {
+    if (checked) {
       this.selectedTaskIds.add(taskId);
     } else {
       this.selectedTaskIds.delete(taskId);
     }
-    this.taskSelectionChanged.emit({ taskId, selected: checkbox.checked });
+    this.taskSelectionChanged.emit({ taskId, selected: checked });
   }
 
   // Method to toggle select all tasks in the current view
-  toggleSelectAll(event: Event): void {
-    const checkbox = event.target as HTMLInputElement;
+  toggleSelectAll(checked: boolean): void {
     const allVisibleTaskIds = this.filteredAndSortedTasks.map(t => t.id);
-    if (checkbox.checked) {
+    if (checked) {
       allVisibleTaskIds.forEach(id => this.selectedTaskIds.add(id));
     } else {
       allVisibleTaskIds.forEach(id => this.selectedTaskIds.delete(id));
     }
-    // Emit change for each task affected - or parent component can fetch all selected IDs
-    // For simplicity, we can let the parent re-evaluate its selectedActiveTaskIds if needed,
-    // or emit individual changes. Emitting individual changes:
     allVisibleTaskIds.forEach(id => {
-      this.taskSelectionChanged.emit({ taskId: id, selected: checkbox.checked });
+      this.taskSelectionChanged.emit({ taskId: id, selected: checked });
     });
   }
 

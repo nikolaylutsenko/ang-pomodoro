@@ -1,0 +1,149 @@
+// Material Design variables and utility classes
+// Note: The actual theming is done through the prebuilt theme in angular.json
+
+// Material Design breakpoints
+$mat-xs: 'screen and (max-width: 599px)';
+$mat-sm: 'screen and (min-width: 600px) and (max-width: 959px)';
+$mat-md: 'screen and (min-width: 960px) and (max-width: 1279px)';
+$mat-lg: 'screen and (min-width: 1280px) and (max-width: 1919px)';
+$mat-xl: 'screen and (min-width: 1920px)';
+
+// Responsive helpers
+.responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+
+  @media #{$mat-xs} {
+    padding: 8px;
+  }
+
+  @media #{$mat-sm} {
+    padding: 12px;
+  }
+}
+
+// Material component overrides for better responsive design
+.mat-mdc-card {
+  margin-bottom: 16px;
+
+  @media #{$mat-xs} {
+    margin-bottom: 8px;
+  }
+}
+
+.mat-toolbar {
+  flex-wrap: wrap;
+
+  @media #{$mat-xs} {
+    padding: 8px;
+  }
+}
+
+// Hide/show based on screen size
+.hide-xs {
+  @media #{$mat-xs} {
+    display: none !important;
+  }
+}
+
+.show-xs {
+  display: none !important;
+  @media #{$mat-xs} {
+    display: flex !important;
+  }
+}
+
+// Custom Material component styles
+.mat-toolbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 2;
+  position: relative;
+}
+
+.mat-card {
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 16px;
+}
+
+// Material button overrides for consistent button sizing
+.mat-button,
+.mat-flat-button,
+.mat-raised-button {
+  min-width: 88px;
+}
+
+// Responsive design helpers
+.full-width {
+  width: 100%;
+}
+
+// Material form overrides
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+// Responsive grid system
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+  width: 100%;
+
+  @media #{$mat-xs} {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  @media #{$mat-sm} {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 12px;
+  }
+}
+
+// Responsive grid items
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    grid-column: span $i;
+
+    @media #{$mat-xs} {
+      grid-column: span if($i > 4, 4, $i);
+    }
+
+    @media #{$mat-sm} {
+      grid-column: span if($i > 8, 8, $i);
+    }
+  }
+}
+
+// Responsive flex layout helpers
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media #{$mat-xs} {
+    gap: 8px;
+  }
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+@media #{$mat-xs} {
+  .flex-xs-column {
+    flex-direction: column;
+  }
+
+  .flex-xs-row {
+    flex-direction: row;
+  }
+}
