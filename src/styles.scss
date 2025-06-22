@@ -575,10 +575,17 @@ body.dark-theme .task-form-container .mat-mdc-form-field {
   --mdc-outlined-text-field-focus-label-text-color: #64b5f6;
 }
 
-/* Dark theme for textarea in create-task */
+/* Dark theme for input and textarea in create-task */
+body.dark-theme .task-form-container input,
 body.dark-theme .task-form-container textarea {
   background-color: transparent !important;
   color: #e0e0e0 !important;
+}
+
+body.dark-theme .task-form-container input::placeholder,
+body.dark-theme .task-form-container textarea::placeholder {
+  color: #b0b0b0 !important;
+  opacity: 1; /* Firefox applies a lower opacity by default */
 }
 
 /* Dark theme for Material button toggle group in create-task */
